@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import Navbar from "./components/shared/Navbar";
 import Home from "./pages/Home";
 import Personas from "./pages/Personas";
+import Clientes from "./pages/Clientes";
 import Login from "./pages/Login";
 import AcercaDe from "./pages/AcercaDe";
 import Footer from "./components/shared/Footer";
@@ -41,6 +42,10 @@ const App = () => {
           <Route
             path="/personas"
             element={user ? <Personas /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/clientes"
+            element={user ? <Clientes /> : <Navigate to="/login" />}
           />
           <Route
             path="/login"

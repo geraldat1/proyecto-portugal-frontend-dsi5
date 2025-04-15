@@ -29,6 +29,9 @@ const Navbar = () => {
             <Nav.Link as={Link} to="/personas">
               Personas
             </Nav.Link>
+            <Nav.Link as={Link} to="/clientes">
+              Clientes
+            </Nav.Link>
           </Nav>
 
           {user && (

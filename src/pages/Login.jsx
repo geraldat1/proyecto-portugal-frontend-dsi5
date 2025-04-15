@@ -7,8 +7,8 @@ import { Form, Button, Alert, Card } from "react-bootstrap";
 
 const Login = () => {
   const { setUser } = useContext(AuthContext);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [correo, setEmail] = useState("");
+  const [clave, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
@@ -17,8 +17,8 @@ const Login = () => {
 
     try {
       const res = await axios.post("http://localhost:3001/api/v1/login", {
-        email,
-        password,
+        correo,
+        clave,
       });
 
       const token = res.data.token;
@@ -48,7 +48,7 @@ const Login = () => {
               <Form.Control
                 type="email"
                 placeholder="Ingresa tu email"
-                value={email}
+                value={correo}
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
@@ -58,7 +58,7 @@ const Login = () => {
               <Form.Control
                 type="password"
                 placeholder="Ingresa tu contraseña"
-                value={password}
+                value={clave}
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
