@@ -26,11 +26,15 @@ const Navbar = () => {
             <Nav.Link as={Link} to="/">
               Inicio
             </Nav.Link>
-            <Nav.Link as={Link} to="/personas">
-              Personas
-            </Nav.Link>
+           
             <Nav.Link as={Link} to="/clientes">
               Clientes
+            </Nav.Link>
+            <Nav.Link as={Link} to="/entrenadores">
+              Entrenadores
+            </Nav.Link>
+            <Nav.Link as={Link} to="/rutinas">
+              Rutinas
             </Nav.Link>
           </Nav>
 

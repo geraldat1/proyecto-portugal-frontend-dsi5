@@ -2,14 +2,14 @@ import React, { useState } from "react";
 import { Table, Button, Pagination } from "react-bootstrap";
 import Swal from "sweetalert2";
 
-const ClienteList = ({ clientes, seleccionar, eliminar }) => {
+const EntrenadorList = ({ entrenadores, seleccionar, eliminar }) => {
   const [paginaActual, setPaginaActual] = useState(1);
   const elementosPorPagina = 5;
 
-  const totalPaginas = Math.ceil(clientes.length / elementosPorPagina);
+  const totalPaginas = Math.ceil(entrenadores.length / elementosPorPagina);
   const indiceInicio = (paginaActual - 1) * elementosPorPagina;
   const indiceFinal = indiceInicio + elementosPorPagina;
-  const clientesPaginados = clientes.slice(indiceInicio, indiceFinal);
+  const entrendoresPaginados = entrenadores.slice(indiceInicio, indiceFinal);
 
   const confirmarEliminacion = (id) => {
     Swal.fire({
@@ -68,27 +68,25 @@ const ClienteList = ({ clientes, seleccionar, eliminar }) => {
         <thead>
           <tr>
             <th>ID</th>
-            <th>Dni</th>
             <th>Nombre</th>
+            <th>Apellido</th>
             <th>Telefono</th>
+            <th>Correo</th>
             <th>Direccion</th>
-            <th>Fecha</th>
             <th>Estado</th>
-            <th>ID User</th>
             <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
-          {clientesPaginados.map((p) => (
+          {entrendoresPaginados.map((p) => (
             <tr key={p.id}>
               <td>{p.id}</td>
-              <td>{p.dni}</td>
               <td>{p.nombre}</td>
+              <td>{p.apellido}</td>
               <td>{p.telefono}</td>
+              <td>{p.correo}</td>
               <td>{p.direccion}</td>
-              <td>{p.fecha}</td>
               <td>{p.estado}</td>
-              <td>{p.id_user}</td>
               <td>
                 <Button variant="warning" onClick={() => seleccionar(p)}>
                   Editar
@@ -113,4 +111,4 @@ const ClienteList = ({ clientes, seleccionar, eliminar }) => {
   );
 };
 
-export default ClienteList;
+export default EntrenadorList;

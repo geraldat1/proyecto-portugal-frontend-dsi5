@@ -49,7 +49,7 @@ const Clientes = () => {
       className="mb-3" 
       variant="primary"
        onClick={() => {
-       seleccionarCliente(null);
+       setClienteSeleccionado(null);
        setMostrarModal(true);
       }
       }

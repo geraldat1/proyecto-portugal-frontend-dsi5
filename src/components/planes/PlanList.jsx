@@ -2,14 +2,14 @@ import React, { useState } from "react";
 import { Table, Button, Pagination } from "react-bootstrap";
 import Swal from "sweetalert2";
 
-const ClienteList = ({ clientes, seleccionar, eliminar }) => {
+const PlanList = ({ planes, seleccionar, eliminar }) => {
   const [paginaActual, setPaginaActual] = useState(1);
   const elementosPorPagina = 5;
 
-  const totalPaginas = Math.ceil(clientes.length / elementosPorPagina);
+  const totalPaginas = Math.ceil(planes.length / elementosPorPagina);
   const indiceInicio = (paginaActual - 1) * elementosPorPagina;
   const indiceFinal = indiceInicio + elementosPorPagina;
-  const clientesPaginados = clientes.slice(indiceInicio, indiceFinal);
+  const planesPaginadas = planes.slice(indiceInicio, indiceFinal);
 
   const confirmarEliminacion = (id) => {
     Swal.fire({
@@ -68,27 +68,29 @@ const ClienteList = ({ clientes, seleccionar, eliminar }) => {
         <thead>
           <tr>
             <th>ID</th>
-            <th>Dni</th>
-            <th>Nombre</th>
-            <th>Telefono</th>
-            <th>Direccion</th>
-            <th>Fecha</th>
+            <th>Plan</th>
+            <th>Descripcion</th>
+            <th>Precio del Plan</th>
+            <th>Condicion</th>
+            <th>Imagen</th>
             <th>Estado</th>
             <th>ID User</th>
+
             <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
-          {clientesPaginados.map((p) => (
+          {planesPaginadas.map((p) => (
             <tr key={p.id}>
               <td>{p.id}</td>
-              <td>{p.dni}</td>
-              <td>{p.nombre}</td>
-              <td>{p.telefono}</td>
-              <td>{p.direccion}</td>
-              <td>{p.fecha}</td>
+              <td>{p.plan}</td>
+              <td>{p.descripcion}</td>
+              <td>{p.precio_plan}</td>
+              <td>{p.condicion}</td>
+              <td>{p.imagen}</td>
               <td>{p.estado}</td>
               <td>{p.id_user}</td>
+
               <td>
                 <Button variant="warning" onClick={() => seleccionar(p)}>
                   Editar
@@ -113,4 +115,4 @@ const ClienteList = ({ clientes, seleccionar, eliminar }) => {
   );
 };
 
-export default ClienteList;
+export default PersonaList;

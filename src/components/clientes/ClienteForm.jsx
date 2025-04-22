@@ -3,20 +3,18 @@ import { Modal, Button, Form } from "react-bootstrap";
 import Swal from "sweetalert2"; // opcional para mostrar errores visualmente
 
 const ClienteForm = ({ show, handleClose, agregar, actualizar, clienteSeleccionado }) => {
-
-const [dni, setDni] = useState("");
-const [nombre, setNombre] = useState("");
-const [telefono, setTelefono] = useState("");
-const [direccion, setDireccion] = useState("");
-const [fecha, setFecha] = useState("");
-const [estado, setEstado] = useState("");
-const [id_user, setIdUser] = useState("");
-
-const [errores, setErrores] = useState({});
+  const [dni, setDni] = useState("");
+  const [nombre, setNombre] = useState("");
+  const [telefono, setTelefono] = useState("");
+  const [direccion, setDireccion] = useState("");
+  const [fecha, setFecha] = useState("");
+  const [estado, setEstado] = useState("");
+  const [id_user, setIdUser] = useState("");
+  const [errores, setErrores] = useState({});
 
   useEffect(() => {
     if (clienteSeleccionado) {
-        setDni(clienteSeleccionado.dni);  
+      setDni(clienteSeleccionado.dni);
       setNombre(clienteSeleccionado.nombre);
       setTelefono(clienteSeleccionado.telefono);
       setDireccion(clienteSeleccionado.direccion);
@@ -35,8 +33,7 @@ const [errores, setErrores] = useState({});
     setErrores({});
   }, [clienteSeleccionado]);
 
-//   validacion de campos
-const validar = () => {
+  const validar = () => {
     const nuevosErrores = {};
   
     if (!dni.trim()) {
@@ -62,22 +59,24 @@ const validar = () => {
     if (!fecha.trim()) {
       nuevosErrores.fecha = "La fecha es obligatoria";
     } else if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha)) {
-      nuevosErrores.fecha = "La fecha debe tener el formato AAAA-MM-DD";
+      nuevosErrores.fecha = "La fecha debe estar en formato AAAA-MM-DD";
     }
   
-    if (!estado.trim()) {
+    if (!estado.toString().trim()) {
       nuevosErrores.estado = "El estado es obligatorio";
+    } else if (isNaN(estado) || (estado !== "0" && estado !== "1" && estado !== 0 && estado !== 1)) {
+      nuevosErrores.estado = "El estado debe ser 0 (inactivo) o 1 (activo)";
     }
-
-    if (!id_user.trim()) {
-      nuevosErrores.estado = "El id del user es obligatorio";
+  
+    if (!id_user.toString().trim()) {
+      nuevosErrores.id_user = "El ID de usuario es obligatorio";
+    } else if (isNaN(id_user) || parseInt(id_user) <= 0) {
+      nuevosErrores.id_user = "El ID de usuario debe ser un número válido y mayor a 0";
     }
   
     setErrores(nuevosErrores);
     return Object.keys(nuevosErrores).length === 0;
   };
-  
-// termina la validacion
 
   const manejarEnvio = (e) => {
     e.preventDefault();
@@ -87,7 +86,7 @@ const validar = () => {
       return;
     }
 
-    const nuevoCliente= { dni, nombre, telefono, direccion, fecha, estado };
+    const nuevoCliente = { dni, nombre, telefono, direccion, fecha, estado: parseInt(estado), id_user: parseInt(id_user)};
 
     if (clienteSeleccionado) {
       actualizar(clienteSeleccionado.id, nuevoCliente);
@@ -95,13 +94,14 @@ const validar = () => {
       agregar(nuevoCliente);
     }
 
-      setDni("");
-      setNombre("");
-      setTelefono("");
-      setDireccion("");
-      setFecha("");
-      setEstado("");
-      setIdUser("");
+    setDni("");
+    setNombre("");
+    setTelefono("");
+    setDireccion("");
+    setFecha("");
+    setEstado("");
+    setIdUser("");
+
     setErrores({});
     handleClose(); // cerrar modal luego de enviar
   };
@@ -139,7 +139,7 @@ const validar = () => {
           <Form.Group className="mb-3">
             <Form.Label>Telefono</Form.Label>
             <Form.Control
-              type="number"
+              type="text"
               value={telefono}
               onChange={(e) => setTelefono(e.target.value)}
               isInvalid={!!errores.telefono}
@@ -172,7 +172,7 @@ const validar = () => {
           <Form.Group className="mb-3">
             <Form.Label>Estado</Form.Label>
             <Form.Control
-              type="text"
+              type="number"
               value={estado}
               onChange={(e) => setEstado(e.target.value)}
               isInvalid={!!errores.estado}
@@ -181,9 +181,9 @@ const validar = () => {
           </Form.Group>
 
           <Form.Group className="mb-3">
-            <Form.Label>Id del Usuario</Form.Label>
+            <Form.Label>ID User</Form.Label>
             <Form.Control
-              type="text"
+              type="number"
               value={id_user}
               onChange={(e) => setIdUser(e.target.value)}
               isInvalid={!!errores.id_user}
