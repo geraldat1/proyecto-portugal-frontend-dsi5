@@ -10,7 +10,7 @@ const AcercaDe = () => {
           <img
             className="d-block w-100"
             src="/imagenes/dsi5pucallpa.jpg"
-            alt="Alumno 1"
+            alt="Pucallpa"
             style={{ height: "400px", objectFit: "cover" }}
           />
           <Carousel.Caption>
@@ -25,7 +25,7 @@ const AcercaDe = () => {
           <img
             className="d-block w-100"
             src="/imagenes/dsi5aguaytia.jpg"
-            alt="Alumno 2"
+            alt="Aguaytia"
             style={{ height: "400px", objectFit: "cover" }}
           />
           <Carousel.Caption>

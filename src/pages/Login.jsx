@@ -44,7 +44,7 @@ const Login = () => {
           {message && <Alert variant="info">{message}</Alert>}
           <Form onSubmit={handleSubmit}>
             <Form.Group className="mb-3">
-              <Form.Label>Email:</Form.Label>
+              <Form.Label>Correo:</Form.Label>
               <Form.Control
                 type="email"
                 placeholder="Ingresa tu email"

@@ -1,15 +1,15 @@
 import React, { useState } from "react";
-import { Card, Button, Pagination, Row, Col } from "react-bootstrap";
+import { Table, Button, Pagination } from "react-bootstrap";
 import Swal from "sweetalert2";
 
-const PlanList = ({ planes, seleccionar, eliminar }) => {
+const UsuarioList = ({ usuarios, seleccionar, eliminar }) => {
   const [paginaActual, setPaginaActual] = useState(1);
   const elementosPorPagina = 5;
 
-  const totalPaginas = Math.ceil(planes.length / elementosPorPagina);
+  const totalPaginas = Math.ceil(usuarios.length / elementosPorPagina);
   const indiceInicio = (paginaActual - 1) * elementosPorPagina;
   const indiceFinal = indiceInicio + elementosPorPagina;
-  const planesPaginadas = planes.slice(indiceInicio, indiceFinal);
+  const usuariosPaginados = usuarios.slice(indiceInicio, indiceFinal);
 
   const confirmarEliminacion = (id) => {
     Swal.fire({
@@ -64,36 +64,42 @@ const PlanList = ({ planes, seleccionar, eliminar }) => {
 
   return (
     <>
-      <Row xs={1} md={2} lg={3} className="g-4">
-        {planesPaginadas.map((p) => (
-          <Col key={p.id}>
-            <Card>
-              {p.imagen && (
-                <Card.Img variant="top" src={p.imagen} alt={p.plan} />
-              )}
-              <Card.Body>
-                <Card.Title>{p.plan}</Card.Title>
-                <Card.Text>
-                  <strong>ID:</strong> {p.id} <br />
-                  <strong>Descripcion:</strong> {p.descripcion} <br />
-                  <strong>Precio del Plan:</strong> {p.precio_plan} <br />
-                  <strong>Condicion:</strong> {p.condicion} <br />
-                  <strong>Estado:</strong> {p.estado} <br />
-                  <strong>ID User:</strong> {p.id_user}
-                </Card.Text>
-                <Button variant="warning" onClick={() => seleccionar(p)} className="me-2">
+      <Table striped bordered hover>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Usuario</th>
+            <th>Nombre</th>
+            <th>Correo</th>
+            <th>Clave</th>
+            <th>Telefono</th>
+            <th>Foto</th>
+            <th>Rol</th>
+            <th>Fecha</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {usuariosPaginados.map((p) => (
+            <tr key={p.id}>
+              <td>{p.id}</td>
+              <td>{p.nombre}</td>
+              <td>{p.edad} años</td>
+              <td>
+                <Button variant="warning" onClick={() => seleccionar(p)}>
                   Editar
-                </Button>
+                </Button>{" "}
                 <Button variant="danger" onClick={() => confirmarEliminacion(p.id)}>
                   Eliminar
                 </Button>
-              </Card.Body>
-            </Card>
-          </Col>
-        ))}
-      </Row>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
 
-      <Pagination className="justify-content-center mt-4">
+      <Pagination className="justify-content-center">
         <Pagination.First onClick={irPrimeraPagina} disabled={paginaActual === 1} />
         <Pagination.Prev onClick={irAnterior} disabled={paginaActual === 1} />
         {obtenerItemsPaginacion()}
@@ -104,4 +110,4 @@ const PlanList = ({ planes, seleccionar, eliminar }) => {
   );
 };
 
-export default PlanList;
+export default UsuarioList;

@@ -5,6 +5,9 @@ import Home from "./pages/Home";
 import Rutinas from "./pages/Rutinas";
 import Clientes from "./pages/Clientes";
 import Entrenadores from "./pages/Entrenadores";
+import Planes from "./pages/Planes";
+import Configuracion from "./pages/Configuraciones";
+import Usuarios from "./pages/Usuarios";
 import Login from "./pages/Login";
 import AcercaDe from "./pages/AcercaDe";
 import Footer from "./components/shared/Footer";
@@ -52,6 +55,18 @@ const App = () => {
           <Route
             path="/rutinas"
             element={user ? <Rutinas /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/planes"
+            element={user ? <Planes /> : <Navigate to="/login" />}
+          />
+           <Route
+            path="/configuracion"
+            element={user ? <Configuracion /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/usuarios"
+            element={user ? <Usuarios /> : <Navigate to="/login" />}
           />
           <Route
             path="/login"

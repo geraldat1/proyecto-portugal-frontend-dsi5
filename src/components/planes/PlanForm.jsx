@@ -21,8 +21,8 @@ const PlanForm = ({ show, handleClose, agregar, actualizar, planSeleccionado }) 
       setPrecioPlan(planSeleccionado.precio_plan);
       setCondicion(planSeleccionado.condicion);
       setImagen(planSeleccionado.imagen);
-      setEstado(planSeleccionado.estado);
-      setIdUser(planSeleccionado.id_user);
+      setEstado(planSeleccionado.estado?.toString() || "");
+      setIdUser(planSeleccionado.id_user?.toString() || "");
 
     } else {
       setPlan("");
@@ -46,7 +46,7 @@ const PlanForm = ({ show, handleClose, agregar, actualizar, planSeleccionado }) 
     }
     if (!condicion.trim()) nuevosErrores.condicion = "La condición es obligatoria";
     if (!imagen.trim()) nuevosErrores.imagen = "La URL de la imagen es obligatoria";
-    if (!estado.trim()) nuevosErrores.estado = "El estado es obligatorio";
+    if (!String(estado).trim()) nuevosErrores.estado = "El estado es obligatorio";
     if (!id_user.trim()) nuevosErrores.id_user = "El ID del usuario es obligatorio";
   
     setErrores(nuevosErrores);

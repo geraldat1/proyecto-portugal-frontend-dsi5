@@ -36,6 +36,9 @@ const Navbar = () => {
             <Nav.Link as={Link} to="/rutinas">
               Rutinas
             </Nav.Link>
+            <Nav.Link as={Link} to="/planes">
+              Planes
+            </Nav.Link>
           </Nav>
 
           {user && (
@@ -48,6 +51,12 @@ const Navbar = () => {
               <Dropdown.Menu>
                 <Dropdown.Item as={Link} to="/acercade">
                   Acerca de Mi APP
+                </Dropdown.Item>
+                <Dropdown.Item as={Link} to="/configuracion">
+                  Configuracion
+                </Dropdown.Item>
+                <Dropdown.Item as={Link} to="/usuarios">
+                    Usuarios
                 </Dropdown.Item>
                 <Dropdown.Item
                   onClick={() => alert("Funcionalidad aún no implementada")}
