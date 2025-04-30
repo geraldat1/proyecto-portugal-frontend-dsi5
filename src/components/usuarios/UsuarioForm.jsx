@@ -42,12 +42,44 @@ const UsuarioForm = ({ show, handleClose, agregar, actualizar, usuarioSelecciona
 
   const validar = () => {
     const nuevosErrores = {};
+  
+    if (!usuario.trim()) nuevosErrores.usuario = "El usuario es obligatorio";
     if (!nombre.trim()) nuevosErrores.nombre = "El nombre es obligatorio";
-    if (!edad || isNaN(edad) || edad <= 0) nuevosErrores.edad = "La edad debe ser un número válido";
-
+  
+    if (!correo.trim()) {
+      nuevosErrores.correo = "El correo es obligatorio";
+    } else if (!/\S+@\S+\.\S+/.test(correo)) {
+      nuevosErrores.correo = "El correo no es válido";
+    }
+  
+    if (!clave.trim()) nuevosErrores.clave = "La clave es obligatoria";
+  
+    if (!telefono.trim()) {
+      nuevosErrores.telefono = "El teléfono es obligatorio";
+    } else if (!/^\d+$/.test(telefono)) {
+      nuevosErrores.telefono = "El teléfono debe contener solo números";
+    }
+  
+    if (!foto.trim()) nuevosErrores.foto = "La URL de la foto es obligatoria";
+  
+    if (!rol.trim()) nuevosErrores.rol = "El rol es obligatorio";
+  
+    if (!fecha.trim()) {
+      nuevosErrores.fecha = "La fecha es obligatoria";
+    } else if (isNaN(Date.parse(fecha))) {
+      nuevosErrores.fecha = "La fecha no es válida";
+    }
+  
+    if (estado === "") {
+      nuevosErrores.estado = "El estado es obligatorio";
+    } else if (isNaN(estado) || estado < 0 || estado > 1) {
+      nuevosErrores.estado = "El estado debe ser 0 (inactivo) o 1 (activo)";
+    }
+  
     setErrores(nuevosErrores);
     return Object.keys(nuevosErrores).length === 0;
   };
+  
 
   const manejarEnvio = (e) => {
     e.preventDefault();

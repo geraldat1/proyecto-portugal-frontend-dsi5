@@ -135,15 +135,26 @@ const PlanForm = ({ show, handleClose, agregar, actualizar, planSeleccionado }) 
           </Form.Group>
 
           <Form.Group className="mb-3">
-            <Form.Label>Imagen</Form.Label>
-            <Form.Control
-              type="text"
-              value={imagen}
-              onChange={(e) => setImagen(e.target.value)}
-              isInvalid={!!errores.imagen}
-            />
-            <Form.Control.Feedback type="invalid">{errores.imagen}</Form.Control.Feedback>
-          </Form.Group>
+          <Form.Label>Imagen</Form.Label>
+          <Form.Control
+            type="img"
+            value={imagen}
+            onChange={(e) => setImagen(e.target.value)}
+            isInvalid={!!errores.imagen}
+          />
+          <Form.Control.Feedback type="invalid">{errores.imagen}</Form.Control.Feedback>
+
+          {imagen && (
+            <div className="text-center mt-2">
+              <img
+                src={imagen}
+                alt="Vista previa"
+                style={{ maxWidth: "100%", maxHeight: "200px", objectFit: "contain" }}
+              />
+            </div>
+          )}
+        </Form.Group>
+
 
           <Form.Group className="mb-3">
             <Form.Label>Estado</Form.Label>

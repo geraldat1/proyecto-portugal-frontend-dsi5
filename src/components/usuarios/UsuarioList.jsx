@@ -34,7 +34,6 @@ const UsuarioList = ({ usuarios, seleccionar, eliminar }) => {
   const irAnterior = () => setPaginaActual((prev) => Math.max(prev - 1, 1));
   const irSiguiente = () => setPaginaActual((prev) => Math.min(prev + 1, totalPaginas));
 
-  // Calcular el rango de páginas a mostrar
   const obtenerItemsPaginacion = () => {
     const paginas = [];
 
@@ -64,7 +63,7 @@ const UsuarioList = ({ usuarios, seleccionar, eliminar }) => {
 
   return (
     <>
-      <Table striped bordered hover>
+      <Table striped bordered hover responsive>
         <thead>
           <tr>
             <th>ID</th>
@@ -72,7 +71,7 @@ const UsuarioList = ({ usuarios, seleccionar, eliminar }) => {
             <th>Nombre</th>
             <th>Correo</th>
             <th>Clave</th>
-            <th>Telefono</th>
+            <th>Teléfono</th>
             <th>Foto</th>
             <th>Rol</th>
             <th>Fecha</th>
@@ -84,13 +83,35 @@ const UsuarioList = ({ usuarios, seleccionar, eliminar }) => {
           {usuariosPaginados.map((p) => (
             <tr key={p.id}>
               <td>{p.id}</td>
+              <td>{p.usuario}</td>
               <td>{p.nombre}</td>
-              <td>{p.edad} años</td>
+              <td>{p.correo}</td>
+              <td>{p.clave}</td>
+              <td>{p.telefono}</td>
               <td>
-                <Button variant="warning" onClick={() => seleccionar(p)}>
+                {p.foto ? (
+                  <img src={p.foto} alt="foto" width="40" height="40" />
+                ) : (
+                  "Sin foto"
+                )}
+              </td>
+              <td>{p.rol}</td>
+              <td>{p.fecha}</td>
+              <td>{p.estado}</td>
+              <td>
+                <Button
+                  variant="warning"
+                  size="sm"
+                  onClick={() => seleccionar(p)}
+                  className="me-2"
+                >
                   Editar
-                </Button>{" "}
-                <Button variant="danger" onClick={() => confirmarEliminacion(p.id)}>
+                </Button>
+                <Button
+                  variant="danger"
+                  size="sm"
+                  onClick={() => confirmarEliminacion(p.id)}
+                >
                   Eliminar
                 </Button>
               </td>
