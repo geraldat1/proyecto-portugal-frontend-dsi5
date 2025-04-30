@@ -39,6 +39,9 @@ const Navbar = () => {
             <Nav.Link as={Link} to="/planes">
               Planes
             </Nav.Link>
+            <Nav.Link as={Link} to="/detalleplanes">
+              Detalle planes
+            </Nav.Link>
           </Nav>
 
           {user && (
