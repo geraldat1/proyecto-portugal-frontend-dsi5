@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
-import Swal from "sweetalert2"; // opcional para mostrar errores visualmente
+import Swal from "sweetalert2";
 
 const EntrenadorForm = ({ show, handleClose, agregar, actualizar, entrenadorSeleccionado }) => {
   const [nombre, setNombre] = useState("");
@@ -9,7 +9,6 @@ const EntrenadorForm = ({ show, handleClose, agregar, actualizar, entrenadorSele
   const [correo, setCorreo] = useState("");
   const [direccion, setDireccion] = useState("");
   const [estado, setEstado] = useState("");
-
   const [errores, setErrores] = useState({});
 
   useEffect(() => {
@@ -34,21 +33,24 @@ const EntrenadorForm = ({ show, handleClose, agregar, actualizar, entrenadorSele
   const validar = () => {
     const nuevosErrores = {};
 
-    // Validación de nombre
-    if (!nombre.trim()) nuevosErrores.nombre = "El nombre es obligatorio";
-    
-    // Validación de apellido
-    if (!apellido.trim()) nuevosErrores.apellido = "El apellido es obligatorio";
-    
-    // Validación de teléfono
-    const telefonoRegex = /^[0-9]{9}$/;  // Se asume que el teléfono tiene 9 dígitos
-    if (!telefono.trim()) {
-      nuevosErrores.telefono = "El teléfono es obligatorio";
-    } else if (!telefonoRegex.test(telefono)) {
-      nuevosErrores.telefono = "El teléfono debe ser un número de 9 dígitos";
+    if (!nombre.trim()) {
+      nuevosErrores.nombre = "El nombre es obligatorio";
+    } else if (!/^[a-zA-ZÁÉÍÓÚáéíóúÑñ\s]+$/.test(nombre)) {
+      nuevosErrores.nombre = "El nombre solo debe contener letras y espacios";
     }
 
-    // Validación de correo
+    if (!apellido.trim()) {
+      nuevosErrores.apellido = "El apellido es obligatorio";
+    } else if (!/^[a-zA-ZÁÉÍÓÚáéíóúÑñ\s]+$/.test(apellido)) {
+      nuevosErrores.apellido = "El apellido solo debe contener letras y espacios";
+    }
+
+    if (!telefono.trim()) {
+      nuevosErrores.telefono = "El teléfono es obligatorio";
+    } else if (!/^\d{9}$/.test(telefono)) {
+      nuevosErrores.telefono = "El teléfono debe tener exactamente 9 dígitos numéricos";
+    }
+
     const correoRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!correo.trim()) {
       nuevosErrores.correo = "El correo es obligatorio";
@@ -56,15 +58,7 @@ const EntrenadorForm = ({ show, handleClose, agregar, actualizar, entrenadorSele
       nuevosErrores.correo = "El correo no tiene un formato válido";
     }
 
-    // Validación de dirección
     if (!direccion.trim()) nuevosErrores.direccion = "La dirección es obligatoria";
-    
-    // Validación de estado
-    if (!estado.toString().trim()) {
-      nuevosErrores.estado = "El estado es obligatorio";
-    } else if (isNaN(estado) || (estado !== "0" && estado !== "1" && estado !== 0 && estado !== 1)) {
-      nuevosErrores.estado = "El estado debe ser 0 (inactivo) o 1 (activo)";
-    }
 
     setErrores(nuevosErrores);
     return Object.keys(nuevosErrores).length === 0;
@@ -73,15 +67,17 @@ const EntrenadorForm = ({ show, handleClose, agregar, actualizar, entrenadorSele
   const manejarEnvio = (e) => {
     e.preventDefault();
     if (!validar()) {
-      // Opcional: mostrar alerta si hay errores
       Swal.fire("Campos inválidos", "Por favor revisa los datos ingresados", "error");
       return;
     }
 
-    const nuevoEntrenador = { nombre, apellido, telefono, correo, direccion, estado: parseInt(estado) };
+    const nuevoEntrenador = { nombre, apellido, telefono, correo, direccion};
 
     if (entrenadorSeleccionado) {
-      actualizar(entrenadorSeleccionado.id, nuevoEntrenador);
+      actualizar(entrenadorSeleccionado.id,{
+        ...nuevoEntrenador,
+        estado: parseInt(estado) 
+      });
     } else {
       agregar(nuevoEntrenador);
     }
@@ -94,7 +90,7 @@ const EntrenadorForm = ({ show, handleClose, agregar, actualizar, entrenadorSele
     setEstado("");
 
     setErrores({});
-    handleClose(); // cerrar modal luego de enviar
+    handleClose();
   };
 
   return (
@@ -110,7 +106,7 @@ const EntrenadorForm = ({ show, handleClose, agregar, actualizar, entrenadorSele
             <Form.Control
               type="text"
               value={nombre}
-              onChange={(e) => setNombre(e.target.value)}
+              onChange={(e) => setNombre(e.target.value.replace(/[^a-zA-ZÁÉÍÓÚáéíóúÑñ\s]/g, ""))}
               isInvalid={!!errores.nombre}
             />
             <Form.Control.Feedback type="invalid">{errores.nombre}</Form.Control.Feedback>
@@ -121,18 +117,18 @@ const EntrenadorForm = ({ show, handleClose, agregar, actualizar, entrenadorSele
             <Form.Control
               type="text"
               value={apellido}
-              onChange={(e) => setApellido(e.target.value)}
+              onChange={(e) => setApellido(e.target.value.replace(/[^a-zA-ZÁÉÍÓÚáéíóúÑñ\s]/g, ""))}
               isInvalid={!!errores.apellido}
             />
             <Form.Control.Feedback type="invalid">{errores.apellido}</Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group className="mb-3">
-            <Form.Label>Telefono</Form.Label>
+            <Form.Label>Teléfono</Form.Label>
             <Form.Control
               type="text"
               value={telefono}
-              onChange={(e) => setTelefono(e.target.value)}
+              onChange={(e) => setTelefono(e.target.value.replace(/\D/g, "").slice(0, 9))}
               isInvalid={!!errores.telefono}
             />
             <Form.Control.Feedback type="invalid">{errores.telefono}</Form.Control.Feedback>
@@ -141,7 +137,7 @@ const EntrenadorForm = ({ show, handleClose, agregar, actualizar, entrenadorSele
           <Form.Group className="mb-3">
             <Form.Label>Correo</Form.Label>
             <Form.Control
-              type="text"
+              type="email"
               value={correo}
               onChange={(e) => setCorreo(e.target.value)}
               isInvalid={!!errores.correo}
@@ -150,7 +146,7 @@ const EntrenadorForm = ({ show, handleClose, agregar, actualizar, entrenadorSele
           </Form.Group>
 
           <Form.Group className="mb-3">
-            <Form.Label>Direccion</Form.Label>
+            <Form.Label>Dirección</Form.Label>
             <Form.Control
               type="text"
               value={direccion}
@@ -160,16 +156,14 @@ const EntrenadorForm = ({ show, handleClose, agregar, actualizar, entrenadorSele
             <Form.Control.Feedback type="invalid">{errores.direccion}</Form.Control.Feedback>
           </Form.Group>
 
+          {entrenadorSeleccionado && (
+            <>
           <Form.Group className="mb-3">
             <Form.Label>Estado</Form.Label>
-            <Form.Control
-              type="number"
-              value={estado}
-              onChange={(e) => setEstado(e.target.value)}
-              isInvalid={!!errores.estado}
-            />
-            <Form.Control.Feedback type="invalid">{errores.estado}</Form.Control.Feedback>
+            <Form.Control type="text" value={estado} disabled />
           </Form.Group>
+          </>
+            )}
 
           <Button variant="primary" type="submit">
             {entrenadorSeleccionado ? "Actualizar" : "Agregar"}

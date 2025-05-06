@@ -70,7 +70,7 @@ const RutinaList = ({ rutinas, seleccionar, eliminar }) => {
             <th>ID</th>
             <th>Dia</th>
             <th>Descripcion</th>
-            <th>Id del Usuario</th>
+            <th>ID User</th>
             <th>Estado</th>
             <th>Acciones</th>
           </tr>
@@ -82,7 +82,7 @@ const RutinaList = ({ rutinas, seleccionar, eliminar }) => {
               <td>{p.dia}</td>
               <td>{p.descripcion}</td>
               <td>{p.id_user}</td>
-              <td>{p.estado}</td>
+              <td>{p.estado === 1 ? "Activo" : "Inactivo"}</td>
               <td>
                 <Button variant="warning" onClick={() => seleccionar(p)}>
                   Editar

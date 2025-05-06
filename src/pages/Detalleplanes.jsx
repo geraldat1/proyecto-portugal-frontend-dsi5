@@ -44,7 +44,7 @@ const Detalleplanes = () => {
 
   return (
     <div>
-      <h2>Gestión de detalleplanes</h2>
+      <h2>Gestión Detallada de los planes</h2>
       <Button 
       className="mb-3" 
       variant="primary"
@@ -53,7 +53,7 @@ const Detalleplanes = () => {
        setMostrarModal(true);
       }
       }
-       >Agregar Detalleplan</Button>
+       >Agregar Detalle del plan</Button>
 
       <DetalleplanesList detalleplanes={detalleplanes} seleccionar={seleccionarDetalleplan} eliminar={eliminar} />
       <DetalleplanesForm

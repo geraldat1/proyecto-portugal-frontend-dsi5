@@ -34,10 +34,8 @@ const ClienteList = ({ clientes, seleccionar, eliminar }) => {
   const irAnterior = () => setPaginaActual((prev) => Math.max(prev - 1, 1));
   const irSiguiente = () => setPaginaActual((prev) => Math.min(prev + 1, totalPaginas));
 
-  // Calcular el rango de páginas a mostrar
   const obtenerItemsPaginacion = () => {
     const paginas = [];
-
     let inicio = Math.max(paginaActual - 2, 1);
     let fin = Math.min(paginaActual + 2, totalPaginas);
 
@@ -68,10 +66,10 @@ const ClienteList = ({ clientes, seleccionar, eliminar }) => {
         <thead>
           <tr>
             <th>ID</th>
-            <th>Dni</th>
+            <th>DNI</th>
             <th>Nombre</th>
-            <th>Telefono</th>
-            <th>Direccion</th>
+            <th>Teléfono</th>
+            <th>Dirección</th>
             <th>Fecha</th>
             <th>Estado</th>
             <th>ID User</th>
@@ -79,21 +77,21 @@ const ClienteList = ({ clientes, seleccionar, eliminar }) => {
           </tr>
         </thead>
         <tbody>
-          {clientesPaginados.map((p) => (
-            <tr key={p.id}>
-              <td>{p.id}</td>
-              <td>{p.dni}</td>
-              <td>{p.nombre}</td>
-              <td>{p.telefono}</td>
-              <td>{p.direccion}</td>
-              <td>{p.fecha}</td>
-              <td>{p.estado}</td>
-              <td>{p.id_user}</td>
+          {clientesPaginados.map((cliente) => (
+            <tr key={cliente.id}>
+              <td>{cliente.id}</td>
+              <td>{cliente.dni}</td>
+              <td>{cliente.nombre}</td>
+              <td>{cliente.telefono}</td>
+              <td>{cliente.direccion}</td>
+              <td>{new Date(cliente.fecha).toLocaleDateString()}</td>
+              <td>{cliente.estado === 1 ? "Activo" : "Inactivo"}</td>
+              <td>{cliente.id_user}</td>
               <td>
-                <Button variant="warning" onClick={() => seleccionar(p)}>
+                <Button variant="warning" onClick={() => seleccionar(cliente)}>
                   Editar
                 </Button>{" "}
-                <Button variant="danger" onClick={() => confirmarEliminacion(p.id)}>
+                <Button variant="danger" onClick={() => confirmarEliminacion(cliente.id)}>
                   Eliminar
                 </Button>
               </td>

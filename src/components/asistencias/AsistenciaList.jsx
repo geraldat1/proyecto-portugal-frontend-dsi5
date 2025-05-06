@@ -2,14 +2,14 @@ import React, { useState } from "react";
 import { Table, Button, Pagination } from "react-bootstrap";
 import Swal from "sweetalert2";
 
-const EntrenadorList = ({ entrenadores, seleccionar, eliminar }) => {
+const AsistenciaList = ({ asistencias, seleccionar, eliminar }) => {
   const [paginaActual, setPaginaActual] = useState(1);
   const elementosPorPagina = 5;
 
-  const totalPaginas = Math.ceil(entrenadores.length / elementosPorPagina);
+  const totalPaginas = Math.ceil(asistencias.length / elementosPorPagina);
   const indiceInicio = (paginaActual - 1) * elementosPorPagina;
   const indiceFinal = indiceInicio + elementosPorPagina;
-  const entrendoresPaginados = entrenadores.slice(indiceInicio, indiceFinal);
+  const asistenciasPaginadas = asistencias.slice(indiceInicio, indiceFinal);
 
   const confirmarEliminacion = (id) => {
     Swal.fire({
@@ -68,25 +68,29 @@ const EntrenadorList = ({ entrenadores, seleccionar, eliminar }) => {
         <thead>
           <tr>
             <th>ID</th>
-            <th>Nombre</th>
-            <th>Apellido</th>
-            <th>Telefono</th>
-            <th>Correo</th>
-            <th>Direccion</th>
+            <th>Fecha</th>
+            <th>Hora de Entrada</th>
+            <th>Hora de Salida</th>
+            <th>ID Cliente</th>
+            <th>ID Entrenador</th>
+            <th>ID Usuario</th>
+            <th>ID Rutina</th>
             <th>Estado</th>
             <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
-          {entrendoresPaginados.map((p) => (
-            <tr key={p.id}>
-              <td>{p.id}</td>
-              <td>{p.nombre}</td>
-              <td>{p.apellido}</td>
-              <td>{p.telefono}</td>
-              <td>{p.correo}</td>
-              <td>{p.direccion}</td>
-              <td>{p.estado === 1 ? "Activo" : "Inactivo"}</td>
+          {asistenciasPaginadas.map((p) => (
+            <tr key={p.id_asistencia}>
+              <td>{p.id_asistencia}</td>
+              <td>{p.fecha}</td>
+              <td>{p.hora_entrada}</td>
+              <td>{p.hora_salida}</td>
+              <td>{p.id_cliente}</td>
+              <td>{p.id_entrenador}</td>
+              <td>{p.id_usuario}</td>
+              <td>{p.id_rutina}</td>
+              <td>{p.estado}</td>
               <td>
                 <Button variant="warning" onClick={() => seleccionar(p)}>
                   Editar
@@ -111,4 +115,4 @@ const EntrenadorList = ({ entrenadores, seleccionar, eliminar }) => {
   );
 };
 
-export default EntrenadorList;
+export default AsistenciaList;

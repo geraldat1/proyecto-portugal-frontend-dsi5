@@ -74,12 +74,10 @@ const PlanList = ({ planes, seleccionar, eliminar }) => {
               <Card.Body>
                 <Card.Title>{p.plan}</Card.Title>
                 <Card.Text>
-                  <strong>ID:</strong> {p.id} <br />
                   <strong>Descripcion:</strong> {p.descripcion} <br />
-                  <strong>Precio del Plan:</strong> {p.precio_plan} <br />
+                  <strong>Precio:</strong> {p.precio_plan} <br />
                   <strong>Condicion:</strong> {p.condicion} <br />
-                  <strong>Estado:</strong> {p.estado} <br />
-                  <strong>ID User:</strong> {p.id_user}
+                  <strong>Estado:</strong> {p.estado === 1 ? "Activo" : "Inactivo"} <br />
                 </Card.Text>
                 <Button variant="warning" onClick={() => seleccionar(p)} className="me-2">
                   Editar

@@ -1,10 +1,10 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { Form, Button, Alert } from "react-bootstrap";
-import { FaEnvelope, FaLock } from "react-icons/fa";
+import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa"; // Importar los iconos de ojo y ojo tachado
 
 const styles = {
   background: {
@@ -35,11 +35,12 @@ const styles = {
     textAlign: "center",
     boxShadow: "0 0 30px rgba(255, 215, 0, 0.3)",
     backdropFilter: "blur(6px)",
+    border: "2px solid #FFD700", // Añadir borde amarillo
   },
   icon: {
-    fontSize: "5rem",
+    fontSize: "1.2rem", // Ajuste el tamaño de los íconos
     color: "#FFD700",
-    marginBottom: "15px",
+    marginRight: "10px", // Espacio entre el ícono y el campo
   },
   title: {
     fontSize: "2.5rem",
@@ -48,32 +49,49 @@ const styles = {
     marginBottom: "25px",
     color: "#FFD700",
   },
-  inputIcon: {
+  inputIconWrapper: {
     position: "absolute",
-    right: "10px",
+    left: "10px", // Mover íconos a la izquierda
     top: "50%",
     transform: "translateY(-50%)",
     fontSize: "1.2rem",
     color: "#FFD700",
   },
   input: {
+    paddingLeft: "35px", // Añadir espacio para los íconos a la izquierda
     paddingRight: "35px",
-    border: "2px solid #FFD700",
-    color: "#000",
+    border: "2px solid #FFD700", // Borde amarillo para los campos de entrada
+    color: "#FFF", // Texto blanco en los campos de entrada
     fontWeight: "bold",
     borderRadius: "8px",
+    background: "rgba(0, 0, 0, 0.07)", // Fondo oscuro ligeramente transparente
   },
   button: {
     backgroundColor: "#FFD700",
-    color: "#000",
+    color: "#FFF", // Texto blanco en el botón
     fontWeight: "bold",
-    border: "none",
+    border: "2px solid #FFD700", // Borde amarillo en el botón
     padding: "12px 20px",
     fontSize: "1rem",
     borderRadius: "8px",
     transition: "0.3s",
     marginTop: "10px",
   },
+  eyeIcon: {
+    position: "absolute",
+    right: "10px", // Ajustado para que esté justo al lado del ícono de candado
+    top: "50%",
+    transform: "translateY(-50%)",
+    cursor: "pointer",
+    fontSize: "1.2rem",
+    color: "#FFD700",
+  },
+  logo: {
+    width: "100px",
+    height: "auto",
+    objectFit: "cover",
+    marginBottom: "20px", // Espacio entre el logo y el título
+  }
 };
 
 const Login = () => {
@@ -82,7 +100,15 @@ const Login = () => {
   const [clave, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState(""); // 'success' o 'error'
+  const [showPassword, setShowPassword] = useState(false); // Estado para mostrar/ocultar contraseña
   const navigate = useNavigate();
+
+  useEffect(() => {
+    document.body.style.overflow = "hidden"; // Desactiva scroll
+    return () => {
+      document.body.style.overflow = "auto"; // Lo vuelve a activar al salir
+    };
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -98,34 +124,41 @@ const Login = () => {
       setMessage("¡Bienvenido al sistema!");
       setMessageType("success");
   
+      // Mostrar el mensaje por 3 segundos y luego redirigir
       setTimeout(() => {
-        navigate("/");
-      }, 1000);
+        setMessage(""); // Ocultar el mensaje
+        navigate("/");  // Redirigir después de 3 segundos
+      }, 5000); // 3 segundos de espera para mostrar el mensaje
     } catch (err) {
       setMessage("Credenciales incorrectas");
       setMessageType("error");
+  
+      // Mostrar mensaje de error por 3 segundos y luego ocultarlo
+      setTimeout(() => {
+        setMessage("");
+      }, 5000);
     }
   };
+  
+  
 
   return (
     <>
       <div style={styles.background}></div>
       <div style={styles.container}>
         <div style={styles.box}>
-          <h2 style={styles.title}>LOGIN</h2>
           <img
-          src="../imagenes/img-toro.png"
-          alt="Logo del gimnasio"
-          style={{
-            width: "100px",
-            height: "auto",
-            objectFit: "cover",
-            marginBottom: "40px",
-          }}
-        />
+            src="../imagenes/img-toro.png"
+            alt="Logo del gimnasio"
+            style={styles.logo} // Usando el estilo para el logo
+          />
+          <h2 style={styles.title}>LOGIN</h2>
           {message && (
             <Alert
-              style={{ color: messageType === "error" ? "red" : "green", fontWeight: "bold" }}
+              style={{
+                color: messageType === "error" ? "red" : "green",
+                fontWeight: "bold",
+              }}
               variant="light"
             >
               {message}
@@ -133,7 +166,9 @@ const Login = () => {
           )}
           <Form onSubmit={handleSubmit}>
             <Form.Group className="mb-3" style={{ position: "relative" }}>
-              <FaEnvelope style={styles.inputIcon} />
+              <div style={styles.inputIconWrapper}>
+                <FaEnvelope style={styles.icon} />
+              </div>
               <Form.Control
                 type="email"
                 placeholder="Correo electrónico"
@@ -144,9 +179,17 @@ const Login = () => {
               />
             </Form.Group>
             <Form.Group className="mb-4" style={{ position: "relative" }}>
-              <FaLock style={styles.inputIcon} />
+              <div style={styles.inputIconWrapper}>
+                <FaLock style={styles.icon} />
+              </div>
+              <div
+                style={styles.eyeIcon}
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <FaEye /> : <FaEyeSlash />}
+              </div>
               <Form.Control
-                type="password"
+                type={showPassword ? "text" : "password"} // Cambiar el tipo según el estado
                 placeholder="Contraseña"
                 value={clave}
                 onChange={(e) => setPassword(e.target.value)}

@@ -10,6 +10,7 @@ const ClienteForm = ({ show, handleClose, agregar, actualizar, clienteSelecciona
   const [fecha, setFecha] = useState("");
   const [estado, setEstado] = useState("");
   const [id_user, setIdUser] = useState("");
+  
   const [errores, setErrores] = useState({});
 
   useEffect(() => {
@@ -35,45 +36,27 @@ const ClienteForm = ({ show, handleClose, agregar, actualizar, clienteSelecciona
 
   const validar = () => {
     const nuevosErrores = {};
-  
+
     if (!dni.trim()) {
       nuevosErrores.dni = "El DNI es obligatorio";
     } else if (!/^\d{8}$/.test(dni)) {
       nuevosErrores.dni = "El DNI debe tener 8 dígitos";
     }
-  
+
     if (!nombre.trim()) {
       nuevosErrores.nombre = "El nombre es obligatorio";
     }
-  
+
     if (!telefono.trim()) {
       nuevosErrores.telefono = "El teléfono es obligatorio";
     } else if (!/^\d{9}$/.test(telefono)) {
       nuevosErrores.telefono = "El teléfono debe tener 9 dígitos";
     }
-  
+
     if (!direccion.trim()) {
       nuevosErrores.direccion = "La dirección es obligatoria";
     }
-  
-    if (!fecha.trim()) {
-      nuevosErrores.fecha = "La fecha es obligatoria";
-    } else if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha)) {
-      nuevosErrores.fecha = "La fecha debe estar en formato AAAA-MM-DD";
-    }
-  
-    if (!estado.toString().trim()) {
-      nuevosErrores.estado = "El estado es obligatorio";
-    } else if (isNaN(estado) || (estado !== "0" && estado !== "1" && estado !== 0 && estado !== 1)) {
-      nuevosErrores.estado = "El estado debe ser 0 (inactivo) o 1 (activo)";
-    }
-  
-    if (!id_user.toString().trim()) {
-      nuevosErrores.id_user = "El ID de usuario es obligatorio";
-    } else if (isNaN(id_user) || parseInt(id_user) <= 0) {
-      nuevosErrores.id_user = "El ID de usuario debe ser un número válido y mayor a 0";
-    }
-  
+
     setErrores(nuevosErrores);
     return Object.keys(nuevosErrores).length === 0;
   };
@@ -81,17 +64,22 @@ const ClienteForm = ({ show, handleClose, agregar, actualizar, clienteSelecciona
   const manejarEnvio = (e) => {
     e.preventDefault();
     if (!validar()) {
-      // Opcional: mostrar alerta si hay errores
       Swal.fire("Campos inválidos", "Por favor revisa los datos ingresados", "error");
       return;
     }
 
-    const nuevoCliente = { dni, nombre, telefono, direccion, fecha, estado: parseInt(estado), id_user: parseInt(id_user)};
+    const nuevoCliente = { dni, nombre, telefono, direccion };
 
     if (clienteSeleccionado) {
-      actualizar(clienteSeleccionado.id, nuevoCliente);
+      // Si se está editando, incluir campos que el backend no gestiona automáticamente
+      actualizar(clienteSeleccionado.id, {
+        ...nuevoCliente,
+        fecha,
+        estado: parseInt(estado),
+        id_user: parseInt(id_user),
+      });
     } else {
-      agregar(nuevoCliente);
+      agregar(nuevoCliente); // el backend agregará fecha, estado, id_user automáticamente
     }
 
     setDni("");
@@ -113,13 +101,15 @@ const ClienteForm = ({ show, handleClose, agregar, actualizar, clienteSelecciona
       </Modal.Header>
       <Modal.Body>
         <Form onSubmit={manejarEnvio}>
-
-        <Form.Group className="mb-3">
+          <Form.Group className="mb-3">
             <Form.Label>Dni</Form.Label>
             <Form.Control
               type="text"
               value={dni}
-              onChange={(e) => setDni(e.target.value)}
+              onChange={(e) => {
+                const valor = e.target.value;
+                if (/^\d{0,8}$/.test(valor)) setDni(valor);
+              }}
               isInvalid={!!errores.dni}
             />
             <Form.Control.Feedback type="invalid">{errores.dni}</Form.Control.Feedback>
@@ -130,7 +120,10 @@ const ClienteForm = ({ show, handleClose, agregar, actualizar, clienteSelecciona
             <Form.Control
               type="text"
               value={nombre}
-              onChange={(e) => setNombre(e.target.value)}
+              onChange={(e) => {
+                const valor = e.target.value;
+                if (/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]*$/.test(valor)) setNombre(valor);
+              }}
               isInvalid={!!errores.nombre}
             />
             <Form.Control.Feedback type="invalid">{errores.nombre}</Form.Control.Feedback>
@@ -141,14 +134,17 @@ const ClienteForm = ({ show, handleClose, agregar, actualizar, clienteSelecciona
             <Form.Control
               type="text"
               value={telefono}
-              onChange={(e) => setTelefono(e.target.value)}
+              onChange={(e) => {
+                const valor = e.target.value;
+                if (/^\d{0,9}$/.test(valor)) setTelefono(valor);
+              }}
               isInvalid={!!errores.telefono}
             />
             <Form.Control.Feedback type="invalid">{errores.telefono}</Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group className="mb-3">
-            <Form.Label>Direccion</Form.Label>
+            <Form.Label>Dirección</Form.Label>
             <Form.Control
               type="text"
               value={direccion}
@@ -158,38 +154,24 @@ const ClienteForm = ({ show, handleClose, agregar, actualizar, clienteSelecciona
             <Form.Control.Feedback type="invalid">{errores.direccion}</Form.Control.Feedback>
           </Form.Group>
 
-          <Form.Group className="mb-3">
-            <Form.Label>Fecha</Form.Label>
-            <Form.Control
-              type="text"
-              value={fecha}
-              onChange={(e) => setFecha(e.target.value)}
-              isInvalid={!!errores.fecha}
-            />
-            <Form.Control.Feedback type="invalid">{errores.fecha}</Form.Control.Feedback>
-          </Form.Group>
+          {clienteSeleccionado && (
+            <>
+              <Form.Group className="mb-3">
+                <Form.Label>Fecha</Form.Label>
+                <Form.Control type="text" value={fecha} disabled />
+              </Form.Group>
 
-          <Form.Group className="mb-3">
-            <Form.Label>Estado</Form.Label>
-            <Form.Control
-              type="number"
-              value={estado}
-              onChange={(e) => setEstado(e.target.value)}
-              isInvalid={!!errores.estado}
-            />
-            <Form.Control.Feedback type="invalid">{errores.estado}</Form.Control.Feedback>
-          </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label>Estado</Form.Label>
+                <Form.Control type="text" value={estado} disabled />
+              </Form.Group>
 
-          <Form.Group className="mb-3">
-            <Form.Label>ID User</Form.Label>
-            <Form.Control
-              type="number"
-              value={id_user}
-              onChange={(e) => setIdUser(e.target.value)}
-              isInvalid={!!errores.id_user}
-            />
-            <Form.Control.Feedback type="invalid">{errores.id_user}</Form.Control.Feedback>
-          </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label>ID User</Form.Label>
+                <Form.Control type="text" value={id_user} disabled />
+              </Form.Group>
+            </>
+          )}
 
           <Button variant="primary" type="submit">
             {clienteSeleccionado ? "Actualizar" : "Agregar"}

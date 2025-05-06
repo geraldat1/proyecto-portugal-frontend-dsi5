@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { Navbar as BsNavbar, Nav, Container, Dropdown } from "react-bootstrap";
+import { Navbar as BsNavbar, Nav, Container, NavDropdown, Dropdown } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import { FaUserCircle } from "react-icons/fa"; // Asegúrate de tener react-icons instalado
@@ -52,17 +52,21 @@ const Navbar = () => {
           <BsNavbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto navbar-custom">
               <Nav.Link as={Link} to="/">Inicio</Nav.Link>
-              <Nav.Link as={Link} to="/clientes">Clientes</Nav.Link>
+
+              <NavDropdown title="Clientes" id="archivos-dropdown">
+                <NavDropdown.Item as={Link} to="/clientes">Lista de Clientes</NavDropdown.Item>
+                <NavDropdown.Item as={Link} to="/detalleplanes">Detalle Planes</NavDropdown.Item>
+                <NavDropdown.Item as={Link} to="/pagosplanes">Pagos</NavDropdown.Item>
+              </NavDropdown>
+              <Nav.Link as={Link} to="/asistencias">Asistencias</Nav.Link>
               <Nav.Link as={Link} to="/entrenadores">Entrenadores</Nav.Link>
               <Nav.Link as={Link} to="/rutinas">Rutinas</Nav.Link>
               <Nav.Link as={Link} to="/planes">Planes</Nav.Link>
-              <Nav.Link as={Link} to="/detalleplanes">Detalle planes</Nav.Link>
-              <Nav.Link as={Link} to="/pagosplanes">Pagos</Nav.Link>
             </Nav>
 
             {user && (
               <Dropdown align="end">
-                <Dropdown.Toggle variant="secondary" id="dropdown-user">
+                <Dropdown.Toggle id="dropdown-user">
                   <FaUserCircle size={20} className="me-2" />
                   {user.name?.toUpperCase()}
                 </Dropdown.Toggle>
@@ -75,7 +79,7 @@ const Navbar = () => {
                     Configuración
                   </Dropdown.Item>
                   <Dropdown.Item as={Link} to="/usuarios">
-                    Usuarios
+                    Empleados
                   </Dropdown.Item>
                   <Dropdown.Item
                     onClick={() => alert("Funcionalidad aún no implementada")}

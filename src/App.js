@@ -8,6 +8,7 @@ import Entrenadores from "./pages/Entrenadores";
 import Planes from "./pages/Planes";
 import Pagosplanes from "./pages/Pagosplanes";
 import Detalleplanes from "./pages/Detalleplanes";
+import Asistencias from "./pages/Asistencias";
 import Configuracion from "./pages/Configuraciones";
 import Usuarios from "./pages/Usuarios";
 import Login from "./pages/Login";
@@ -69,6 +70,10 @@ const App = () => {
           <Route
             path="/detalleplanes"
             element={user ? <Detalleplanes /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/asistencias"
+            element={user ? <Asistencias/> : <Navigate to="/login" />}
           />
            <Route
             path="/configuracion"

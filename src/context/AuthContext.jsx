@@ -23,9 +23,9 @@ export const AuthProvider = ({ children }) => {
         navigate("/login");
       }
     }
-  }, []);
+  }, [navigate]); // Se incluye navigate como dependencia
 
-  // ESCUCHA DE CAMBIOS EN OTRAS PESTAÑAS
+  // Escucha de cambios en otras pestañas
   useEffect(() => {
     const handleStorageChange = (e) => {
       if (e.key === "token" && e.newValue === null) {
@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }) => {
     return () => {
       window.removeEventListener("storage", handleStorageChange);
     };
-  }, []);
+  }, [navigate]); // Se incluye navigate como dependencia
 
   return (
     <AuthContext.Provider value={{ user, setUser }}>

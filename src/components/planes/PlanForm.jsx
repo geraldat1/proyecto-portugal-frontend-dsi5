@@ -21,8 +21,8 @@ const PlanForm = ({ show, handleClose, agregar, actualizar, planSeleccionado }) 
       setPrecioPlan(planSeleccionado.precio_plan);
       setCondicion(planSeleccionado.condicion);
       setImagen(planSeleccionado.imagen);
-      setEstado(planSeleccionado.estado?.toString() || "");
-      setIdUser(planSeleccionado.id_user?.toString() || "");
+      setEstado(planSeleccionado.estado);
+      setIdUser(planSeleccionado.id_user);
 
     } else {
       setPlan("");
@@ -46,9 +46,7 @@ const PlanForm = ({ show, handleClose, agregar, actualizar, planSeleccionado }) 
     }
     if (!condicion.trim()) nuevosErrores.condicion = "La condición es obligatoria";
     if (!imagen.trim()) nuevosErrores.imagen = "La URL de la imagen es obligatoria";
-    if (!String(estado).trim()) nuevosErrores.estado = "El estado es obligatorio";
-    if (!id_user.trim()) nuevosErrores.id_user = "El ID del usuario es obligatorio";
-  
+
     setErrores(nuevosErrores);
     return Object.keys(nuevosErrores).length === 0;
   };
@@ -62,10 +60,14 @@ const PlanForm = ({ show, handleClose, agregar, actualizar, planSeleccionado }) 
       return;
     }
 
-    const nuevoPlan = { plan, descripcion, precio_plan, condicion, imagen, estado, id_user};
+    const nuevoPlan = { plan, descripcion, precio_plan, condicion, imagen};
 
     if (planSeleccionado) {
-      actualizar(planSeleccionado.id, nuevoPlan);
+      actualizar(planSeleccionado.id, {
+        ...nuevoPlan,
+        estado: parseInt(estado),
+        id_user: parseInt(id_user),
+      });
     } else {
       agregar(nuevoPlan);
     }
@@ -124,59 +126,61 @@ const PlanForm = ({ show, handleClose, agregar, actualizar, planSeleccionado }) 
           </Form.Group>
 
           <Form.Group className="mb-3">
-            <Form.Label>Condicion</Form.Label>
-            <Form.Control
-              type="text"
+            <Form.Label>Condición</Form.Label>
+            <Form.Select
               value={condicion}
               onChange={(e) => setCondicion(e.target.value)}
               isInvalid={!!errores.condicion}
-            />
+            >
+              <option value="">Seleccione una opción</option>
+              <option value="Mensual">MENSUAL</option>
+              <option value="Bimestral">BIMESTRAL</option>
+              <option value="Trimestral">TRIMESTRAL</option>
+              <option value="Anual">ANUAL</option>
+            </Form.Select>
             <Form.Control.Feedback type="invalid">{errores.condicion}</Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group className="mb-3">
-          <Form.Label>Imagen</Form.Label>
-          <Form.Control
-            type="img"
-            value={imagen}
-            onChange={(e) => setImagen(e.target.value)}
-            isInvalid={!!errores.imagen}
-          />
-          <Form.Control.Feedback type="invalid">{errores.imagen}</Form.Control.Feedback>
+            <Form.Label>Imagen</Form.Label>
+            <Form.Control
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files[0];
+                if (file) {
+                  const imageUrl = URL.createObjectURL(file);
+                  setImagen(imageUrl);
+                }
+              }}
+              isInvalid={!!errores.imagen}
+            />
+            <Form.Control.Feedback type="invalid">{errores.imagen}</Form.Control.Feedback>
 
-          {imagen && (
-            <div className="text-center mt-2">
-              <img
-                src={imagen}
-                alt="Vista previa"
-                style={{ maxWidth: "100%", maxHeight: "200px", objectFit: "contain" }}
-              />
-            </div>
-          )}
-        </Form.Group>
+            {imagen && (
+              <div className="text-center mt-2">
+                <img
+                  src={imagen}
+                  alt="Vista previa"
+                  style={{ maxWidth: "100%", maxHeight: "200px", objectFit: "contain" }}
+                />
+              </div>
+            )}
+          </Form.Group>
 
-
+        {planSeleccionado &&(
+          <>
           <Form.Group className="mb-3">
             <Form.Label>Estado</Form.Label>
-            <Form.Control
-              type="text"
-              value={estado}
-              onChange={(e) => setEstado(e.target.value)}
-              isInvalid={!!errores.estado}
-            />
-            <Form.Control.Feedback type="invalid">{errores.estado}</Form.Control.Feedback>
+            <Form.Control type="text" value={estado} disabled />
           </Form.Group>
-
+          
           <Form.Group className="mb-3">
             <Form.Label>ID User</Form.Label>
-            <Form.Control
-              type="text"
-              value={id_user}
-              onChange={(e) => setIdUser(e.target.value)}
-              isInvalid={!!errores.id_user}
-            />
-            <Form.Control.Feedback type="invalid">{errores.id_user}</Form.Control.Feedback>
+            <Form.Control type="text" value={id_user} disabled />
           </Form.Group>
+          </>
+        )}
 
           <Button variant="primary" type="submit">
             {planSeleccionado ? "Actualizar" : "Agregar"}
