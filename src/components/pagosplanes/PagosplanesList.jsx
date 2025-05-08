@@ -80,22 +80,22 @@ const PagosplanesList = ({ pagosplanes, seleccionar, eliminar }) => {
           </tr>
         </thead>
         <tbody>
-          {pagosplanesPaginadas.map((p) => (
-            <tr key={p.id}>
-              <td>{p.id}</td>
-              <td>{p.id_detalle}</td>
-              <td>{p.id_cliente}</td>
-              <td>{p.id_plan}</td>
-              <td>S/ {parseFloat(p.precio).toFixed(2)}</td>
-              <td>{p.fecha}</td>
-              <td>{p.hora}</td>
-              <td>{p.id_user}</td>
-              <td>{p.estado}</td>
+          {pagosplanesPaginadas.map((pagosplanes) => (
+            <tr key={pagosplanes.id}>
+              <td>{pagosplanes.id}</td>
+              <td>{pagosplanes.id_detalle}</td>
+              <td>{pagosplanes.id_cliente}</td>
+              <td>{pagosplanes.id_plan}</td>
+              <td>S/ {parseFloat(pagosplanes.precio).toFixed(2)}</td>
+              <td>{new Date(pagosplanes.fecha).toLocaleDateString()}</td>
+              <td>{pagosplanes.hora}</td>
+              <td>{pagosplanes.id_user}</td>
+              <td>{pagosplanes.estado}</td>
               <td>
-                <Button variant="warning" onClick={() => seleccionar(p)}>
+                <Button variant="warning" onClick={() => seleccionar(pagosplanes)}>
                   Editar
                 </Button>{" "}
-                <Button variant="danger" onClick={() => confirmarEliminacion(p.id)}>
+                <Button variant="danger" onClick={() => confirmarEliminacion(pagosplanes.id)}>
                   Eliminar
                 </Button>
               </td>

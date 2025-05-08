@@ -2,7 +2,15 @@ import React, { useState, useEffect } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import Swal from "sweetalert2"; // opcional para mostrar errores visualmente
 
-const DetalleplanesForm = ({ show, handleClose, agregar, actualizar, detalleplanSeleccionada }) => {
+const DetalleplanesForm = ({
+  show,
+  handleClose,
+  agregar,
+  actualizar,
+  detalleplanSeleccionada,
+  clientes,
+  planes,
+}) => {
   const [id_cliente, setIdCliente] = useState("");
   const [id_plan, setIdPlan] = useState("");
   const [fecha, setFecha] = useState("");
@@ -11,8 +19,8 @@ const DetalleplanesForm = ({ show, handleClose, agregar, actualizar, detalleplan
   const [fecha_limite, setFechaLimite] = useState("");
   const [id_user, setIdUser] = useState("");
   const [estado, setEstado] = useState("");
-const[errores, setErrores] = useState({});
 
+  const [errores, setErrores] = useState({});
 
   useEffect(() => {
     if (detalleplanSeleccionada) {
@@ -20,11 +28,10 @@ const[errores, setErrores] = useState({});
       setIdPlan(detalleplanSeleccionada.id_plan);
       setFecha(detalleplanSeleccionada.fecha);
       setHora(detalleplanSeleccionada.hora);
-      setFechaVenc(detalleplanSeleccionada.fecha_venc);
-      setFechaLimite(detalleplanSeleccionada.fecha_limite);
+      setFechaVenc(detalleplanSeleccionada.fecha_venc?.substring(0, 10));
+      setFechaLimite(detalleplanSeleccionada.fecha_limite?.substring(0, 10));
       setIdUser(detalleplanSeleccionada.id_user);
       setEstado(detalleplanSeleccionada.estado);
-      
     } else {
       setIdCliente("");
       setIdPlan("");
@@ -40,14 +47,10 @@ const[errores, setErrores] = useState({});
 
   const validar = () => {
     const nuevosErrores = {};
-    if (!id_cliente.trim()) nuevosErrores.id_cliente = "El ID de cliente es obligatorio";
-    if (!id_plan.trim()) nuevosErrores.id_plan = "El ID de plan es obligatorio";
-    if (!fecha.trim() || isNaN(Date.parse(fecha))) nuevosErrores.fecha = "La fecha es obligatoria y debe ser válida";
-    if (!hora.trim()) nuevosErrores.hora = "La hora es obligatoria";
+    if (!id_cliente || String(id_cliente).trim() === "") nuevosErrores.id_cliente = "El ID de cliente es obligatorio";
+    if (!id_plan || String(id_plan).trim() === "") nuevosErrores.id_plan = "El ID de plan es obligatorio";
     if (!fecha_venc.trim() || isNaN(Date.parse(fecha_venc))) nuevosErrores.fecha_venc = "Fecha de vencimiento inválida";
     if (!fecha_limite.trim() || isNaN(Date.parse(fecha_limite))) nuevosErrores.fecha_limite = "Fecha límite inválida";
-    if (!id_user.trim()) nuevosErrores.id_user = "El ID de usuario es obligatorio";
-    if (estado === "" || isNaN(estado)) nuevosErrores.estado = "El estado es obligatorio y debe ser numérico";
 
     setErrores(nuevosErrores);
     return Object.keys(nuevosErrores).length === 0;
@@ -61,10 +64,16 @@ const[errores, setErrores] = useState({});
       return;
     }
 
-    const nuevaDetalleplan = { id_cliente, id_plan, fecha, hora, fecha_venc, fecha_limite, id_user, estado };
+    const nuevaDetalleplan = { id_cliente, id_plan, fecha_venc, fecha_limite };
 
     if (detalleplanSeleccionada) {
-      actualizar(detalleplanSeleccionada.id, nuevaDetalleplan);
+      actualizar(detalleplanSeleccionada.id, {
+        ...nuevaDetalleplan,
+        fecha,
+        hora,
+        id_user: parseInt(id_user),
+        estado: parseInt(estado),
+      });
     } else {
       agregar(nuevaDetalleplan);
     }
@@ -89,50 +98,45 @@ const[errores, setErrores] = useState({});
       </Modal.Header>
       <Modal.Body>
         <Form onSubmit={manejarEnvio}>
+          {/* Select Cliente */}
           <Form.Group className="mb-3">
-            <Form.Label>ID Cliente</Form.Label>
+            <Form.Label>Cliente</Form.Label>
             <Form.Control
-              type="text"
+              as="select"
               value={id_cliente}
               onChange={(e) => setIdCliente(e.target.value)}
               isInvalid={!!errores.id_cliente}
-            />
+            >
+              <option value="">Selecciona un cliente</option>
+              {clientes.map((cliente) => (
+                <option key={cliente.id} value={cliente.id}>
+                  {cliente.nombre} {/* Asumiendo que 'nombre' es el campo del cliente */}
+                </option>
+              ))}
+            </Form.Control>
             <Form.Control.Feedback type="invalid">{errores.id_cliente}</Form.Control.Feedback>
           </Form.Group>
 
+          {/* Select Plan */}
           <Form.Group className="mb-3">
-            <Form.Label>ID Plan</Form.Label>
+            <Form.Label>Plan</Form.Label>
             <Form.Control
-              type="text"
+              as="select"
               value={id_plan}
               onChange={(e) => setIdPlan(e.target.value)}
               isInvalid={!!errores.id_plan}
-            />
+            >
+              <option value="">Selecciona un plan</option>
+              {planes.map((plan) => (
+                <option key={plan.id} value={plan.id}>
+                  {plan.plan} 
+                </option>
+              ))}
+            </Form.Control>
             <Form.Control.Feedback type="invalid">{errores.id_plan}</Form.Control.Feedback>
           </Form.Group>
 
-          <Form.Group className="mb-3">
-            <Form.Label>Fecha</Form.Label>
-            <Form.Control
-              type="date"
-              value={fecha}
-              onChange={(e) => setFecha(e.target.value)}
-              isInvalid={!!errores.fecha}
-            />
-            <Form.Control.Feedback type="invalid">{errores.fecha}</Form.Control.Feedback>
-          </Form.Group>
-
-          <Form.Group className="mb-3">
-            <Form.Label>Hora</Form.Label>
-            <Form.Control
-              type="time"
-              value={hora}
-              onChange={(e) => setHora(e.target.value)}
-              isInvalid={!!errores.hora}
-            />
-            <Form.Control.Feedback type="invalid">{errores.hora}</Form.Control.Feedback>
-          </Form.Group>
-
+          {/* Fecha Vencimiento */}
           <Form.Group className="mb-3">
             <Form.Label>Fecha Vencimiento</Form.Label>
             <Form.Control
@@ -144,6 +148,7 @@ const[errores, setErrores] = useState({});
             <Form.Control.Feedback type="invalid">{errores.fecha_venc}</Form.Control.Feedback>
           </Form.Group>
 
+          {/* Fecha Límite */}
           <Form.Group className="mb-3">
             <Form.Label>Fecha Límite</Form.Label>
             <Form.Control
@@ -155,27 +160,30 @@ const[errores, setErrores] = useState({});
             <Form.Control.Feedback type="invalid">{errores.fecha_limite}</Form.Control.Feedback>
           </Form.Group>
 
-          <Form.Group className="mb-3">
-            <Form.Label>ID Usuario</Form.Label>
-            <Form.Control
-              type="text"
-              value={id_user}
-              onChange={(e) => setIdUser(e.target.value)}
-              isInvalid={!!errores.id_user}
-            />
-            <Form.Control.Feedback type="invalid">{errores.id_user}</Form.Control.Feedback>
-          </Form.Group>
+          {/* Información de Detalleplan */}
+          {detalleplanSeleccionada && (
+            <>
+              <Form.Group className="mb-3">
+                <Form.Label>Fecha</Form.Label>
+                <Form.Control type="text" value={fecha} disabled />
+              </Form.Group>
 
-          <Form.Group className="mb-3">
-            <Form.Label>Estado</Form.Label>
-            <Form.Control
-              type="number"
-              value={estado}
-              onChange={(e) => setEstado(e.target.value)}
-              isInvalid={!!errores.estado}
-            />
-            <Form.Control.Feedback type="invalid">{errores.estado}</Form.Control.Feedback>
-          </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label>Hora</Form.Label>
+                <Form.Control type="text" value={hora} disabled />
+              </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Label>ID User</Form.Label>
+                <Form.Control type="text" value={id_user} disabled />
+              </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Label>Estado</Form.Label>
+                <Form.Control type="text" value={estado} disabled />
+              </Form.Group>
+            </>
+          )}
 
           <Button variant="primary" type="submit">
             {detalleplanSeleccionada ? "Actualizar" : "Agregar"}

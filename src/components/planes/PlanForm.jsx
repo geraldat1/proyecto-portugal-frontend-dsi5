@@ -119,7 +119,12 @@ const PlanForm = ({ show, handleClose, agregar, actualizar, planSeleccionado }) 
             <Form.Control
               type="number"
               value={precio_plan}
-              onChange={(e) => setPrecioPlan(e.target.value)}
+              onChange={(e) => {
+                // Asegúrate de que el valor no sea negativo
+                const valor = Math.max(1, e.target.value); // Esto asegura que el valor nunca sea negativo
+                setPrecioPlan(valor);
+              }}
+              min="1" // Esto evita que el campo acepte valores negativos
               isInvalid={!!errores.precio_plan}
             />
             <Form.Control.Feedback type="invalid">{errores.precio_plan}</Form.Control.Feedback>
@@ -150,7 +155,8 @@ const PlanForm = ({ show, handleClose, agregar, actualizar, planSeleccionado }) 
                 const file = e.target.files[0];
                 if (file) {
                   const imageUrl = URL.createObjectURL(file);
-                  setImagen(imageUrl);
+                  setImagen(imageUrl); // Establece la nueva imagen
+                  e.target.value = ''; // Resetea el input de archivo
                 }
               }}
               isInvalid={!!errores.imagen}

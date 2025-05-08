@@ -39,45 +39,22 @@ const AsistenciaForm = ({ show, handleClose, agregar, actualizar, asistenciaSele
 
   const validar = () => {
     const nuevosErrores = {};
-  
-    if (!fecha.trim()) {
-      nuevosErrores.fecha = "La fecha es obligatoria";
-    } else if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha)) {
-      nuevosErrores.fecha = "La fecha debe estar en formato AAAA-MM-DD";
-    }
-  
-    if (!hora_entrada.trim()) {
-      nuevosErrores.hora_entrada = "La hora de entrada es obligatoria";
-    }
-  
-    if (!hora_salida.trim()) {
-      nuevosErrores.hora_salida = "La hora de salida es obligatoria";
-    }
-  
-    if (!id_cliente.trim()) {
+
+    if (!id_cliente || String(id_cliente).trim() === "") {
       nuevosErrores.id_cliente = "El ID del cliente es obligatorio";
     }
-  
-    if (!id_entrenador.trim()) {
+
+    if (!id_entrenador || String(id_entrenador).trim() === "") {
       nuevosErrores.id_entrenador = "El ID del entrenador es obligatorio";
     }
-  
-    if (!id_usuario.toString().trim()) {
-      nuevosErrores.id_usuario = "El ID del usuario es obligatorio";
-    }
-  
-    if (!id_rutina.trim()) {
+
+    if (!id_rutina || String(id_rutina).trim() === "") {
       nuevosErrores.id_rutina = "El ID de la rutina es obligatorio";
     }
-  
-    if (estado !== "0" && estado !== "1") {
-      nuevosErrores.estado = "El estado debe ser 0 o 1";
-    }
-  
+
     setErrores(nuevosErrores);
     return Object.keys(nuevosErrores).length === 0;
   };
-  
 
   const manejarEnvio = (e) => {
     e.preventDefault();
@@ -86,16 +63,23 @@ const AsistenciaForm = ({ show, handleClose, agregar, actualizar, asistenciaSele
       Swal.fire("Campos inválidos", "Por favor revisa los datos ingresados", "error");
       return;
     }
-
-    const nuevaAsistencia = { fecha, hora_entrada, hora_salida, id_cliente, id_entrenador, id_usuario, id_rutina, estado: parseInt(estado)};
-
+  
+    const nuevaAsistencia = { id_cliente, id_entrenador, id_rutina };
+  
     if (asistenciaSeleccionada) {
-        actualizar(asistenciaSeleccionada.id_asistencia, nuevaAsistencia);
+      actualizar(asistenciaSeleccionada.id_asistencia, {
+        ...nuevaAsistencia,
+        fecha,
+        hora_entrada,
+        hora_salida: hora_salida && hora_salida.trim() === "" ? null : hora_salida, // Evitar trim() en null
+        id_usuario: parseInt(id_usuario),
+        estado: parseInt(estado),
+      });
     } else {
-        agregar(nuevaAsistencia);
+      agregar(nuevaAsistencia);
     }
-    
-
+  
+    // Limpiar formulario después de enviar
     setFecha("");
     setHoraEnt("");
     setHoraSal("");
@@ -104,7 +88,7 @@ const AsistenciaForm = ({ show, handleClose, agregar, actualizar, asistenciaSele
     setIdUsuario("");
     setIdRutina("");
     setEstado("");
-
+  
     setErrores({});
     handleClose(); // cerrar modal luego de enviar
   };
@@ -116,39 +100,7 @@ const AsistenciaForm = ({ show, handleClose, agregar, actualizar, asistenciaSele
       </Modal.Header>
       <Modal.Body>
         <Form onSubmit={manejarEnvio}>
-          <Form.Group className="mb-3">
-            <Form.Label>Fecha</Form.Label>
-            <Form.Control
-              type="date"
-              value={fecha}
-              onChange={(e) => setFecha(e.target.value)}
-              isInvalid={!!errores.fecha}
-            />
-            <Form.Control.Feedback type="invalid">{errores.fecha}</Form.Control.Feedback>
-          </Form.Group>
-  
-          <Form.Group className="mb-3">
-            <Form.Label>Hora de Entrada</Form.Label>
-            <Form.Control
-              type="time"
-              value={hora_entrada}
-              onChange={(e) => setHoraEnt(e.target.value)}
-              isInvalid={!!errores.hora_entrada}
-            />
-            <Form.Control.Feedback type="invalid">{errores.hora_entrada}</Form.Control.Feedback>
-          </Form.Group>
-  
-          <Form.Group className="mb-3">
-            <Form.Label>Hora de Salida</Form.Label>
-            <Form.Control
-              type="time"
-              value={hora_salida}
-              onChange={(e) => setHoraSal(e.target.value)}
-              isInvalid={!!errores.hora_salida}
-            />
-            <Form.Control.Feedback type="invalid">{errores.hora_salida}</Form.Control.Feedback>
-          </Form.Group>
-  
+
           <Form.Group className="mb-3">
             <Form.Label>ID Cliente</Form.Label>
             <Form.Control
@@ -159,7 +111,7 @@ const AsistenciaForm = ({ show, handleClose, agregar, actualizar, asistenciaSele
             />
             <Form.Control.Feedback type="invalid">{errores.id_cliente}</Form.Control.Feedback>
           </Form.Group>
-  
+
           <Form.Group className="mb-3">
             <Form.Label>ID Entrenador</Form.Label>
             <Form.Control
@@ -170,18 +122,7 @@ const AsistenciaForm = ({ show, handleClose, agregar, actualizar, asistenciaSele
             />
             <Form.Control.Feedback type="invalid">{errores.id_entrenador}</Form.Control.Feedback>
           </Form.Group>
-  
-          <Form.Group className="mb-3">
-            <Form.Label>ID Usuario</Form.Label>
-            <Form.Control
-              type="number"
-              value={id_usuario}
-              onChange={(e) => setIdUsuario(e.target.value)}
-              isInvalid={!!errores.id_usuario}
-            />
-            <Form.Control.Feedback type="invalid">{errores.id_usuario}</Form.Control.Feedback>
-          </Form.Group>
-  
+
           <Form.Group className="mb-3">
             <Form.Label>ID Rutina</Form.Label>
             <Form.Control
@@ -192,25 +133,44 @@ const AsistenciaForm = ({ show, handleClose, agregar, actualizar, asistenciaSele
             />
             <Form.Control.Feedback type="invalid">{errores.id_rutina}</Form.Control.Feedback>
           </Form.Group>
-  
-          <Form.Group className="mb-3">
-            <Form.Label>Estado</Form.Label>
-            <Form.Control
-              type="number"
-              value={estado}
-              onChange={(e) => setEstado(e.target.value)}
-              isInvalid={!!errores.estado}
-            />
-            <Form.Control.Feedback type="invalid">{errores.estado}</Form.Control.Feedback>
-          </Form.Group>
-  
+
+          {asistenciaSeleccionada && (
+            <>
+              <Form.Group className="mb-3">
+                <Form.Label>Fecha</Form.Label>
+                <Form.Control type="text" value={fecha|| ""} disabled />
+              </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Label>Hora de Entrada</Form.Label>
+                <Form.Control type="text" value={hora_entrada|| ""} disabled />
+              </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Label>Hora de Salida</Form.Label>
+                <Form.Control type="text" value={hora_salida|| ""} disabled />
+              </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Label>ID Usuario</Form.Label>
+                <Form.Control type="text" value={id_usuario|| ""} disabled />
+              </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Label>Estado</Form.Label>
+                <Form.Control type="text" value={estado|| ""} disabled />
+              </Form.Group>
+
+            </>
+          )}
+
           <Button variant="primary" type="submit">
             {asistenciaSeleccionada ? "Actualizar" : "Agregar"}
           </Button>
         </Form>
       </Modal.Body>
     </Modal>
-  );  
+  );
 };
 
 export default AsistenciaForm;

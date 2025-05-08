@@ -1,67 +1,92 @@
 import React, { useEffect, useState } from "react";
-import { obtenerDetalleplanes, agregarDetalleplan, actualizarDetalleplan, eliminarDetalleplan } from "../services/detalleplanesService";
+import {
+  obtenerDetalleplanes,
+  agregarDetalleplan,
+  actualizarDetalleplan,
+  eliminarDetalleplan,
+} from "../services/detalleplanesService";
+import { obtenerClientes } from "../services/clienteService";
+import { obtenerPlanes } from "../services/planService";
 import DetalleplanesList from "../components/detalleplanes/DetalleplanesList";
 import DetalleplanesForm from "../components/detalleplanes/DetalleplanesForm";
 import { Button } from "react-bootstrap";
 
 const Detalleplanes = () => {
-  const [detalleplanes, setDetallesplanes] = useState([]);
-  const [detalleplanesSeleccionada, setDetalleplanesSeleccionada] = useState(null);
+  const [detalleplanes, setDetalleplanes] = useState([]);
+  const [clientes, setClientes] = useState([]);
+  const [planes, setPlanes] = useState([]);
+  const [detalleplanSeleccionada, setDetalleplanSeleccionada] = useState(null);
   const [mostrarModal, setMostrarModal] = useState(false);
 
   useEffect(() => {
-    cargarDetalleplanes();
+    cargarDatos();
   }, []);
 
-  const cargarDetalleplanes= async () => {
-    const datos = await obtenerDetalleplanes();
-    setDetallesplanes(datos);
+  const cargarDatos = async () => {
+    const [datosDetalleplanes, datosClientes, datosPlanes] = await Promise.all([
+      obtenerDetalleplanes(),
+      obtenerClientes(),
+      obtenerPlanes(),
+    ]);
+
+    setDetalleplanes(datosDetalleplanes);
+    setClientes(datosClientes);
+    setPlanes(datosPlanes);
   };
 
   const agregar = async (detalleplan) => {
     await agregarDetalleplan(detalleplan);
-    cargarDetalleplanes();
+    cargarDatos();
     setMostrarModal(false);
   };
 
   const actualizar = async (id, detalleplan) => {
     await actualizarDetalleplan(id, detalleplan);
-    cargarDetalleplanes();
-    setDetalleplanesSeleccionada(null);
+    cargarDatos();
+    setDetalleplanSeleccionada(null);
     setMostrarModal(false);
   };
 
   const eliminar = async (id) => {
     await eliminarDetalleplan(id);
-    cargarDetalleplanes();
+    cargarDatos();
   };
 
-  // Cuando seleccionamos una detalleplan, mostramos el modal con los datos
   const seleccionarDetalleplan = (detalleplan) => {
-    setDetalleplanesSeleccionada(detalleplan);
+    setDetalleplanSeleccionada(detalleplan);
     setMostrarModal(true);
   };
 
   return (
     <div>
-      <h2>Gestión Detallada de los planes</h2>
-      <Button 
-      className="mb-3" 
-      variant="primary"
-       onClick={() => {
-       setDetalleplanesSeleccionada(null);
-       setMostrarModal(true);
-      }
-      }
-       >Agregar Detalle del plan</Button>
+      <h2>Acuerdo de planes</h2>
+      <Button
+        className="mb-3"
+        variant="primary"
+        onClick={() => {
+          setDetalleplanSeleccionada(null);
+          setMostrarModal(true);
+        }}
+      >
+        Agregar Detalle del plan
+      </Button>
 
-      <DetalleplanesList detalleplanes={detalleplanes} seleccionar={seleccionarDetalleplan} eliminar={eliminar} />
+      <DetalleplanesList
+        detalleplanes={detalleplanes}
+        seleccionar={seleccionarDetalleplan}
+        eliminar={eliminar}
+        clientes={clientes}
+        planes={planes}
+      />
+
       <DetalleplanesForm
         show={mostrarModal}
         handleClose={() => setMostrarModal(false)}
         agregar={agregar}
         actualizar={actualizar}
-        detalleplanesSeleccionada={detalleplanesSeleccionada}
+        detalleplanSeleccionada={detalleplanSeleccionada}
+        clientes={clientes}
+        planes={planes}
       />
     </div>
   );

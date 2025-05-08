@@ -44,7 +44,7 @@ const Pagosplanes = () => {
 
   return (
     <div>
-      <h2>Gestión de los Planes Pagados</h2>
+      <h2>Registro de Planes Pagados</h2>
       <Button 
       className="mb-3" 
       variant="primary"

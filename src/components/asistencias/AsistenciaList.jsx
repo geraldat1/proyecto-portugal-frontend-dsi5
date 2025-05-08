@@ -11,7 +11,7 @@ const AsistenciaList = ({ asistencias, seleccionar, eliminar }) => {
   const indiceFinal = indiceInicio + elementosPorPagina;
   const asistenciasPaginadas = asistencias.slice(indiceInicio, indiceFinal);
 
-  const confirmarEliminacion = (id) => {
+  const confirmarEliminacion = (id_asistencia) => {
     Swal.fire({
       title: "¿Estás seguro?",
       text: "¡No podrás revertir esto!",
@@ -23,7 +23,7 @@ const AsistenciaList = ({ asistencias, seleccionar, eliminar }) => {
       cancelButtonText: "Cancelar",
     }).then((result) => {
       if (result.isConfirmed) {
-        eliminar(id);
+        eliminar(id_asistencia);
         Swal.fire("¡Eliminado!", "El registro ha sido eliminado.", "success");
       }
     });
@@ -80,22 +80,22 @@ const AsistenciaList = ({ asistencias, seleccionar, eliminar }) => {
           </tr>
         </thead>
         <tbody>
-          {asistenciasPaginadas.map((p) => (
-            <tr key={p.id_asistencia}>
-              <td>{p.id_asistencia}</td>
-              <td>{p.fecha}</td>
-              <td>{p.hora_entrada}</td>
-              <td>{p.hora_salida}</td>
-              <td>{p.id_cliente}</td>
-              <td>{p.id_entrenador}</td>
-              <td>{p.id_usuario}</td>
-              <td>{p.id_rutina}</td>
-              <td>{p.estado}</td>
+          {asistenciasPaginadas.map((asistencias) => (
+            <tr key={asistencias.id_asistencia}>
+              <td>{asistencias.id_asistencia}</td>
+              <td>{new Date(asistencias.fecha).toLocaleDateString()}</td>
+              <td>{asistencias.hora_entrada}</td>
+              <td>{asistencias.hora_salida}</td>
+              <td>{asistencias.id_cliente}</td>
+              <td>{asistencias.id_entrenador}</td>
+              <td>{asistencias.id_usuario}</td>
+              <td>{asistencias.id_rutina}</td>
+              <td>{asistencias.estado === 1 ? "En Gym" : "Salido"}</td>
               <td>
-                <Button variant="warning" onClick={() => seleccionar(p)}>
+                <Button variant="info" onClick={() => seleccionar(asistencias)}>
                   Editar
                 </Button>{" "}
-                <Button variant="danger" onClick={() => confirmarEliminacion(p.id)}>
+                <Button variant="danger" onClick={() => confirmarEliminacion(asistencias.id_asistencia)}>
                   Eliminar
                 </Button>
               </td>

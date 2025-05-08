@@ -70,17 +70,37 @@ const ClienteForm = ({ show, handleClose, agregar, actualizar, clienteSelecciona
 
     const nuevoCliente = { dni, nombre, telefono, direccion };
 
-    if (clienteSeleccionado) {
-      // Si se está editando, incluir campos que el backend no gestiona automáticamente
-      actualizar(clienteSeleccionado.id, {
-        ...nuevoCliente,
-        fecha,
-        estado: parseInt(estado),
-        id_user: parseInt(id_user),
-      });
-    } else {
-      agregar(nuevoCliente); // el backend agregará fecha, estado, id_user automáticamente
-    }
+  if (clienteSeleccionado) {
+    actualizar(clienteSeleccionado.id, {
+      ...nuevoCliente,
+      fecha,
+      estado: parseInt(estado),
+      id_user: parseInt(id_user),
+    });
+
+    Swal.fire({
+      icon: "info",
+      title: "Registro actualizado",
+      text: "El cliente fue actualizado correctamente.",
+      timer: 2000,
+      showConfirmButton: false,
+    });
+  } else {
+    agregar({
+      ...nuevoCliente,
+      fecha,
+      estado: parseInt(estado),
+      id_user: parseInt(id_user),
+    });
+
+    Swal.fire({
+      icon: "success",
+      title: "Cliente agregado",
+      text: "El cliente fue registrado exitosamente.",
+      timer: 2000,
+      showConfirmButton: false,
+    });
+  }
 
     setDni("");
     setNombre("");
@@ -154,24 +174,6 @@ const ClienteForm = ({ show, handleClose, agregar, actualizar, clienteSelecciona
             <Form.Control.Feedback type="invalid">{errores.direccion}</Form.Control.Feedback>
           </Form.Group>
 
-          {clienteSeleccionado && (
-            <>
-              <Form.Group className="mb-3">
-                <Form.Label>Fecha</Form.Label>
-                <Form.Control type="text" value={fecha} disabled />
-              </Form.Group>
-
-              <Form.Group className="mb-3">
-                <Form.Label>Estado</Form.Label>
-                <Form.Control type="text" value={estado} disabled />
-              </Form.Group>
-
-              <Form.Group className="mb-3">
-                <Form.Label>ID User</Form.Label>
-                <Form.Control type="text" value={id_user} disabled />
-              </Form.Group>
-            </>
-          )}
 
           <Button variant="primary" type="submit">
             {clienteSeleccionado ? "Actualizar" : "Agregar"}

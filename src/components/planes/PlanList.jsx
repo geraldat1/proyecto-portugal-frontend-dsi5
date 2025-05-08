@@ -65,24 +65,24 @@ const PlanList = ({ planes, seleccionar, eliminar }) => {
   return (
     <>
       <Row xs={1} md={2} lg={3} className="g-4">
-        {planesPaginadas.map((p) => (
-          <Col key={p.id}>
+        {planesPaginadas.map((plan) => (
+          <Col key={plan.id}>
             <Card>
-              {p.imagen && (
-                <Card.Img variant="top" src={p.imagen} alt={p.plan} />
+              {plan.imagen && (
+                <Card.Img variant="top" src={plan.imagen} alt={plan.plan} />
               )}
               <Card.Body>
-                <Card.Title>{p.plan}</Card.Title>
+                <Card.Title>{plan.plan}</Card.Title>
                 <Card.Text>
-                  <strong>Descripcion:</strong> {p.descripcion} <br />
-                  <strong>Precio:</strong> {p.precio_plan} <br />
-                  <strong>Condicion:</strong> {p.condicion} <br />
-                  <strong>Estado:</strong> {p.estado === 1 ? "Activo" : "Inactivo"} <br />
+                  <strong>Descripcion:</strong> {plan.descripcion} <br />
+                  <strong>Precio:</strong> S/ {Number(plan.precio_plan).toFixed(2)} <br />
+                  <strong>Condicion:</strong> {plan.condicion} <br />
+                  <strong>Estado:</strong> {plan.estado === 1 ? "Activo" : "Inactivo"} <br />
                 </Card.Text>
-                <Button variant="warning" onClick={() => seleccionar(p)} className="me-2">
+                <Button variant="warning" onClick={() => seleccionar(plan)} className="me-2">
                   Editar
                 </Button>
-                <Button variant="danger" onClick={() => confirmarEliminacion(p.id)}>
+                <Button variant="danger" onClick={() => confirmarEliminacion(plan.id)}>
                   Eliminar
                 </Button>
               </Card.Body>
@@ -90,6 +90,7 @@ const PlanList = ({ planes, seleccionar, eliminar }) => {
           </Col>
         ))}
       </Row>
+
 
       <Pagination className="justify-content-center mt-4">
         <Pagination.First onClick={irPrimeraPagina} disabled={paginaActual === 1} />

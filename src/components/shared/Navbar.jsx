@@ -25,17 +25,49 @@ const Navbar = () => {
           color: #FFD700 !important;
         }
 
-        .dropdown-menu a {
-          color: black;
-        }
-        .dropdown-menu a:hover {
-          background-color: #FFD700;
-          color: black;
+        /* Estilos para el dropdown de Clientes */
+        .navbar-custom .nav-item .dropdown-menu {
+          background-color: #000 !important; /* Fondo negro */
         }
 
-        .dropdown-toggle {
+        .navbar-custom .nav-item .dropdown-menu a {
+          color: white !important; /* Texto blanco */
+        }
+
+        .navbar-custom .nav-item .dropdown-menu a:hover {
+          background-color: #FFD700 !important; /* Fondo amarillo al pasar el ratón */
+          color: black !important; /* Texto negro al pasar el ratón */
+        }
+
+        .navbar-custom .nav-item .dropdown-toggle {
+          background-color: #000 !important;
+          border: none;
+          color: white !important;
+        }
+
+        /* Estilos para el dropdown de Usuario */
+        .dropdown-menu-user {
+          background-color: #FFD700 !important; /* Fondo amarillo */
+        }
+
+        .dropdown-menu-user a {
+          color: black !important; /* Texto negro */
+        }
+
+        /* Cambiar el fondo del dropdown de usuario a amarillo al pasar el puntero */
+        .dropdown-toggle-user:hover {
+          background-color: #FFD700 !important;
+          color: black !important;
+        }
+
+        .dropdown-menu-user a:hover {
+          background-color: #f7f7f7 !important; /* Fondo claro al pasar el ratón */
+        }
+
+        .dropdown-toggle-user {
           background-color: #FFD700 !important;
           border: none;
+          color: black !important;
         }
       `}</style>
 
@@ -58,6 +90,7 @@ const Navbar = () => {
                 <NavDropdown.Item as={Link} to="/detalleplanes">Detalle Planes</NavDropdown.Item>
                 <NavDropdown.Item as={Link} to="/pagosplanes">Pagos</NavDropdown.Item>
               </NavDropdown>
+
               <Nav.Link as={Link} to="/asistencias">Asistencias</Nav.Link>
               <Nav.Link as={Link} to="/entrenadores">Entrenadores</Nav.Link>
               <Nav.Link as={Link} to="/rutinas">Rutinas</Nav.Link>
@@ -65,8 +98,8 @@ const Navbar = () => {
             </Nav>
 
             {user && (
-              <Dropdown align="end">
-                <Dropdown.Toggle id="dropdown-user">
+              <Dropdown align="end" className="dropdown-user">
+                <Dropdown.Toggle className="dropdown-toggle-user" id="dropdown-user">
                   <FaUserCircle size={20} className="me-2" />
                   {user.name?.toUpperCase()}
                 </Dropdown.Toggle>

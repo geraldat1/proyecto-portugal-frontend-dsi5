@@ -40,17 +40,12 @@ const PagosplanesForm = ({ show, handleClose, agregar, actualizar, pagosplanSele
   const validar = () => {
     const nuevosErrores = {};
 
-    if (!id_detalle.trim()) nuevosErrores.id_detalle = "El ID de detalle es obligatorio";
-    if (!id_cliente.trim()) nuevosErrores.id_cliente = "El ID del cliente es obligatorio";
-    if (!id_plan.trim()) nuevosErrores.id_plan = "El ID del plan es obligatorio";
+    if (!String(id_detalle).trim())  nuevosErrores.id_detalle = "El ID de detalle es obligatorio";
+    if (!String(id_cliente).trim()) nuevosErrores.id_cliente = "El ID del cliente es obligatorio";
+    if (!String(id_plan).trim()) nuevosErrores.id_plan = "El ID del plan es obligatorio";
     if (!precio || isNaN(precio) || parseFloat(precio) <= 0) {
       nuevosErrores.precio = "El precio debe ser un número válido y mayor a 0";
     }
-    if (!fecha.trim()) nuevosErrores.fecha = "La fecha es obligatoria";
-    if (!hora.trim()) nuevosErrores.hora = "La hora es obligatoria";
-    if (!id_user.trim()) nuevosErrores.id_user = "El ID del usuario es obligatorio";
-    if (!estado.trim()) nuevosErrores.estado = "El estado es obligatorio";
-
     setErrores(nuevosErrores);
     return Object.keys(nuevosErrores).length === 0;
   };
@@ -63,18 +58,20 @@ const PagosplanesForm = ({ show, handleClose, agregar, actualizar, pagosplanSele
     }
 
     const nuevaPagosplan = {
-      id_detalle,
-      id_cliente,
-      id_plan,
-      precio: parseFloat(precio),
-      fecha,
-      hora,
-      id_user,
-      estado,
+      id_detalle: parseInt(id_detalle),
+      id_cliente: parseInt(id_cliente) ,
+      id_plan: parseInt(id_plan),
+      precio: parseFloat(precio)
     };
 
     if (pagosplanSeleccionada) {
-      actualizar(pagosplanSeleccionada.id, nuevaPagosplan);
+      actualizar(pagosplanSeleccionada.id, {
+        ...nuevaPagosplan,
+        fecha,
+        hora,
+        id_user: parseInt(id_user),
+        estado: parseInt(estado),
+      });
     } else {
       agregar(nuevaPagosplan);
     }
@@ -87,6 +84,7 @@ const PagosplanesForm = ({ show, handleClose, agregar, actualizar, pagosplanSele
     setHora("");
     setIdUser("");
     setEstado("");
+
     setErrores({});
     handleClose();
   };
@@ -142,50 +140,32 @@ const PagosplanesForm = ({ show, handleClose, agregar, actualizar, pagosplanSele
             <Form.Control.Feedback type="invalid">{errores.precio}</Form.Control.Feedback>
           </Form.Group>
 
-          <Form.Group className="mb-3">
-            <Form.Label>Fecha</Form.Label>
-            <Form.Control
-              type="date"
-              value={fecha}
-              onChange={(e) => setFecha(e.target.value)}
-              isInvalid={!!errores.fecha}
-            />
-            <Form.Control.Feedback type="invalid">{errores.fecha}</Form.Control.Feedback>
-          </Form.Group>
+          {pagosplanSeleccionada &&(
+            <>
 
-          <Form.Group className="mb-3">
-            <Form.Label>Hora</Form.Label>
-            <Form.Control
-              type="time"
-              value={hora}
-              onChange={(e) => setHora(e.target.value)}
-              isInvalid={!!errores.hora}
-            />
-            <Form.Control.Feedback type="invalid">{errores.hora}</Form.Control.Feedback>
-          </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Fecha</Form.Label>
+              <Form.Control type="text" value={fecha} disabled />
+            </Form.Group>
 
-          <Form.Group className="mb-3">
-            <Form.Label>ID Usuario</Form.Label>
-            <Form.Control
-              type="text"
-              value={id_user}
-              onChange={(e) => setIdUser(e.target.value)}
-              isInvalid={!!errores.id_user}
-            />
-            <Form.Control.Feedback type="invalid">{errores.id_user}</Form.Control.Feedback>
-          </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Hora</Form.Label>
+              <Form.Control type="text" value={hora} disabled />
+            </Form.Group>
 
-          <Form.Group className="mb-3">
-            <Form.Label>Estado</Form.Label>
-            <Form.Control
-              type="text"
-              value={estado}
-              onChange={(e) => setEstado(e.target.value)}
-              isInvalid={!!errores.estado}
-            />
-            <Form.Control.Feedback type="invalid">{errores.estado}</Form.Control.Feedback>
-          </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>ID User</Form.Label>
+              <Form.Control type="text" value={id_user} disabled />
+            </Form.Group>
 
+            
+            <Form.Group className="mb-3">
+              <Form.Label>Estado</Form.Label>
+              <Form.Control type="text" value={estado} disabled />
+            </Form.Group>
+
+            </>
+          )}
           <Button variant="primary" type="submit">
             {pagosplanSeleccionada ? "Actualizar" : "Agregar"}
           </Button>

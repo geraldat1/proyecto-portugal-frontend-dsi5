@@ -49,9 +49,9 @@ export const agregarAsistencia= async (asistencia) => {
 };
 
 // Actualizar asistencia por ID
-export const actualizarAsistencia = async (id, asistencia) => {
+export const actualizarAsistencia = async (id_asistencia, asistencia) => {
   try {
-    const respuesta = await fetch(`${API_URL}/${id}`, {
+    const respuesta = await fetch(`${API_URL}/${id_asistencia}`, {
       method: "PUT",
       headers: getAuthHeaders(),
       body: JSON.stringify(asistencia),
@@ -66,9 +66,9 @@ export const actualizarAsistencia = async (id, asistencia) => {
 };
 
 // Eliminar asistencia por ID
-export const eliminarAsistencia = async (id) => {
+export const eliminarAsistencia = async (id_asistencia) => {
   try {
-    const respuesta = await fetch(`${API_URL}/${id}`, {
+    const respuesta = await fetch(`${API_URL}/${id_asistencia}`, {
       method: "DELETE",
       headers: getAuthHeaders(),
     });

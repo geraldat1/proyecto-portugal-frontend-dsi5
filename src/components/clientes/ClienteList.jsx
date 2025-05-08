@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Table, Button, Pagination } from "react-bootstrap";
 import Swal from "sweetalert2";
+import { BiEdit, BiTrash } from "react-icons/bi";
+
 
 const ClienteList = ({ clientes, seleccionar, eliminar }) => {
   const [paginaActual, setPaginaActual] = useState(1);
@@ -24,10 +26,17 @@ const ClienteList = ({ clientes, seleccionar, eliminar }) => {
     }).then((result) => {
       if (result.isConfirmed) {
         eliminar(id);
-        Swal.fire("¡Eliminado!", "El registro ha sido eliminado.", "success");
+        Swal.fire({
+          title: "¡Eliminado!",
+          text: "El registro ha sido eliminado.",
+          icon: "success",
+          showConfirmButton: false,
+          timer: 1500, // se cierra automáticamente después de 1.5 segundos
+        });
       }
     });
   };
+  
 
   const irPrimeraPagina = () => setPaginaActual(1);
   const irUltimaPagina = () => setPaginaActual(totalPaginas);
@@ -88,12 +97,12 @@ const ClienteList = ({ clientes, seleccionar, eliminar }) => {
               <td>{cliente.estado === 1 ? "Activo" : "Inactivo"}</td>
               <td>{cliente.id_user}</td>
               <td>
-                <Button variant="warning" onClick={() => seleccionar(cliente)}>
-                  Editar
-                </Button>{" "}
-                <Button variant="danger" onClick={() => confirmarEliminacion(cliente.id)}>
-                  Eliminar
-                </Button>
+              <Button variant="info" onClick={() => seleccionar(cliente)} title="Editar">
+                <BiEdit size={22} />
+              </Button>{" "}
+              <Button variant="danger" onClick={() => confirmarEliminacion(cliente.id)} title="Eliminar">
+                <BiTrash size={22} />
+              </Button>
               </td>
             </tr>
           ))}

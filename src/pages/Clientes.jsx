@@ -44,7 +44,7 @@ const Clientes = () => {
 
   return (
     <div>
-      <h2>Gestión de Clientes</h2>
+      <h2>Clientes Registrados</h2>
       <Button 
       className="mb-3" 
       variant="primary"

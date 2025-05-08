@@ -99,7 +99,7 @@ const Login = () => {
   const [correo, setEmail] = useState("");
   const [clave, setPassword] = useState("");
   const [message, setMessage] = useState("");
-  const [messageType, setMessageType] = useState(""); // 'success' o 'error'
+  const [messageType, setMessageType] = useState(""); // 
   const [showPassword, setShowPassword] = useState(false); // Estado para mostrar/ocultar contraseña
   const navigate = useNavigate();
 
@@ -112,36 +112,31 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+  
     try {
       const res = await axios.post("http://localhost:3001/api/v1/login", {
         correo,
         clave,
       });
+  
       const token = res.data.token;
       localStorage.setItem("token", token);
+  
       const decoded = jwtDecode(token);
       setUser(decoded);
       setMessage("¡Bienvenido al sistema!");
-      setMessageType("success");
+      setMessageType("success"); // Definir el tipo de mensaje como éxito
   
-      // Mostrar el mensaje por 3 segundos y luego redirigir
       setTimeout(() => {
-        setMessage(""); // Ocultar el mensaje
-        navigate("/");  // Redirigir después de 3 segundos
-      }, 5000); // 3 segundos de espera para mostrar el mensaje
+        navigate("/");
+      }, 1000);
     } catch (err) {
       setMessage("Credenciales incorrectas");
-      setMessageType("error");
-  
-      // Mostrar mensaje de error por 3 segundos y luego ocultarlo
-      setTimeout(() => {
-        setMessage("");
-      }, 5000);
+      setMessageType("error"); // Definir el tipo de mensaje como error
     }
   };
   
   
-
   return (
     <>
       <div style={styles.background}></div>
@@ -153,17 +148,18 @@ const Login = () => {
             style={styles.logo} // Usando el estilo para el logo
           />
           <h2 style={styles.title}>LOGIN</h2>
+
           {message && (
             <Alert
+              variant={messageType === "error" ? "danger" : "success"} // Establece el tipo de variante según el tipo de mensaje
               style={{
-                color: messageType === "error" ? "red" : "green",
                 fontWeight: "bold",
               }}
-              variant="light"
             >
               {message}
             </Alert>
           )}
+
           <Form onSubmit={handleSubmit}>
             <Form.Group className="mb-3" style={{ position: "relative" }}>
               <div style={styles.inputIconWrapper}>

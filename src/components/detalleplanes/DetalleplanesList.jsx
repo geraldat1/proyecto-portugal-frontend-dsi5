@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState } from "react"; 
 import { Table, Button, Pagination } from "react-bootstrap";
 import Swal from "sweetalert2";
+import { BiEdit, BiTrash } from "react-icons/bi";
 
-const DetalleplanesList = ({ detalleplanes, seleccionar, eliminar }) => {
+const DetalleplanesList = ({ detalleplanes, seleccionar, eliminar, clientes, planes }) => {
   const [paginaActual, setPaginaActual] = useState(1);
   const elementosPorPagina = 5;
 
@@ -62,17 +63,27 @@ const DetalleplanesList = ({ detalleplanes, seleccionar, eliminar }) => {
     return paginas;
   };
 
+  const obtenerClienteNombre = (id) => {
+    const cliente = clientes.find((cliente) => cliente.id === id);
+    return cliente ? cliente.nombre : "Cliente no encontrado";
+  };
+
+  const obtenerPlanDescripcion = (id) => {
+    const plan = planes.find((plan) => plan.id === id);
+    return plan ? plan.plan : "Plan no encontrado";
+  };
+
   return (
     <>
       <Table striped bordered hover>
         <thead>
           <tr>
             <th>ID</th>
-            <th>ID Cliente</th>
-            <th>ID plan</th>
+            <th>Cliente</th>
+            <th>Plan</th>
             <th>FECHA</th>
             <th>HORA</th>
-            <th>FECHA vec</th>
+            <th>FECHA VENC</th>
             <th>Fecha Limite</th>
             <th>ID User</th>
             <th>Estado</th>
@@ -80,23 +91,23 @@ const DetalleplanesList = ({ detalleplanes, seleccionar, eliminar }) => {
           </tr>
         </thead>
         <tbody>
-          {detalleplanesPaginadas.map((p) => (
-            <tr key={p.id}>
-              <td>{p.id}</td>
-              <td>{p.id_cliente}</td>
-              <td>{p.id_plan}</td>
-              <td>{p.fecha}</td>
-              <td>{p.hora}</td>
-              <td>{p.fecha_venc}</td>
-              <td>{p.fecha_limite}</td>
-              <td>{p.id_user}</td>
-              <td>{p.estado}</td>
+          {detalleplanesPaginadas.map((detalleplan) => (
+            <tr key={detalleplan.id}>
+              <td>{detalleplan.id}</td>
+              <td>{obtenerClienteNombre(detalleplan.id_cliente)}</td>
+              <td>{obtenerPlanDescripcion(detalleplan.id_plan)}</td>
+              <td>{new Date(detalleplan.fecha).toLocaleDateString()}</td>
+              <td>{detalleplan.hora}</td>
+              <td>{new Date(detalleplan.fecha_venc).toLocaleDateString()}</td>
+              <td>{new Date(detalleplan.fecha_limite).toLocaleDateString()}</td>
+              <td>{detalleplan.id_user}</td>
+              <td>{detalleplan.estado}</td>
               <td>
-                <Button variant="warning" onClick={() => seleccionar(p)}>
-                  Editar
+                <Button variant="warning" onClick={() => seleccionar(detalleplan)} title="Editar">
+                  <BiEdit size={22} />
                 </Button>{" "}
-                <Button variant="danger" onClick={() => confirmarEliminacion(p.id)}>
-                  Eliminar
+                <Button variant="danger" onClick={() => confirmarEliminacion(detalleplan.id)} title="Eliminar">
+                  <BiTrash size={22} />
                 </Button>
               </td>
             </tr>
