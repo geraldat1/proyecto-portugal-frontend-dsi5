@@ -1,13 +1,12 @@
 import React from "react";
 import { Container } from "react-bootstrap";
+import "../shared/css/Footer.css"; // Asegúrate de que esta ruta sea correcta
 
 const Footer = () => {
   return (
-    <footer className="text-dark py-3" style={{ background: "transparent" }}>
+    <footer>
       <Container className="text-center">
-        <small>
-          &copy; {new Date().getFullYear()} Mi App - Todos los derechos reservados | Desarrollado por Alumnos DSI 5 - TEC
-        </small>
+        <small>&copy; {new Date().getFullYear()} App ToretoGym</small>
       </Container>
     </footer>
   );

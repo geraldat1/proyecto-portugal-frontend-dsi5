@@ -174,7 +174,6 @@ const ClienteForm = ({ show, handleClose, agregar, actualizar, clienteSelecciona
             <Form.Control.Feedback type="invalid">{errores.direccion}</Form.Control.Feedback>
           </Form.Group>
 
-
           <Button variant="primary" type="submit">
             {clienteSeleccionado ? "Actualizar" : "Agregar"}
           </Button>

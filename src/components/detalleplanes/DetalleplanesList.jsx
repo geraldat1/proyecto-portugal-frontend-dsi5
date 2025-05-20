@@ -1,7 +1,8 @@
 import React, { useState } from "react"; 
 import { Table, Button, Pagination } from "react-bootstrap";
 import Swal from "sweetalert2";
-import { BiEdit, BiTrash } from "react-icons/bi";
+import { BiEdit, BiTrash, BiDollar } from "react-icons/bi";
+import { agregarPagosplan } from "../../services/pagosplanesService";
 
 const DetalleplanesList = ({ detalleplanes, seleccionar, eliminar, clientes, planes }) => {
   const [paginaActual, setPaginaActual] = useState(1);
@@ -35,10 +36,8 @@ const DetalleplanesList = ({ detalleplanes, seleccionar, eliminar, clientes, pla
   const irAnterior = () => setPaginaActual((prev) => Math.max(prev - 1, 1));
   const irSiguiente = () => setPaginaActual((prev) => Math.min(prev + 1, totalPaginas));
 
-  // Calcular el rango de páginas a mostrar
   const obtenerItemsPaginacion = () => {
     const paginas = [];
-
     let inicio = Math.max(paginaActual - 2, 1);
     let fin = Math.min(paginaActual + 2, totalPaginas);
 
@@ -73,6 +72,33 @@ const DetalleplanesList = ({ detalleplanes, seleccionar, eliminar, clientes, pla
     return plan ? plan.plan : "Plan no encontrado";
   };
 
+const pagar = async (detalleplan) => {
+  // Obtener el plan correspondiente usando el id_plan
+  const plan = planes.find((plan) => plan.id === detalleplan.id_plan);
+  
+  if (!plan) {
+    Swal.fire("Error", "Plan no encontrado.", "error");
+    return;
+  }
+
+  const pagosplan = {
+    id_detalle: detalleplan.id, // Cambia 'id' a 'id_detalle'
+    id_cliente: detalleplan.id_cliente, // Asegúrate de que este campo sea correcto
+    id_plan: detalleplan.id_plan, // Asegúrate de que este campo sea correcto
+    precio: plan.precio_plan, // Asegúrate de acceder al campo correcto
+  };
+
+  console.log("Objeto pagosplan:", pagosplan); // Verifica el objeto
+
+  try {
+    await agregarPagosplan(pagosplan);
+    Swal.fire("¡Pago realizado!", "El registro ha sido enviado a pagos.", "success");
+  } catch (error) {
+    Swal.fire("Error", "No se pudo realizar el pago.", "error");
+  }
+};
+
+
   return (
     <>
       <Table striped bordered hover>
@@ -81,11 +107,10 @@ const DetalleplanesList = ({ detalleplanes, seleccionar, eliminar, clientes, pla
             <th>ID</th>
             <th>Cliente</th>
             <th>Plan</th>
-            <th>FECHA</th>
-            <th>HORA</th>
-            <th>FECHA VENC</th>
-            <th>Fecha Limite</th>
-            <th>ID User</th>
+            <th>Fecha</th>
+            <th>Hora</th>
+            <th>Desde</th>
+            <th>Hasta</th>
             <th>Estado</th>
             <th>Acciones</th>
           </tr>
@@ -100,13 +125,27 @@ const DetalleplanesList = ({ detalleplanes, seleccionar, eliminar, clientes, pla
               <td>{detalleplan.hora}</td>
               <td>{new Date(detalleplan.fecha_venc).toLocaleDateString()}</td>
               <td>{new Date(detalleplan.fecha_limite).toLocaleDateString()}</td>
-              <td>{detalleplan.id_user}</td>
-              <td>{detalleplan.estado}</td>
-              <td>
-                <Button variant="warning" onClick={() => seleccionar(detalleplan)} title="Editar">
+              <td>{detalleplan.estado === 1 ? "Activo" : "Inactivo"}</td>
+              <td className="d-flex gap-2">
+                <Button
+                  variant="success"
+                  onClick={() => pagar(detalleplan)}
+                  title="Pagar"
+                >
+                  <BiDollar size={20} />
+                </Button>
+                <Button
+                  variant="warning"
+                  onClick={() => seleccionar(detalleplan)}
+                  title="Editar"
+                >
                   <BiEdit size={22} />
-                </Button>{" "}
-                <Button variant="danger" onClick={() => confirmarEliminacion(detalleplan.id)} title="Eliminar">
+                </Button>
+                <Button
+                  variant="danger"
+                  onClick={() => confirmarEliminacion(detalleplan.id)}
+                  title="Eliminar"
+                >
                   <BiTrash size={22} />
                 </Button>
               </td>
@@ -127,3 +166,4 @@ const DetalleplanesList = ({ detalleplanes, seleccionar, eliminar, clientes, pla
 };
 
 export default DetalleplanesList;
+

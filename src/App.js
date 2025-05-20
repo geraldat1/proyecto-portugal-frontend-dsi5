@@ -18,6 +18,9 @@ import { AuthContext } from "./context/AuthContext";
 import { jwtDecode } from "jwt-decode";
 import "bootstrap/dist/css/bootstrap.min.css";
 
+import './App.css';
+
+
 const App = () => {
   const { user, setUser } = useContext(AuthContext);
 
@@ -38,7 +41,7 @@ const App = () => {
   }, [setUser]);
 
   return (
-    <>
+    <div className="app-container">
       {user && <Navbar />}
       <div className="container mt-3">
         <Routes>
@@ -46,12 +49,11 @@ const App = () => {
             path="/"
             element={user ? <Home /> : <Navigate to="/login" />}
           />
-          
           <Route
             path="/clientes"
             element={user ? <Clientes /> : <Navigate to="/login" />}
           />
-           <Route
+          <Route
             path="/entrenadores"
             element={user ? <Entrenadores /> : <Navigate to="/login" />}
           />
@@ -73,9 +75,9 @@ const App = () => {
           />
           <Route
             path="/asistencias"
-            element={user ? <Asistencias/> : <Navigate to="/login" />}
+            element={user ? <Asistencias /> : <Navigate to="/login" />}
           />
-           <Route
+          <Route
             path="/configuracion"
             element={user ? <Configuracion /> : <Navigate to="/login" />}
           />
@@ -91,7 +93,7 @@ const App = () => {
         </Routes>
       </div>
       <Footer />
-    </>
+    </div>
   );
 };
 

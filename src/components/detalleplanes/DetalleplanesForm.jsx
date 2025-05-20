@@ -74,8 +74,30 @@ const DetalleplanesForm = ({
         id_user: parseInt(id_user),
         estado: parseInt(estado),
       });
+
+      Swal.fire({
+            icon: "info",
+            title: "Registro actualizado",
+            text: "El acuerdo fue actualizado correctamente.",
+            timer: 2000,
+            showConfirmButton: false,
+          });
     } else {
-      agregar(nuevaDetalleplan);
+      agregar({
+        ...nuevaDetalleplan,
+        fecha,
+        hora,
+        id_user: parseInt(id_user),
+        estado: parseInt(estado),
+      });
+
+      Swal.fire({
+            icon: "success",
+            title: "Cliente agregado",
+            text: "El acuerdo fue registrado exitosamente.",
+            timer: 2000,
+            showConfirmButton: false,
+          });
     }
 
     setIdCliente("");
@@ -159,31 +181,6 @@ const DetalleplanesForm = ({
             />
             <Form.Control.Feedback type="invalid">{errores.fecha_limite}</Form.Control.Feedback>
           </Form.Group>
-
-          {/* Información de Detalleplan */}
-          {detalleplanSeleccionada && (
-            <>
-              <Form.Group className="mb-3">
-                <Form.Label>Fecha</Form.Label>
-                <Form.Control type="text" value={fecha} disabled />
-              </Form.Group>
-
-              <Form.Group className="mb-3">
-                <Form.Label>Hora</Form.Label>
-                <Form.Control type="text" value={hora} disabled />
-              </Form.Group>
-
-              <Form.Group className="mb-3">
-                <Form.Label>ID User</Form.Label>
-                <Form.Control type="text" value={id_user} disabled />
-              </Form.Group>
-
-              <Form.Group className="mb-3">
-                <Form.Label>Estado</Form.Label>
-                <Form.Control type="text" value={estado} disabled />
-              </Form.Group>
-            </>
-          )}
 
           <Button variant="primary" type="submit">
             {detalleplanSeleccionada ? "Actualizar" : "Agregar"}

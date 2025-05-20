@@ -1,0 +1,69 @@
+.navbar-custom .nav-link {
+  color: white !important;
+  transition: all 0.3s ease;
+  margin: 0 10px;
+  border-bottom: 2px solid transparent; /* Invisible por defecto */
+}
+
+.navbar-custom .nav-link:hover {
+  color: #FFD700 !important;
+  border-bottom: 2px solid #FFD700; /* Borde dorado al pasar el cursor */
+}
+
+
+/* Estilos para el dropdown de Clientes */
+.navbar-custom .nav-item .dropdown-menu {
+  background-color: #000 !important;
+}
+
+.navbar-custom .nav-item .dropdown-menu a {
+  color: white !important;
+  border-bottom: 2px solid transparent; /* Invisible por defecto */
+  transition: all 0.3s ease;
+}
+
+.navbar-custom .nav-item .dropdown-menu a:hover {
+  background-color: #FFD700 !important;
+  color: black !important;
+  border-bottom: 2px solid black; /* Borde negro al hacer hover */
+}
+
+/* Estilo del botón que abre el dropdown */
+.navbar-custom .nav-item .dropdown-toggle {
+  background-color: #000 !important;
+  border: none;
+  color: white !important;
+  transition: all 0.3s ease;
+  border-bottom: 2px solid transparent;
+}
+
+.navbar-custom .nav-item .dropdown-toggle:hover {
+  color: #FFD700 !important;
+  border-bottom: 2px solid #FFD700;
+}
+
+
+/* Estilos para el dropdown de Usuario */
+.dropdown-menu-user {
+  background-color: #FFD700 !important;
+}
+
+.dropdown-menu-user a {
+  color: black !important;
+}
+
+.dropdown-toggle-user:hover {
+  background-color: #FFD700 !important;
+  color: black !important;
+}
+
+.dropdown-menu-user a:hover {
+  background-color: #f7f7f7 !important;
+}
+
+.dropdown-toggle-user {
+  background-color: #FFD700 !important;
+  border: none;
+  color: black !important;
+}
+
