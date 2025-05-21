@@ -6,10 +6,13 @@ const RutinaList = ({ rutinas, seleccionar, eliminar }) => {
   const [paginaActual, setPaginaActual] = useState(1);
   const elementosPorPagina = 5;
 
-  const totalPaginas = Math.ceil(rutinas.length / elementosPorPagina);
+  // Ordenar rutinas por ID de forma descendente
+  const rutinasOrdenadas = [...rutinas].sort((a, b) => b.id - a.id);
+
+  const totalPaginas = Math.ceil(rutinasOrdenadas.length / elementosPorPagina);
   const indiceInicio = (paginaActual - 1) * elementosPorPagina;
   const indiceFinal = indiceInicio + elementosPorPagina;
-  const rutinasPaginadas = rutinas.slice(indiceInicio, indiceFinal);
+  const rutinasPaginadas = rutinasOrdenadas.slice(indiceInicio, indiceFinal);
 
   const confirmarEliminacion = (id) => {
     Swal.fire({

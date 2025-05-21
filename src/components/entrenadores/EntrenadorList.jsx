@@ -1,15 +1,32 @@
 import React, { useState } from "react";
-import { Table, Button, Pagination } from "react-bootstrap";
+import { Table, Button, Pagination, Form, InputGroup } from "react-bootstrap";
 import Swal from "sweetalert2";
+import { FaUserCheck, FaSearch } from "react-icons/fa";
 
 const EntrenadorList = ({ entrenadores, seleccionar, eliminar }) => {
   const [paginaActual, setPaginaActual] = useState(1);
+  const [busqueda, setBusqueda] = useState("");
   const elementosPorPagina = 5;
 
-  const totalPaginas = Math.ceil(entrenadores.length / elementosPorPagina);
+  const entrenadoresFiltrados = entrenadores.filter((ent) => {
+    const texto = busqueda.toLowerCase();
+    return (
+      ent.nombre.toLowerCase().includes(texto) ||
+      ent.apellido.toLowerCase().includes(texto) ||
+      ent.telefono.toLowerCase().includes(texto) ||
+      ent.correo.toLowerCase().includes(texto) ||
+      ent.direccion.toLowerCase().includes(texto)
+    );
+  });
+
+  const entrenadoresOrdenados = [...entrenadoresFiltrados].sort((a, b) => b.id - a.id);
+
+  const totalPaginas = Math.ceil(entrenadoresOrdenados.length / elementosPorPagina);
   const indiceInicio = (paginaActual - 1) * elementosPorPagina;
   const indiceFinal = indiceInicio + elementosPorPagina;
-  const entrendoresPaginados = entrenadores.slice(indiceInicio, indiceFinal);
+  const entrenadoresPaginados = entrenadoresOrdenados.slice(indiceInicio, indiceFinal);
+
+  const entrenadoresActivos = entrenadores.filter(ent => ent.estado === 1).length;
 
   const confirmarEliminacion = (id) => {
     Swal.fire({
@@ -34,10 +51,8 @@ const EntrenadorList = ({ entrenadores, seleccionar, eliminar }) => {
   const irAnterior = () => setPaginaActual((prev) => Math.max(prev - 1, 1));
   const irSiguiente = () => setPaginaActual((prev) => Math.min(prev + 1, totalPaginas));
 
-  // Calcular el rango de páginas a mostrar
   const obtenerItemsPaginacion = () => {
     const paginas = [];
-
     let inicio = Math.max(paginaActual - 2, 1);
     let fin = Math.min(paginaActual + 2, totalPaginas);
 
@@ -64,6 +79,31 @@ const EntrenadorList = ({ entrenadores, seleccionar, eliminar }) => {
 
   return (
     <>
+      {/* Buscador + contador activos */}
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <Form.Group style={{ maxWidth: "300px", marginBottom: 0 }}>
+          <InputGroup size="sm">
+            <InputGroup.Text>
+              <FaSearch />
+            </InputGroup.Text>
+            <Form.Control
+              type="text"
+              placeholder="Buscar"
+              value={busqueda}
+              onChange={(e) => {
+                setBusqueda(e.target.value);
+                setPaginaActual(1);
+              }}
+            />
+          </InputGroup>
+        </Form.Group>
+
+        <div className="d-flex align-items-center" style={{ fontSize: "1.1rem", fontWeight: "500" }}>
+          <FaUserCheck size={20} className="me-2 text-success" />
+          Entrenadores activos: {entrenadoresActivos}
+        </div>
+      </div>
+
       <Table striped bordered hover>
         <thead>
           <tr>
@@ -78,7 +118,7 @@ const EntrenadorList = ({ entrenadores, seleccionar, eliminar }) => {
           </tr>
         </thead>
         <tbody>
-          {entrendoresPaginados.map((p) => (
+          {entrenadoresPaginados.map((p) => (
             <tr key={p.id}>
               <td>{p.id}</td>
               <td>{p.nombre}</td>
