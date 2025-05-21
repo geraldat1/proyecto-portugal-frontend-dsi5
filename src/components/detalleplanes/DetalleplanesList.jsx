@@ -154,7 +154,7 @@ const DetalleplanesList = ({ detalleplanes, seleccionar, eliminar, clientes, pla
               <td>{detalleplan.hora}</td>
               <td>{new Date(detalleplan.fecha_venc).toLocaleDateString()}</td>
               <td>{new Date(detalleplan.fecha_limite).toLocaleDateString()}</td>
-              <td>{detalleplan.estado === 1 ? "Activo" : "Inactivo"}</td>
+             <td>{detalleplan.estado === 1 ? "Pendiente" : detalleplan.estado === 0 ? "Deshabilitado" : "Desconocido"}</td>
               <td className="d-flex gap-2">
                 <Button variant="success" onClick={() => pagar(detalleplan)} title="Pagar">
                   <BiDollar size={20} />
