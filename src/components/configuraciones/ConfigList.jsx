@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Table, Button, Pagination } from "react-bootstrap";
+import { Button, Pagination, Card, Row, Col, Form } from "react-bootstrap";
 import Swal from "sweetalert2";
 
 const ConfigList = ({ configuraciones, seleccionar, eliminar }) => {
@@ -34,10 +34,8 @@ const ConfigList = ({ configuraciones, seleccionar, eliminar }) => {
   const irAnterior = () => setPaginaActual((prev) => Math.max(prev - 1, 1));
   const irSiguiente = () => setPaginaActual((prev) => Math.min(prev + 1, totalPaginas));
 
-  // Calcular el rango de páginas a mostrar
   const obtenerItemsPaginacion = () => {
     const paginas = [];
-
     let inicio = Math.max(paginaActual - 2, 1);
     let fin = Math.min(paginaActual + 2, totalPaginas);
 
@@ -49,11 +47,7 @@ const ConfigList = ({ configuraciones, seleccionar, eliminar }) => {
 
     for (let i = inicio; i <= fin; i++) {
       paginas.push(
-        <Pagination.Item
-          key={i}
-          active={i === paginaActual}
-          onClick={() => setPaginaActual(i)}
-        >
+        <Pagination.Item key={i} active={i === paginaActual} onClick={() => setPaginaActual(i)}>
           {i}
         </Pagination.Item>
       );
@@ -64,45 +58,80 @@ const ConfigList = ({ configuraciones, seleccionar, eliminar }) => {
 
   return (
     <>
-      <Table striped bordered hover>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Ruc</th>
-            <th>Nombre</th>
-            <th>Correo</th>
-            <th>Telefono</th>
-            <th>Direccion</th>
-            <th>Mensaje</th>
-            <th>Logo</th>
-            <th>Limite</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {configuracionesPaginadas.map((p) => (
-            <tr key={p.id}>
-              <td>{p.id}</td>
-              <td>{p.ruc}</td>
-              <td>{p.nombre}</td>
-              <td>{p.correo}</td>
-              <td>{p.telefono}</td>
-              <td>{p.direccion}</td>
-              <td>{p.mensaje}</td>
-              <td>{p.logo}</td>
-              <td>{p.limite}</td>
-              <td>
-                <Button variant="warning" onClick={() => seleccionar(p)}>
-                  Editar
-                </Button>{" "}
-                <Button variant="danger" onClick={() => confirmarEliminacion(p.id)}>
-                  Eliminar
-                </Button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
+      {configuracionesPaginadas.map((p) => (
+        <Card key={p.id} className="mb-4">
+          <Card.Body>
+            <Row className="mb-2">
+              <Col md={6}>
+                <Form.Group>
+                  <Form.Label>RUC</Form.Label>
+                  <Form.Control type="text" value={p.ruc} readOnly />
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group>
+                  <Form.Label>Nombre</Form.Label>
+                  <Form.Control type="text" value={p.nombre} readOnly />
+                </Form.Group>
+              </Col>
+            </Row>
+
+            <Row className="mb-2">
+              <Col md={6}>
+                <Form.Group>
+                  <Form.Label>Correo</Form.Label>
+                  <Form.Control type="email" value={p.correo} readOnly />
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group>
+                  <Form.Label>Teléfono</Form.Label>
+                  <Form.Control type="text" value={p.telefono} readOnly />
+                </Form.Group>
+              </Col>
+            </Row>
+
+            <Row className="mb-2">
+              <Col md={6}>
+                <Form.Group>
+                  <Form.Label>Dirección</Form.Label>
+                  <Form.Control type="text" value={p.direccion} readOnly />
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group>
+                  <Form.Label>Mensaje</Form.Label>
+                  <Form.Control type="text" value={p.mensaje} readOnly />
+                </Form.Group>
+              </Col>
+            </Row>
+
+            <Row className="mb-3">
+              <Col md={6}>
+                <Form.Group>
+                  <Form.Label>Logo</Form.Label>
+                  <Form.Control type="text" value={p.logo} readOnly />
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group>
+                  <Form.Label>Límite</Form.Label>
+                  <Form.Control type="number" value={p.limite} readOnly />
+                </Form.Group>
+              </Col>
+            </Row>
+
+            <div className="d-flex justify-content-end">
+              <Button variant="warning" className="me-2" onClick={() => seleccionar(p)}>
+                Editar
+              </Button>
+              <Button variant="danger" onClick={() => confirmarEliminacion(p.id)}>
+                Eliminar
+              </Button>
+            </div>
+          </Card.Body>
+        </Card>
+      ))}
 
       <Pagination className="justify-content-center">
         <Pagination.First onClick={irPrimeraPagina} disabled={paginaActual === 1} />

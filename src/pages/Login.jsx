@@ -6,13 +6,9 @@ import { AuthContext } from "../context/AuthContext";
 import { Form, Button, Alert } from "react-bootstrap";
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 
-// Estilos en un solo lugar
 const styles = {
   background: {
-    backgroundImage: "url(../imagenes/fondo.jpg)",
-    backgroundSize: "cover",
-    backgroundPosition: "center",
-    backgroundRepeat: "no-repeat",
+    backgroundColor: "rgba(10, 10, 10, 0.99)",
     position: "fixed",
     top: 0,
     left: 0,
@@ -25,74 +21,70 @@ const styles = {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
+    fontFamily: "'Montserrat', sans-serif",
   },
   box: {
-    background: "rgba(0, 0, 0, 0.6)", // Semitransparente
+    background: "rgba(20, 20, 20, 0.7)",
     padding: "0",
-    borderRadius: "20px",
-    color: "#FFD700",
-    width: "100%",
-    maxWidth: "800px",
+    borderRadius: "8px",
+    color: "#FFFFFF",
+    width: "90%",
+    maxWidth: "700px",
     display: "flex",
     overflow: "hidden",
-    boxShadow: "0 0 30px rgba(255, 215, 0, 0.3)",
-    border: "2px solid #FFD700",
+    boxShadow: "0 0 20px rgba(255, 255, 255, 0.1)",
+    border: "1px solid rgba(255, 255, 255, 0.1)",
+    backdropFilter: "blur(8px)",
   },
   leftImageSection: {
     width: "50%",
     backgroundImage: "url(../imagenes/fondo-log2.jpg)",
     backgroundSize: "cover",
     backgroundPosition: "center",
+    position: "relative",
   },
   formSection: {
     width: "50%",
-    padding: "50px 30px",
+    padding: "30px 25px",
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "transparent",
-    color: "#FFD700",
-  },
-  icon: {
-    fontSize: "1.2rem",
-    color: "#FFD700",
-    marginRight: "10px",
-  },
-  title: {
-    fontSize: "1.8rem", // Tamaño de la fuente más pequeño
-    fontWeight: "bold",
-    letterSpacing: "2px",
-    marginBottom: "25px",
-    color: "#FFF", // Cambié el color del título a blanco
   },
   inputIconWrapper: {
     position: "absolute",
     left: "10px",
     top: "50%",
     transform: "translateY(-50%)",
-    fontSize: "1.2rem",
+    fontSize: "0.9rem",
     color: "#FFD700",
   },
   input: {
     paddingLeft: "35px",
-    paddingRight: "35px",
-    border: "2px solid #FFD700",
-    color: "#FFF", // Texto de entrada en blanco
-    fontWeight: "bold",
-    borderRadius: "8px",
-    background: "rgba(26, 25, 25, 0)", // Transparente claro
+    border: "1px solid rgba(255, 215, 0, 0.5)",
+    color: "#FFFFFF",
+    fontWeight: 400,
+    borderRadius: "5px",
+    background: "rgba(0, 0, 0, 0.3)",
+    fontSize: "0.9rem",
+    height: "45px",
+    marginBottom: "15px",
+    transition: "all 0.3s ease",
   },
   button: {
-    backgroundColor: "#FFD700",
-    color: "#000",
-    fontWeight: "bold",
-    border: "2px solid #FFD700",
-    padding: "12px 20px",
-    fontSize: "1rem",
-    borderRadius: "8px",
-    transition: "0.3s",
+    backgroundColor: "rgba(255, 215, 0, 0.9)",
+    color: "#000000",
+    fontWeight: 600,
+    border: "none",
+    padding: "10px",
+    fontSize: "0.95rem",
+    borderRadius: "5px",
+    transition: "all 0.3s ease",
     marginTop: "10px",
+    height: "45px",
+    width: "100%",
+    letterSpacing: "0.8px",
   },
   eyeIcon: {
     position: "absolute",
@@ -100,20 +92,33 @@ const styles = {
     top: "50%",
     transform: "translateY(-50%)",
     cursor: "pointer",
-    fontSize: "1.2rem",
+    fontSize: "0.9rem",
     color: "#FFD700",
   },
   logo: {
-    width: "100px",
+    width: "80px",
     height: "auto",
-    objectFit: "cover",
     marginBottom: "20px",
+    filter: "drop-shadow(0 0 4px rgba(255, 215, 0, 0.4))",
   },
-};
-
-// Estilo para cambiar el color del placeholder
-const placeholderStyle = {
-  color: "#FFF", // Blanco para el texto del placeholder
+  title: {
+    fontSize: "1.5rem",
+    fontWeight: 600,
+    marginBottom: "20px",
+    color: "#FFD700",
+    textAlign: "center",
+    letterSpacing: "0.8px",
+  },
+  alert: {
+    width: "100%",
+    marginBottom: "15px",
+    fontWeight: 500,
+    fontSize: "0.85rem",
+    border: "1px solid rgba(255, 255, 255, 0.2)",
+    padding: "8px 12px",
+    color: "#FFFFFF",
+    borderRadius: "4px",
+  },
 };
 
 const Login = () => {
@@ -123,6 +128,7 @@ const Login = () => {
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -132,8 +138,41 @@ const Login = () => {
     };
   }, []);
 
+  useEffect(() => {
+    if (message) {
+      setShowAlert(true);
+      const timer = setTimeout(() => {
+        setShowAlert(false);
+        setMessage("");
+        setMessageType("");
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validación de campos vacíos
+    if (!correo || !clave) {
+      setMessage("Por favor, completa todos los campos.");
+      setMessageType("error");
+      return;
+    }
+
+    // Validación de formato de correo electrónico
+    if (!validateEmail(correo)) {
+      setMessage("Por favor, ingresa un correo electrónico válido.");
+      setMessageType("error");
+      return;
+    }
+
+    // Validación de longitud de la contraseña
+    if (clave.length < 6) {
+      setMessage("La contraseña debe tener al menos 6 caracteres.");
+      setMessageType("error");
+      return;
+    }
 
     try {
       const res = await axios.post("http://localhost:3001/api/v1/login", {
@@ -146,16 +185,25 @@ const Login = () => {
 
       const decoded = jwtDecode(token);
       setUser(decoded);
+
+      // Mostrar mensaje de bienvenida
       setMessage("¡Bienvenido al sistema!");
       setMessageType("success");
 
+      // Redirigir después de un breve retraso
       setTimeout(() => {
         navigate("/");
-      }, 1000);
+      }, 3000);
     } catch (err) {
       setMessage("Credenciales incorrectas");
       setMessageType("error");
     }
+  };
+
+  // Función para validar el formato del correo electrónico
+  const validateEmail = (email) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(String(email).toLowerCase());
   };
 
   return (
@@ -167,40 +215,43 @@ const Login = () => {
           <div style={styles.formSection}>
             <img
               src="../imagenes/img-toro.png"
-              alt="Logo del gimnasio"
+              alt="Logo"
               style={styles.logo}
             />
-            <h2 style={styles.title}>INICIAR SESIÓN</h2> {/* Título ahora más pequeño */}
+            <h2 style={styles.title}>INICIAR SESIÓN</h2>
 
-            {message && (
+            {showAlert && (
               <Alert
                 variant={messageType === "error" ? "danger" : "success"}
-                style={{ fontWeight: "bold" }}
+                style={{
+                  ...styles.alert,
+                  backgroundColor: messageType === "error" 
+                    ? "rgba(217, 83, 79, 0.9)" 
+                    : "rgba(92, 184, 92, 0.9)"
+                }}
               >
                 {message}
               </Alert>
             )}
 
             <Form onSubmit={handleSubmit} style={{ width: "100%" }}>
-              <Form.Group className="mb-3" style={{ position: "relative" }}>
+              <Form.Group style={{ position: "relative", marginBottom: "15px" }}>
                 <div style={styles.inputIconWrapper}>
-                  <FaEnvelope style={styles.icon} />
+                  <FaEnvelope />
                 </div>
                 <Form.Control
                   type="email"
                   placeholder="Correo electrónico"
                   value={correo}
                   onChange={(e) => setEmail(e.target.value)}
-                  required
                   style={styles.input}
-                  // Establecer color blanco al placeholder
                   className="custom-placeholder"
                 />
               </Form.Group>
 
-              <Form.Group className="mb-4" style={{ position: "relative" }}>
+              <Form.Group style={{ position: "relative", marginBottom: "20px" }}>
                 <div style={styles.inputIconWrapper}>
-                  <FaLock style={styles.icon} />
+                  <FaLock />
                 </div>
                 <div
                   style={styles.eyeIcon}
@@ -213,36 +264,34 @@ const Login = () => {
                   placeholder="Contraseña"
                   value={clave}
                   onChange={(e) => setPassword(e.target.value)}
-                  required
                   style={styles.input}
-                  // Establecer color blanco al placeholder
                   className="custom-placeholder"
                 />
               </Form.Group>
 
-              <Button
-                type="submit"
-                className="w-100"
-                style={styles.button}
-                onMouseEnter={(e) =>
-                  (e.target.style.backgroundColor = "#e6c200")
-                }
-                onMouseLeave={(e) =>
-                  (e.target.style.backgroundColor = "#FFD700")
-                }
-              >
-                Ingresar
+              <Button type="submit" className="login-button" style={styles.button}>
+                INGRESAR
               </Button>
             </Form>
           </div>
         </div>
       </div>
 
-      {/* Agregar estilo global para los placeholders */}
       <style>
         {`
           .custom-placeholder::placeholder {
-            color: #FFF !important;
+            color: rgba(255, 255, 255, 0.6) !important;
+            font-size: 0.85rem;
+          }
+
+          .login-button:hover {
+            background-color: #FFFFFF !important;
+            color: #000000 !important;
+            transform: translateY(-1px);
+          }
+
+          body {
+            font-family: 'Montserrat', sans-serif;
           }
         `}
       </style>

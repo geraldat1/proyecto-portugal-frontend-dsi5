@@ -110,6 +110,7 @@ const DetalleplanesForm = ({
     setEstado("");
 
     setErrores({});
+    document.activeElement?.blur();  // <-- Añade esta línea
     handleClose(); // cerrar modal luego de enviar
   };
 

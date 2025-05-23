@@ -147,26 +147,24 @@ const PlanForm = ({ show, handleClose, agregar, actualizar, planSeleccionado }) 
           </Form.Group>
 
           <Form.Group className="mb-3">
-  <Form.Label>Imagen</Form.Label>
-  <Form.Control
-    type="file"
-    accept="image/*"
-    onChange={(e) => {
-      const file = e.target.files[0];
-      if (file) {
-        // Solo extrae el nombre del archivo (o genera una ruta)
-        const nombreArchivo = file.name; // Ejemplo: "foto-perfil.jpg"
-        // O una ruta relativa como "/uploads/foto-perfil.jpg"
-        const rutaArchivo = `/imagenes/plan/${file.name}`;
-        
-        setImagen(rutaArchivo); // Guarda solo la ruta en el estado
-      }
-    }}
-    isInvalid={!!errores.imagen}
-  />
-  <Form.Control.Feedback type="invalid">
-    {errores.imagen}
-  </Form.Control.Feedback>
+            <Form.Label>Imagen</Form.Label>
+            <Form.Control
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files[0];
+                if (file) {
+                 // O una ruta relativa como "/uploads/foto-perfil.jpg"
+                  const rutaArchivo = `/imagenes/plan/${file.name}`;
+                  
+                  setImagen(rutaArchivo); // Guarda solo la ruta en el estado
+                }
+              }}
+              isInvalid={!!errores.imagen}
+            />
+            <Form.Control.Feedback type="invalid">
+              {errores.imagen}
+            </Form.Control.Feedback>
 
   {/* Vista previa (opcional, si la imagen está en una ruta accesible) */}
   {imagen && (

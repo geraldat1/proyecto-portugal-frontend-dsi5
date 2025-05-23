@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
-import Swal from "sweetalert2"; // opcional para mostrar errores visualmente
+import Swal from "sweetalert2";
 
 const ConfigForm = ({ show, handleClose, agregar, actualizar, configuracionSeleccionada }) => {
   const [ruc, setRuc] = useState("");
@@ -11,7 +11,6 @@ const ConfigForm = ({ show, handleClose, agregar, actualizar, configuracionSelec
   const [mensaje, setMensaje] = useState("");
   const [logo, setLogo] = useState("");
   const [limite, setLimite] = useState("");
-
 
   const [errores, setErrores] = useState({});
 
@@ -24,8 +23,7 @@ const ConfigForm = ({ show, handleClose, agregar, actualizar, configuracionSelec
       setDireccion(configuracionSeleccionada.direccion);
       setMensaje(configuracionSeleccionada.mensaje);
       setLogo(configuracionSeleccionada.logo);
-      setLimite(configuracionSeleccionada.limite);
-
+      setLimite(String(configuracionSeleccionada.limite || ""));
     } else {
       setRuc("");
       setNombre("");
@@ -41,49 +39,57 @@ const ConfigForm = ({ show, handleClose, agregar, actualizar, configuracionSelec
 
   const validar = () => {
     const nuevosErrores = {};
-  
+
     if (!ruc.trim()) nuevosErrores.ruc = "El RUC es obligatorio";
     else if (!/^\d{11}$/.test(ruc)) nuevosErrores.ruc = "El RUC debe tener 11 dígitos numéricos";
-  
+
     if (!nombre.trim()) nuevosErrores.nombre = "El nombre es obligatorio";
-  
+
     if (!correo.trim()) nuevosErrores.correo = "El correo es obligatorio";
     else if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(correo)) {
       nuevosErrores.correo = "Formato de correo inválido";
     }
-  
+
     if (!telefono.trim()) nuevosErrores.telefono = "El teléfono es obligatorio";
     else if (!/^\d{9}$/.test(telefono)) nuevosErrores.telefono = "El teléfono debe tener 9 dígitos";
-  
+
     if (!direccion.trim()) nuevosErrores.direccion = "La dirección es obligatoria";
-  
+
     if (!mensaje.trim()) nuevosErrores.mensaje = "El mensaje es obligatorio";
-  
+
     if (!logo.trim()) {
       nuevosErrores.logo = "El logo es obligatorio";
     } else if (!/^(https?:\/\/.+\.(jpg|jpeg|png|gif|svg)|[\w,\s-]+\.(jpg|jpeg|png|gif|svg))$/i.test(logo)) {
       nuevosErrores.logo = "Debe ser una URL o archivo válido de imagen (.jpg, .png, .gif...)";
     }
-    
-  
-    if (!limite.trim()) nuevosErrores.limite = "El límite es obligatorio";
-    else if (isNaN(limite) || parseInt(limite) <= 0) {
+
+    if (!limite.trim()) {
+      nuevosErrores.limite = "El límite es obligatorio";
+    } else if (isNaN(Number(limite)) || Number(limite) <= 0) {
       nuevosErrores.limite = "El límite debe ser un número mayor a 0";
     }
-  
+
     setErrores(nuevosErrores);
     return Object.keys(nuevosErrores).length === 0;
   };
-  
+
   const manejarEnvio = (e) => {
     e.preventDefault();
     if (!validar()) {
-      // Opcional: mostrar alerta si hay errores
       Swal.fire("Campos inválidos", "Por favor revisa los datos ingresados", "error");
       return;
     }
 
-    const nuevaConfiguracion = { ruc, nombre, correo, telefono, direccion, mensaje, logo, limite };
+    const nuevaConfiguracion = {
+      ruc,
+      nombre,
+      correo,
+      telefono,
+      direccion,
+      mensaje,
+      logo,
+      limite: Number(limite),
+    };
 
     if (configuracionSeleccionada) {
       actualizar(configuracionSeleccionada.id, nuevaConfiguracion);
@@ -99,9 +105,8 @@ const ConfigForm = ({ show, handleClose, agregar, actualizar, configuracionSelec
     setMensaje("");
     setLogo("");
     setLimite("");
-
     setErrores({});
-    handleClose(); // cerrar modal luego de enviar
+    handleClose();
   };
 
   return (

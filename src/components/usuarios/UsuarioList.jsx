@@ -61,6 +61,19 @@ const UsuarioList = ({ usuarios, seleccionar, eliminar }) => {
     return paginas;
   };
 
+  // Funciones para mostrar texto según valor numérico
+  const mostrarRol = (rol) => {
+    if (rol === "1" || rol === 1) return "Administrador";
+    if (rol === "2" || rol === 2) return "Empleado";
+    return "Desconocido";
+  };
+
+  const mostrarEstado = (estado) => {
+    if (estado === "1" || estado === 1) return "Activo";
+    if (estado === "0" || estado === 0) return "Deshabilitado";
+    return "Desconocido";
+  };
+
   return (
     <>
       <Table striped bordered hover responsive>
@@ -70,9 +83,9 @@ const UsuarioList = ({ usuarios, seleccionar, eliminar }) => {
             <th>Usuario</th>
             <th>Nombre</th>
             <th>Correo</th>
-            <th>Clave</th>
+            {/* <th>Clave</th> Eliminado */}
             <th>Teléfono</th>
-            <th>Foto</th>
+            {/* <th>Foto</th> Eliminado */}
             <th>Rol</th>
             <th>Fecha</th>
             <th>Estado</th>
@@ -86,18 +99,12 @@ const UsuarioList = ({ usuarios, seleccionar, eliminar }) => {
               <td>{p.usuario}</td>
               <td>{p.nombre}</td>
               <td>{p.correo}</td>
-              <td>{p.clave}</td>
+              {/* <td>{p.clave}</td> Eliminado */}
               <td>{p.telefono}</td>
-              <td>
-                {p.foto ? (
-                  <img src={p.foto} alt="foto" width="40" height="40" />
-                ) : (
-                  "Sin foto"
-                )}
-              </td>
-              <td>{p.rol}</td>
-              <td>{p.fecha}</td>
-              <td>{p.estado}</td>
+              {/* Campo foto eliminado */}
+              <td>{mostrarRol(p.rol)}</td>
+              <td>{new Date(p.fecha).toLocaleDateString()}</td>
+              <td>{mostrarEstado(p.estado)}</td>
               <td>
                 <Button
                   variant="warning"

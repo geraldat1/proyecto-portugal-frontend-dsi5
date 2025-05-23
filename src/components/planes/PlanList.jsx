@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Card, Button, Pagination, Row, Col } from "react-bootstrap";
+import { Card, Button, Pagination, Row, Col, Badge } from "react-bootstrap";
 import Swal from "sweetalert2";
 
 const PlanList = ({ planes, seleccionar, eliminar }) => {
@@ -34,7 +34,6 @@ const PlanList = ({ planes, seleccionar, eliminar }) => {
   const irAnterior = () => setPaginaActual((prev) => Math.max(prev - 1, 1));
   const irSiguiente = () => setPaginaActual((prev) => Math.min(prev + 1, totalPaginas));
 
-  // Calcular el rango de páginas a mostrar
   const obtenerItemsPaginacion = () => {
     const paginas = [];
 
@@ -67,38 +66,119 @@ const PlanList = ({ planes, seleccionar, eliminar }) => {
       <Row xs={1} md={2} lg={3} className="g-4">
         {planesPaginadas.map((plan) => (
           <Col key={plan.id}>
-            <Card>
+            <Card className="h-100 shadow-sm border-0" style={{ transition: 'transform 0.2s', borderRadius: '12px' }}>
               {plan.imagen && (
-                <Card.Img variant="top" src={plan.imagen} alt={plan.plan} />
+                <div style={{ height: '200px', overflow: 'hidden', borderRadius: '12px 12px 0 0' }}>
+                  <Card.Img 
+                    variant="top" 
+                    src={plan.imagen} 
+                    alt={plan.plan}
+                    style={{ 
+                      height: '100%', 
+                      objectFit: 'cover',
+                      transition: 'transform 0.3s ease'
+                    }}
+                  />
+                </div>
               )}
-              <Card.Body>
-                <Card.Title>{plan.plan}</Card.Title>
-                <Card.Text>
-                  <strong>Descripcion:</strong> {plan.descripcion} <br />
-                  <strong>Precio:</strong> S/ {Number(plan.precio_plan).toFixed(2)} <br />
-                  <strong>Condicion:</strong> {plan.condicion} <br />
-                  <strong>Estado:</strong> {plan.estado === 1 ? "Activo" : "Inactivo"} <br />
+              
+              <Card.Body className="d-flex flex-column p-4">
+                <div className="d-flex justify-content-between align-items-start mb-3">
+                  <Card.Title className="mb-0 fw-bold text-dark" style={{ fontSize: '1.25rem' }}>
+                    {plan.plan}
+                  </Card.Title>
+                  <Badge 
+                    bg={plan.estado === 1 ? "success" : "secondary"} 
+                    className="ms-2"
+                    style={{ fontSize: '0.75rem' }}
+                  >
+                    {plan.estado === 1 ? "Activo" : "Inactivo"}
+                  </Badge>
+                </div>
+
+                <Card.Text className="text-muted mb-3" style={{ fontSize: '0.95rem', lineHeight: '1.5' }}>
+                  {plan.descripcion}
                 </Card.Text>
-                <Button variant="warning" onClick={() => seleccionar(plan)} className="me-2">
-                  Editar
-                </Button>
-                <Button variant="danger" onClick={() => confirmarEliminacion(plan.id)}>
-                  Eliminar
-                </Button>
+
+                <div className="mb-4 mt-auto">
+                  <div className="d-flex justify-content-between align-items-center mb-2">
+                    <span className="text-muted small">Precio</span>
+                    <span className="fw-bold text-primary" style={{ fontSize: '1.5rem' }}>
+                      S/ {Number(plan.precio_plan).toFixed(2)}
+                    </span>
+                  </div>
+                  
+                  <div className="d-flex justify-content-between align-items-center">
+                    <span className="text-muted small">Condición</span>
+                    <Badge bg="info" style={{ fontSize: '0.75rem' }}>
+                      {plan.condicion}
+                    </Badge>
+                  </div>
+                </div>
+
+                <div className="d-grid gap-2 d-md-flex justify-content-md-end">
+                  <Button 
+                    variant="outline-warning" 
+                    size="sm"
+                    onClick={() => seleccionar(plan)}
+                    className="px-3 py-2 fw-semibold"
+                    style={{ borderRadius: '8px' }}
+                  >
+                    <i className="fas fa-edit me-1"></i>
+                    Editar
+                  </Button>
+                  <Button 
+                    variant="outline-danger" 
+                    size="sm"
+                    onClick={() => confirmarEliminacion(plan.id)}
+                    className="px-3 py-2 fw-semibold"
+                    style={{ borderRadius: '8px' }}
+                  >
+                    <i className="fas fa-trash me-1"></i>
+                    Eliminar
+                  </Button>
+                </div>
               </Card.Body>
             </Card>
           </Col>
         ))}
       </Row>
 
+      {totalPaginas > 1 && (
+        <div className="d-flex justify-content-center mt-5">
+          <Pagination className="shadow-sm">
+            <Pagination.First 
+              onClick={irPrimeraPagina} 
+              disabled={paginaActual === 1}
+              style={{ borderRadius: '8px 0 0 8px' }}
+            />
+            <Pagination.Prev 
+              onClick={irAnterior} 
+              disabled={paginaActual === 1}
+            />
+            {obtenerItemsPaginacion()}
+            <Pagination.Next 
+              onClick={irSiguiente} 
+              disabled={paginaActual === totalPaginas}
+            />
+            <Pagination.Last 
+              onClick={irUltimaPagina} 
+              disabled={paginaActual === totalPaginas}
+              style={{ borderRadius: '0 8px 8px 0' }}
+            />
+          </Pagination>
+        </div>
+      )}
 
-      <Pagination className="justify-content-center mt-4">
-        <Pagination.First onClick={irPrimeraPagina} disabled={paginaActual === 1} />
-        <Pagination.Prev onClick={irAnterior} disabled={paginaActual === 1} />
-        {obtenerItemsPaginacion()}
-        <Pagination.Next onClick={irSiguiente} disabled={paginaActual === totalPaginas} />
-        <Pagination.Last onClick={irUltimaPagina} disabled={paginaActual === totalPaginas} />
-      </Pagination>
+      <style>{`
+        .card:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+        }
+        .card-img-top:hover {
+          transform: scale(1.05);
+        }
+      `}</style>
     </>
   );
 };

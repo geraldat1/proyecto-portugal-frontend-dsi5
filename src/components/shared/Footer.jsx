@@ -1,6 +1,6 @@
 import React from "react";
 import { Container } from "react-bootstrap";
-import "../shared/css/Footer.css"; // Asegúrate de que esta ruta sea correcta
+import "../shared/css/estiloFooter.css"; // Asegúrate de que esta ruta sea correcta
 
 const Footer = () => {
   return (

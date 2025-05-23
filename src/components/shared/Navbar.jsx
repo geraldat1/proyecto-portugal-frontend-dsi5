@@ -22,9 +22,11 @@ import {
   FaUserTie,
   FaLock,
   FaSignOutAlt,
-  FaInfoCircle
+  FaInfoCircle,
+  FaBars,
+  FaChevronDown
 } from "react-icons/fa";
-import '../shared/css/Navbar.css';
+import '../shared/css/estiloNavbar.css';
 
 const Navbar = () => {
   const { user, setUser } = useContext(AuthContext);
@@ -53,7 +55,12 @@ const Navbar = () => {
             style={{ width: "70px", height: "auto" }}
           />
         </BsNavbar.Brand>
-        <BsNavbar.Toggle aria-controls="basic-navbar-nav"/>
+        <div
+          className="custom-toggle d-lg-none"
+          onClick={() => document.getElementById("basic-navbar-nav").classList.toggle("show")}
+        >
+          <FaBars className="menu-icon" size={24} />
+        </div>
         <BsNavbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto navbar-custom">
             <Nav.Link as={Link} to="/">
@@ -87,34 +94,79 @@ const Navbar = () => {
           </Nav>
 
           {user && (
-            <Dropdown align="end" className="dropdown-user">
-              <Dropdown.Toggle className="dropdown-toggle-user" id="dropdown-user">
-                <span className="d-inline-flex align-items-center gap-2">
-                  <FaUserCircle size={20} />
-                  {user.name?.toUpperCase()}
-                </span>
-              </Dropdown.Toggle>
+  <Dropdown 
+    align="end" 
+    className="dropdown-user shadow-sm"
+  >
+    <Dropdown.Toggle 
+      variant="light" 
+      id="dropdown-user"
+      className="dropdown-toggle-user d-flex align-items-center py-2 px-3 border-0 bg-transparent"
+    >
+      <span className="d-inline-flex align-items-center gap-2 text-light">
+        <FaUserCircle size={20} className="text-primary" />
+        <span className="fw-medium">
+          {user.name?.toUpperCase()}
+        </span>
+        <FaChevronDown size={12} className="ms-1" />
+      </span>
+    </Dropdown.Toggle>
 
-              <Dropdown.Menu className="dropdown-menu-user">
-                <Dropdown.Item as={Link} to="/acercade">
-                  {menuItem(<FaInfoCircle />, "Acerca de Mi APP")}
-                </Dropdown.Item>
-                <Dropdown.Item as={Link} to="/configuracion">
-                  {menuItem(<FaCog />, "Configuración")}
-                </Dropdown.Item>
-                <Dropdown.Item as={Link} to="/usuarios">
-                  {menuItem(<FaUserTie />, "Empleados")}
-                </Dropdown.Item>
-                <Dropdown.Item onClick={() => alert("Funcionalidad aún no implementada")}>
-                  {menuItem(<FaLock />, "Cambiar contraseña")}
-                </Dropdown.Item>
-                <Dropdown.Divider />
-                <Dropdown.Item onClick={handleLogout}>
-                  {menuItem(<FaSignOutAlt />, "Cerrar sesión")}
-                </Dropdown.Item>
-              </Dropdown.Menu>
-            </Dropdown>
-          )}
+     <Dropdown.Menu 
+        className="dropdown-menu-user border-0 shadow-sm rounded-1 mt-1"
+        style={{ 
+          minWidth: "220px",
+          position: "absolute",
+          left: "0",
+          top: "100%"
+        }}
+      >
+      <Dropdown.Header className="text-muted small">
+        MENÚ DE USUARIO
+      </Dropdown.Header>
+      
+      <Dropdown.Item 
+        as={Link} 
+        to="/acercade"
+        className="d-flex align-items-center py-2 px-3"
+      >
+        {menuItem(<FaInfoCircle className="text-info me-2" />, "Acerca de Mi APP")}
+      </Dropdown.Item>
+      
+      <Dropdown.Item 
+        as={Link} 
+        to="/configuracion"
+        className="d-flex align-items-center py-2 px-3"
+      >
+        {menuItem(<FaCog className="text-secondary me-2" />, "Configuración")}
+      </Dropdown.Item>
+      
+      <Dropdown.Item 
+        as={Link} 
+        to="/usuarios"
+        className="d-flex align-items-center py-2 px-3"
+      >
+        {menuItem(<FaUserTie className="text-success me-2" />, "Empleados")}
+      </Dropdown.Item>
+      
+      <Dropdown.Item 
+        onClick={() => alert("Funcionalidad aún no implementada")}
+        className="d-flex align-items-center py-2 px-3"
+      >
+        {menuItem(<FaLock className="text-warning me-2" />, "Cambiar contraseña")}
+      </Dropdown.Item>
+      
+      <Dropdown.Divider className="my-1" />
+      
+      <Dropdown.Item 
+        onClick={handleLogout}
+        className="d-flex align-items-center py-2 px-3 text-danger"
+      >
+        {menuItem(<FaSignOutAlt className="me-2" />, "Cerrar sesión")}
+      </Dropdown.Item>
+    </Dropdown.Menu>
+  </Dropdown>
+)}
         </BsNavbar.Collapse>
       </Container>
     </BsNavbar>
