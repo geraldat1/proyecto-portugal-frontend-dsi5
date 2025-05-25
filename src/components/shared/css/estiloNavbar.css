@@ -3,6 +3,9 @@
   background-color: #000; /* Fondo negro sólido */
   padding: 0.75rem 1.5rem;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .navbar-custom .nav-link {
@@ -21,6 +24,16 @@
   border-bottom: 2px solid #FFD700;
   background-color: rgba(255, 215, 0, 0.05);
   border-radius: 4px;
+}
+
+.navbar-logo {
+  width: 70px;
+  height: auto;
+}
+
+/* Oculta el caret de Bootstrap */
+.no-caret::after {
+  display: none !important;
 }
 
 /* === DROPDOWN GENERAL === */
@@ -62,56 +75,41 @@
 }
 
 /* === USUARIO DROPDOWN === */
-
 .dropdown-user-wrapper {
-  position: relative; /* Permite que el dropdown se posicione correctamente */
-  display: inline-block; /* Mantiene el dropdown en línea con otros elementos */
+  position: relative;
+  display: inline-block;
+  width: 100%; /* Asegura adaptabilidad en móvil */
 }
 
 .dropdown-menu-user {
-  position: absolute; /* Posiciona el menú de forma absoluta */
-  right: 0; /* Alinea el menú a la derecha del contenedor */
-  top: calc(100% + 0.5rem); /* Coloca el menú justo debajo del botón con un margen */
-  z-index: 1050; /* Asegura que el menú esté por encima de otros elementos */
-  min-width: 200px; /* Ancho mínimo del menú */
-  background-color: #111 !important;
-  border-radius: 8px; /* Bordes redondeados */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); /* Sombra más notable para fondo oscuro */
-  transition: opacity 0.3s ease, visibility 0.3s ease; /* Transiciones suaves */
-  opacity: 0; /* Inicialmente oculto */
-  visibility: hidden; /* Inicialmente oculto */
+  min-width: 220px;
+  position: absolute;
+  left: 0;
+  top: 100%;
+  z-index: 1000;
+  background-color: #000; /* Asegura visibilidad */
 }
 
 .dropdown-menu-user.show {
-  opacity: 1; /* Muestra el menú */
-  visibility: visible; /* Hace visible el menú */
+  opacity: 1;
+  visibility: visible;
 }
 
 .dropdown-menu-user a {
-  color: rgb(255, 255, 255); /* Texto blanco */
-  padding: 0.75rem 1.25rem; /* Espaciado interno */
-  transition: background-color 0.3s ease, color 0.3s ease; /* Transición suave */
-  font-size: 0.95rem; /* Tamaño de fuente */
+  color: #fff;
+  padding: 0.75rem 1.25rem;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  font-size: 0.95rem;
   display: block;
   text-decoration: none;
 }
 
 .dropdown-menu-user a:hover {
-  background-color: #FFD700; /* Fondo amarillo al pasar el mouse */
-  color: #000; /* Texto negro en hover */
+  background-color: #FFD700;
+  color: #000;
 }
 
-/* === RESPONSIVE === */
-@media (max-width: 768px) {
-  .dropdown-menu-user {
-    min-width: 100%; /* Ancho completo en pantallas pequeñas */
-    left: 0; /* Alineado a la izquierda */
-    right: auto; /* Restablece alineación */
-  }
-}
-
-
-/* Botón usuario */
+/* === BOTÓN USUARIO === */
 .dropdown-toggle-user {
   background-color: #FFD700 !important;
   color: black !important;
@@ -142,10 +140,22 @@
 
 /* === RESPONSIVE === */
 @media (max-width: 768px) {
+  .navbar-custom {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
   .navbar-custom .nav-link,
   .navbar-custom .dropdown-toggle {
     padding: 0.5rem;
     margin: 0.25rem 0;
+  }
+
+  .dropdown-menu-user {
+    position: static;
+    width: 100%;
+    min-width: unset;
+    margin-top: 0.5rem;
   }
 
   .dropdown-menu-user {

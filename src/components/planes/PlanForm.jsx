@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Button, Form } from "react-bootstrap";
+import { Modal, Button, Form, InputGroup } from "react-bootstrap";
 import Swal from "sweetalert2"; // opcional para mostrar errores visualmente
 
 const PlanForm = ({ show, handleClose, agregar, actualizar, planSeleccionado }) => {
@@ -85,125 +85,185 @@ const PlanForm = ({ show, handleClose, agregar, actualizar, planSeleccionado }) 
   };
 
   return (
-    <Modal show={show} onHide={handleClose}>
-      <Modal.Header closeButton>
-        <Modal.Title>{planSeleccionado ? "Editar Plan" : "Agregar Plan"}</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <Form onSubmit={manejarEnvio}>
+    <Modal 
+  show={show} 
+  onHide={handleClose}
+  backdrop="static"
+  keyboard={false}
+  size="lg"
+  centered
+>
+  <Modal.Header closeButton className="bg-light">
+    <Modal.Title className="fw-bold">
+      {planSeleccionado ? (
+        <><i className="bi bi-pencil-square me-2"></i>Editar Plan</>
+      ) : (
+        <><i className="bi bi-plus-circle me-2"></i>Agregar Nuevo Plan</>
+      )}
+    </Modal.Title>
+  </Modal.Header>
+  <Modal.Body>
+    <Form onSubmit={manejarEnvio}>
+      <div className="row">
+        {/* Nombre del Plan */}
+        <Form.Group className="mb-3 col-md-6">
+          <Form.Label className="fw-bold">Nombre del Plan <span className="text-danger">*</span></Form.Label>
+          <Form.Control
+            type="text"
+            placeholder="Ej: Plan Básico"
+            value={plan}
+            onChange={(e) => setPlan(e.target.value)}
+            isInvalid={!!errores.plan}
+          />
+          <Form.Control.Feedback type="invalid">
+            {errores.plan}
+          </Form.Control.Feedback>
+        </Form.Group>
 
-          <Form.Group className="mb-3">
-            <Form.Label>Plan</Form.Label>
+        {/* Precio */}
+        <Form.Group className="mb-3 col-md-6">
+          <Form.Label className="fw-bold">
+            Precio <span className="text-danger">*</span>
+          </Form.Label>
+          <InputGroup>
+            <InputGroup.Text>S/</InputGroup.Text>
             <Form.Control
               type="text"
-              value={plan}
-              onChange={(e) => setPlan(e.target.value)}
-              isInvalid={!!errores.plan}
-            />
-            <Form.Control.Feedback type="invalid">{errores.plan}</Form.Control.Feedback>
-          </Form.Group>
-
-          <Form.Group className="mb-3">
-            <Form.Label>Descripcion</Form.Label>
-            <Form.Control
-              type="text"
-              value={descripcion}
-              onChange={(e) => setDescripcion(e.target.value)}
-              isInvalid={!!errores.descripcion}
-            />
-            <Form.Control.Feedback type="invalid">{errores.descripcion}</Form.Control.Feedback>
-          </Form.Group>
-
-          <Form.Group className="mb-3">
-            <Form.Label>Precio del Plan</Form.Label>
-            <Form.Control
-              type="number"
+              placeholder="0.00"
+              inputMode="decimal"
+              pattern="^\d+(\.\d{0,2})?$"
               value={precio_plan}
               onChange={(e) => {
-                // Asegúrate de que el valor no sea negativo
-                const valor = Math.max(1, e.target.value); // Esto asegura que el valor nunca sea negativo
-                setPrecioPlan(valor);
-              }}
-              min="1" // Esto evita que el campo acepte valores negativos
-              isInvalid={!!errores.precio_plan}
-            />
-            <Form.Control.Feedback type="invalid">{errores.precio_plan}</Form.Control.Feedback>
-          </Form.Group>
+                const valor = e.target.value;
 
-          <Form.Group className="mb-3">
-            <Form.Label>Condición</Form.Label>
-            <Form.Select
-              value={condicion}
-              onChange={(e) => setCondicion(e.target.value)}
-              isInvalid={!!errores.condicion}
-            >
-              <option value="">Seleccione una opción</option>
-              <option value="Mensual">MENSUAL</option>
-              <option value="Bimestral">BIMESTRAL</option>
-              <option value="Trimestral">TRIMESTRAL</option>
-              <option value="Anual">ANUAL</option>
-            </Form.Select>
-            <Form.Control.Feedback type="invalid">{errores.condicion}</Form.Control.Feedback>
-          </Form.Group>
-
-          <Form.Group className="mb-3">
-            <Form.Label>Imagen</Form.Label>
-            <Form.Control
-              type="file"
-              accept="image/*"
-              onChange={(e) => {
-                const file = e.target.files[0];
-                if (file) {
-                 // O una ruta relativa como "/uploads/foto-perfil.jpg"
-                  const rutaArchivo = `/imagenes/plan/${file.name}`;
-                  
-                  setImagen(rutaArchivo); // Guarda solo la ruta en el estado
+                // Validar que solo permita números y máximo dos decimales
+                if (/^\d*\.?\d{0,2}$/.test(valor) || valor === "") {
+                  setPrecioPlan(valor);
                 }
               }}
-              isInvalid={!!errores.imagen}
+              isInvalid={!!errores.precio_plan}
             />
-            <Form.Control.Feedback type="invalid">
-              {errores.imagen}
-            </Form.Control.Feedback>
+          </InputGroup>
+          <Form.Control.Feedback type="invalid">
+            {errores.precio_plan}
+          </Form.Control.Feedback>
+        </Form.Group>
 
-  {/* Vista previa (opcional, si la imagen está en una ruta accesible) */}
-  {imagen && (
-    <div className="mt-3">
-      <img
-        src={imagen} // Si la ruta es pública, se mostrará
-        alt="Vista previa"
-        style={{ 
-          maxWidth: '200px', 
-          maxHeight: '200px', 
-          objectFit: 'contain', 
-          border: '1px solid #ddd', 
-          borderRadius: '4px' 
-        }}
-      />
-    </div>
-  )}
-</Form.Group>
+      </div>
 
-        {planSeleccionado &&(
-          <>
-          <Form.Group className="mb-3">
-            <Form.Label>Estado</Form.Label>
-            <Form.Control type="text" value={estado} disabled />
-          </Form.Group>
-          
-          <Form.Group className="mb-3">
-            <Form.Label>ID User</Form.Label>
-            <Form.Control type="text" value={id_user} disabled />
-          </Form.Group>
-          </>
-        )}
+      {/* Descripción */}
+      <Form.Group className="mb-3">
+        <Form.Label className="fw-bold">Descripción <span className="text-danger">*</span></Form.Label>
+        <Form.Control
+          as="textarea"
+          rows={3}
+          placeholder="Describe las características del plan"
+          value={descripcion}
+          onChange={(e) => setDescripcion(e.target.value)}
+          isInvalid={!!errores.descripcion}
+        />
+        <Form.Control.Feedback type="invalid">
+          {errores.descripcion}
+        </Form.Control.Feedback>
+      </Form.Group>
 
-          <Button variant="primary" type="submit">
-            {planSeleccionado ? "Actualizar" : "Agregar"}
-          </Button>
-        </Form>
-      </Modal.Body>
-    </Modal>
+      <div className="row">
+        {/* Periodicidad */}
+        <Form.Group className="mb-3 col-md-6">
+          <Form.Label className="fw-bold">Periodicidad <span className="text-danger">*</span></Form.Label>
+          <Form.Select
+            value={condicion}
+            onChange={(e) => setCondicion(e.target.value)}
+            isInvalid={!!errores.condicion}
+          >
+            <option value="">Seleccione una opción</option>
+            <option value="Mensual">Mensual</option>
+            <option value="Bimestral">Bimestral</option>
+            <option value="Trimestral">Trimestral</option>
+            <option value="Anual">Anual</option>
+          </Form.Select>
+          <Form.Control.Feedback type="invalid">
+            {errores.condicion}
+          </Form.Control.Feedback>
+        </Form.Group>
+
+        {/* Imagen */}
+        <Form.Group className="mb-3 col-md-6">
+          <Form.Label className="fw-bold">Imagen del Plan</Form.Label>
+          <Form.Control
+            type="file"
+            accept="image/*"
+            onChange={(e) => {
+              const file = e.target.files[0];
+              if (file) {
+                const rutaArchivo = `/imagenes/plan/${file.name}`;
+                setImagen(rutaArchivo);
+                
+                // Vista previa
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                  document.getElementById('vista-previa-plan').src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+              }
+            }}
+          />
+          <div className="mt-2 text-center">
+            <img
+              id="vista-previa-plan"
+              src={imagen || "/placeholder-plan.png"}
+              alt="Vista previa"
+              className="img-thumbnail"
+              style={{
+                maxWidth: '150px',
+                maxHeight: '100px',
+                objectFit: 'cover'
+              }}
+            />
+          </div>
+        </Form.Group>
+      </div>
+
+      {planSeleccionado && (
+        <div className="row mt-2">
+          <div className="col-md-6">
+            <Form.Group className="mb-3">
+              <Form.Label className="fw-bold">Estado</Form.Label>
+              <Form.Control type="text" value={estado} disabled />
+            </Form.Group>
+          </div>
+          <div className="col-md-6">
+            <Form.Group className="mb-3">
+              <Form.Label className="fw-bold">ID Usuario</Form.Label>
+              <Form.Control type="text" value={id_user} disabled />
+            </Form.Group>
+          </div>
+        </div>
+      )}
+
+      <div className="d-flex justify-content-end gap-3 mt-4">
+        <Button 
+          variant="outline-secondary" 
+          onClick={handleClose}
+          className="px-4"
+        >
+          Cancelar
+        </Button>
+        <Button 
+          variant="primary" 
+          type="submit" 
+          className="px-4 fw-bold"
+        >
+          {planSeleccionado ? (
+            <><i className="bi bi-check-circle me-2"></i>Guardar Cambios</>
+          ) : (
+            <><i className="bi bi-save me-2"></i>Registrar Plan</>
+          )}
+        </Button>
+      </div>
+    </Form>
+  </Modal.Body>
+</Modal>
   );
 };
 

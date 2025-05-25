@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Card, Button, Pagination, Row, Col, Badge } from "react-bootstrap";
 import Swal from "sweetalert2";
 
+import { FaEdit, FaTrash } from "react-icons/fa";
+
 const PlanList = ({ planes, seleccionar, eliminar }) => {
   const [paginaActual, setPaginaActual] = useState(1);
   const elementosPorPagina = 5;
@@ -117,27 +119,28 @@ const PlanList = ({ planes, seleccionar, eliminar }) => {
                 </div>
 
                 <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-                  <Button 
-                    variant="outline-warning" 
-                    size="sm"
-                    onClick={() => seleccionar(plan)}
-                    className="px-3 py-2 fw-semibold"
-                    style={{ borderRadius: '8px' }}
-                  >
-                    <i className="fas fa-edit me-1"></i>
-                    Editar
-                  </Button>
-                  <Button 
-                    variant="outline-danger" 
-                    size="sm"
-                    onClick={() => confirmarEliminacion(plan.id)}
-                    className="px-3 py-2 fw-semibold"
-                    style={{ borderRadius: '8px' }}
-                  >
-                    <i className="fas fa-trash me-1"></i>
-                    Eliminar
-                  </Button>
-                </div>
+                <Button
+                  variant="outline-warning"
+                  size="sm"
+                  onClick={() => seleccionar(plan)}
+                  className="d-flex justify-content-center align-items-center fw-semibold"
+                  style={{ borderRadius: '8px', width: '38px', height: '38px', padding: 0 }}
+                  aria-label="Editar"
+                >
+                  <FaEdit />
+                </Button>
+                <Button
+                  variant="outline-danger"
+                  size="sm"
+                  onClick={() => confirmarEliminacion(plan.id)}
+                  className="d-flex justify-content-center align-items-center fw-semibold"
+                  style={{ borderRadius: '8px', width: '38px', height: '38px', padding: 0 }}
+                  aria-label="Eliminar"
+                >
+                  <FaTrash />
+                </Button>
+              </div>
+
               </Card.Body>
             </Card>
           </Col>

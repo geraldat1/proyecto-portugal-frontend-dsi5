@@ -4,6 +4,8 @@ import ClienteList from "../components/clientes/ClienteList";
 import ClienteForm from "../components/clientes/ClienteForm";
 import { Button } from "react-bootstrap";
 
+import { FaUserPlus } from "react-icons/fa";
+
 const Clientes = () => {
   const [clientes, setClientes] = useState([]);
   const [clienteSeleccionado, setClienteSeleccionado] = useState(null);
@@ -45,15 +47,17 @@ const Clientes = () => {
   return (
     <div>
       <h2>Clientes Registrados</h2>
-      <Button 
-      className="mb-3" 
-      variant="primary"
-       onClick={() => {
-       setClienteSeleccionado(null);
-       setMostrarModal(true);
-      }
-      }
-       >Agregar Cliente</Button>
+      <Button
+        className="mb-3 d-flex align-items-center"
+        variant="primary"
+        onClick={() => {
+          setClienteSeleccionado(null);
+          setMostrarModal(true);
+        }}
+      >
+        <FaUserPlus className="me-2" />
+        Agregar Cliente
+      </Button>
 
       <ClienteList clientes={clientes} seleccionar={seleccionarCliente} eliminar={eliminar} />
       <ClienteForm

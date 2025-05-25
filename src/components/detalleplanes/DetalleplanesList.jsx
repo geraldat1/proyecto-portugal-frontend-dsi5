@@ -110,14 +110,15 @@ const DetalleplanesList = ({ detalleplanes, seleccionar, eliminar, clientes, pla
     <>
       {/* Buscador */}
       <div className="d-flex justify-content-between align-items-center mb-3">
-        <Form.Group style={{ maxWidth: "300px", marginBottom: 0 }}>
+        <Form.Group className="mb-0" style={{ maxWidth: "300px" }}>
           <InputGroup size="sm">
-            <InputGroup.Text>
-              <FaSearch />
+            <InputGroup.Text className="bg-white border-end-0">
+              <FaSearch className="text-muted" />
             </InputGroup.Text>
             <Form.Control
               type="text"
               placeholder="Buscar"
+              className="border-start-0"
               value={busqueda}
               onChange={(e) => {
                 setBusqueda(e.target.value);
@@ -126,6 +127,7 @@ const DetalleplanesList = ({ detalleplanes, seleccionar, eliminar, clientes, pla
             />
           </InputGroup>
         </Form.Group>
+
       </div>
 
       <Table striped bordered hover>
@@ -154,7 +156,21 @@ const DetalleplanesList = ({ detalleplanes, seleccionar, eliminar, clientes, pla
               <td>{detalleplan.hora}</td>
               <td>{new Date(detalleplan.fecha_venc).toLocaleDateString()}</td>
               <td>{new Date(detalleplan.fecha_limite).toLocaleDateString()}</td>
-             <td>{detalleplan.estado === 1 ? "Pendiente" : detalleplan.estado === 0 ? "Deshabilitado" : "Desconocido"}</td>
+              <td>
+                <span className={`badge ${
+                  detalleplan.estado === 1 
+                    ? "bg-warning text-dark" 
+                    : detalleplan.estado === 0 
+                      ? "bg-danger" 
+                      : "bg-secondary"
+                }`}>
+                  {detalleplan.estado === 1 
+                    ? "Proceso" 
+                    : detalleplan.estado === 0 
+                      ? "Deshabilitado" 
+                      : "Desconocido"}
+                </span>
+              </td>
               <td className="d-flex gap-2">
                 <Button variant="success" onClick={() => pagar(detalleplan)} title="Pagar">
                   <BiDollar size={20} />

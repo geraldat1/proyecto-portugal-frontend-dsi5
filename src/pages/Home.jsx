@@ -49,7 +49,7 @@ const Home = () => {
         {/* Cards Grid - 2x2 layout */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
           gap: '1.5rem',
           width: '100%',
           marginBottom: '2rem'
@@ -58,29 +58,29 @@ const Home = () => {
             icon={<FiUsers style={{ color: '#fff', fontSize: '1.8rem' }} />}
             title="Total Clientes"
             value={clientes.length}
-            gradient="linear-gradient(135deg, #FFB347 0%, #FFCC33 100%)"
-            shadowColor="rgba(255, 179, 71, 0.4)"
+            gradient="linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%)" // Azul vibrante
+            shadowColor="rgba(67, 97, 238, 0.4)"
           />
           <Card
             icon={<FiUserCheck style={{ color: '#fff', fontSize: '1.8rem' }} />}
             title="Entrenadores"
             value={entrenadores.length}
-            gradient="linear-gradient(135deg, #FF9500 0%, #FFD700 100%)"
-            shadowColor="rgba(255, 149, 0, 0.4)"
+            gradient="linear-gradient(135deg, #7209b7 0%, #560bad 100%)" // Púrpura
+            shadowColor="rgba(114, 9, 183, 0.4)"
           />
           <Card
             icon={<FiClipboard style={{ color: '#fff', fontSize: '1.8rem' }} />}
             title="Rutinas Activas"
             value={rutinas.length}
-            gradient="linear-gradient(135deg, #FFA500 0%, #FFD700 100%)"
-            shadowColor="rgba(255, 165, 0, 0.4)"
+            gradient="linear-gradient(135deg, #f72585 0%, #b5179e 100%)" // Rosa magenta
+            shadowColor="rgba(247, 37, 133, 0.4)"
           />
           <Card
             icon={<FiFileText style={{ color: '#fff', fontSize: '1.8rem' }} />}
             title="Planes Disponibles"
             value={planes.length}
-            gradient="linear-gradient(135deg, #FFD700 0%, #FFA500 100%)"
-            shadowColor="rgba(255, 215, 0, 0.4)"
+             gradient="linear-gradient(135deg, #4cc9f0 0%, #4895ef 100%)" // Azul claro
+            shadowColor="rgba(76, 201, 240, 0.4)"
           />
         </div>
 
@@ -150,7 +150,7 @@ const Card = ({ icon, title, value, gradient, shadowColor }) => {
   return (
     <div
       style={{
-        padding: '1.5rem',
+        padding: '1rem',
         borderRadius: '12px',
         background: gradient,
         display: 'flex',

@@ -115,30 +115,73 @@ const ClienteForm = ({ show, handleClose, agregar, actualizar, clienteSelecciona
   };
 
   return (
-    <Modal show={show} onHide={handleClose}>
-      <Modal.Header closeButton>
-        <Modal.Title>{clienteSeleccionado ? "Editar Cliente" : "Agregar Cliente"}</Modal.Title>
+    <Modal 
+      show={show} 
+      onHide={handleClose}
+      backdrop="static"
+      keyboard={false}
+      size="lg"
+      centered
+    >
+      <Modal.Header closeButton className="bg-light">
+        <Modal.Title className="fw-bold">
+          {clienteSeleccionado ? (
+            <><i className="bi bi-pencil-square me-2"></i>Editar Cliente</>
+          ) : (
+            <><i className="bi bi-person-plus me-2"></i>Agregar Nuevo Cliente</>
+          )}
+        </Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Form onSubmit={manejarEnvio}>
-          <Form.Group className="mb-3">
-            <Form.Label>Dni</Form.Label>
-            <Form.Control
-              type="text"
-              value={dni}
-              onChange={(e) => {
-                const valor = e.target.value;
-                if (/^\d{0,8}$/.test(valor)) setDni(valor);
-              }}
-              isInvalid={!!errores.dni}
-            />
-            <Form.Control.Feedback type="invalid">{errores.dni}</Form.Control.Feedback>
-          </Form.Group>
+          <div className="row">
+            {/* DNI */}
+            <Form.Group className="mb-3 col-md-6">
+              <Form.Label className="fw-bold">DNI <span className="text-danger">*</span></Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Ingrese DNI (8 dígitos)"
+                value={dni}
+                onChange={(e) => {
+                  const valor = e.target.value;
+                  if (/^\d{0,8}$/.test(valor)) setDni(valor);
+                }}
+                isInvalid={!!errores.dni}
+                maxLength={8}
+              />
+              <Form.Text className="text-muted">Solo números, sin puntos ni guiones</Form.Text>
+              <Form.Control.Feedback type="invalid">
+                {errores.dni}
+              </Form.Control.Feedback>
+            </Form.Group>
 
+            {/* Teléfono */}
+            <Form.Group className="mb-3 col-md-6">
+              <Form.Label className="fw-bold">Teléfono <span className="text-danger">*</span></Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Ingrese teléfono"
+                value={telefono}
+                onChange={(e) => {
+                  const valor = e.target.value;
+                  if (/^\d{0,9}$/.test(valor)) setTelefono(valor);
+                }}
+                isInvalid={!!errores.telefono}
+                maxLength={9}
+              />
+              <Form.Text className="text-muted">Ejemplo: 987654321</Form.Text>
+              <Form.Control.Feedback type="invalid">
+                {errores.telefono}
+              </Form.Control.Feedback>
+            </Form.Group>
+          </div>
+
+          {/* Nombre */}
           <Form.Group className="mb-3">
-            <Form.Label>Nombre</Form.Label>
+            <Form.Label className="fw-bold">Nombre Completo <span className="text-danger">*</span></Form.Label>
             <Form.Control
               type="text"
+              placeholder="Ingrese nombre completo"
               value={nombre}
               onChange={(e) => {
                 const valor = e.target.value;
@@ -146,37 +189,47 @@ const ClienteForm = ({ show, handleClose, agregar, actualizar, clienteSelecciona
               }}
               isInvalid={!!errores.nombre}
             />
-            <Form.Control.Feedback type="invalid">{errores.nombre}</Form.Control.Feedback>
+            <Form.Text className="text-muted">Solo letras y espacios</Form.Text>
+            <Form.Control.Feedback type="invalid">
+              {errores.nombre}
+            </Form.Control.Feedback>
           </Form.Group>
 
-          <Form.Group className="mb-3">
-            <Form.Label>Telefono</Form.Label>
+          {/* Dirección */}
+          <Form.Group className="mb-4">
+            <Form.Label className="fw-bold">Dirección</Form.Label>
             <Form.Control
               type="text"
-              value={telefono}
-              onChange={(e) => {
-                const valor = e.target.value;
-                if (/^\d{0,9}$/.test(valor)) setTelefono(valor);
-              }}
-              isInvalid={!!errores.telefono}
-            />
-            <Form.Control.Feedback type="invalid">{errores.telefono}</Form.Control.Feedback>
-          </Form.Group>
-
-          <Form.Group className="mb-3">
-            <Form.Label>Dirección</Form.Label>
-            <Form.Control
-              type="text"
+              placeholder="Ingrese dirección completa"
               value={direccion}
               onChange={(e) => setDireccion(e.target.value)}
               isInvalid={!!errores.direccion}
             />
-            <Form.Control.Feedback type="invalid">{errores.direccion}</Form.Control.Feedback>
+            <Form.Control.Feedback type="invalid">
+              {errores.direccion}
+            </Form.Control.Feedback>
           </Form.Group>
 
-          <Button variant="primary" type="submit">
-            {clienteSeleccionado ? "Actualizar" : "Agregar"}
-          </Button>
+          <div className="d-flex justify-content-end gap-3 mt-4">
+            <Button 
+              variant="outline-secondary" 
+              onClick={handleClose}
+              className="px-4"
+            >
+              Cancelar
+            </Button>
+            <Button 
+              variant="primary" 
+              type="submit" 
+              className="px-4 fw-bold"
+            >
+              {clienteSeleccionado ? (
+                <><i className="bi bi-check-circle me-2"></i>Guardar Cambios</>
+              ) : (
+                <><i className="bi bi-save me-2"></i>Registrar Cliente</>
+              )}
+            </Button>
+          </div>
         </Form>
       </Modal.Body>
     </Modal>

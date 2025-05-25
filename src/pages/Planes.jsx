@@ -4,6 +4,8 @@ import PlanList from "../components/planes/PlanList";
 import PlanForm from "../components/planes/PlanForm";
 import { Button } from "react-bootstrap";
 
+import { FaPlus } from "react-icons/fa"; // Asegúrate de importar el ícono
+
 const Planes = () => {
   const [planes, setPlanes] = useState([]);
   const [planSeleccionado, setPlanSeleccionado] = useState(null);
@@ -45,15 +47,18 @@ const Planes = () => {
   return (
     <div>
       <h2>Gestión de Planes</h2>
-      <Button 
-      className="mb-3" 
-      variant="primary"
-       onClick={() => {
-       setPlanSeleccionado(null);
-       setMostrarModal(true);
-      }
-      }
-       >Agregar Plan</Button>
+      <Button
+        className="mb-3 d-flex align-items-center gap-2 fw-semibold shadow-sm"
+        variant="primary"
+        onClick={() => {
+          setPlanSeleccionado(null);
+          setMostrarModal(true);
+        }}
+        style={{ borderRadius: '8px' }}
+      >
+        <FaPlus />
+        Agregar Plan
+      </Button>
 
       <PlanList planes={planes} seleccionar={seleccionarPlan} eliminar={eliminar} />
       <PlanForm

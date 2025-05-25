@@ -86,22 +86,26 @@ const ClienteList = ({ clientes, seleccionar, eliminar }) => {
     <>
       {/* Buscador */}
       <div className="d-flex justify-content-between align-items-center mb-3">
-        <Form.Group style={{ maxWidth: "300px", marginBottom: 0 }}>
+        <Form.Group className="mb-0" style={{ maxWidth: 300 }}>
           <InputGroup size="sm">
-            <InputGroup.Text>
-              <FaSearch />
+            <InputGroup.Text className="bg-white border-end-0">
+              <FaSearch className="text-muted" />
             </InputGroup.Text>
             <Form.Control
               type="text"
               placeholder="Buscar"
+              className="border-start-0"
               value={busqueda}
               onChange={(e) => {
                 setBusqueda(e.target.value);
                 setPaginaActual(1);
               }}
+              autoComplete="off"
+              spellCheck={false}
             />
           </InputGroup>
         </Form.Group>
+
 
         <div style={{ fontSize: "1.1rem", fontWeight: "500" }} className="d-flex align-items-center">
           <FaUserCheck size={20} className="me-2 text-success" />
@@ -119,7 +123,6 @@ const ClienteList = ({ clientes, seleccionar, eliminar }) => {
             <th>Dirección</th>
             <th>Fecha</th>
             <th>Estado</th>
-            <th>ID User</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -132,8 +135,11 @@ const ClienteList = ({ clientes, seleccionar, eliminar }) => {
               <td>{cliente.telefono}</td>
               <td>{cliente.direccion}</td>
               <td>{new Date(cliente.fecha).toLocaleDateString()}</td>
-              <td>{cliente.estado === 1 ? "Activo" : "Inactivo"}</td>
-              <td>{cliente.id_user}</td>
+              <td>
+                <span className={`badge ${cliente.estado === 1 ? 'bg-success' : 'bg-secondary'}`}>
+                  {cliente.estado === 1 ? "Activo" : "Inactivo"}
+                </span>
+              </td>
               <td>
                 <Button variant="info" onClick={() => seleccionar(cliente)} title="Editar">
                   <BiEdit size={22} />

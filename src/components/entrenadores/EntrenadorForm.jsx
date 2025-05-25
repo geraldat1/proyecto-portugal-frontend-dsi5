@@ -94,83 +94,144 @@ const EntrenadorForm = ({ show, handleClose, agregar, actualizar, entrenadorSele
   };
 
   return (
-    <Modal show={show} onHide={handleClose}>
-      <Modal.Header closeButton>
-        <Modal.Title>{entrenadorSeleccionado ? "Editar Entrenador" : "Agregar Entrenador"}</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <Form onSubmit={manejarEnvio}>
+    <Modal 
+  show={show} 
+  onHide={handleClose}
+  backdrop="static"
+  keyboard={false}
+  size="lg"
+  centered
+>
+  <Modal.Header closeButton className="bg-light">
+    <Modal.Title className="fw-bold">
+      {entrenadorSeleccionado ? (
+        <><i className="bi bi-pencil-square me-2"></i>Editar Entrenador</>
+      ) : (
+        <><i className="bi bi-person-plus me-2"></i>Agregar Nuevo Entrenador</>
+      )}
+    </Modal.Title>
+  </Modal.Header>
+  <Modal.Body>
+    <Form onSubmit={manejarEnvio}>
+      <div className="row">
+        {/* Nombre */}
+        <Form.Group className="mb-3 col-md-6">
+          <Form.Label className="fw-bold">Nombre <span className="text-danger">*</span></Form.Label>
+          <Form.Control
+            type="text"
+            placeholder="Ingrese nombre(s)"
+            value={nombre}
+            onChange={(e) => setNombre(e.target.value.replace(/[^a-zA-ZÁÉÍÓÚáéíóúÑñ\s]/g, ""))}
+            isInvalid={!!errores.nombre}
+          />
+          <Form.Text className="text-muted">Solo letras y espacios</Form.Text>
+          <Form.Control.Feedback type="invalid">
+            {errores.nombre}
+          </Form.Control.Feedback>
+        </Form.Group>
 
-          <Form.Group className="mb-3">
-            <Form.Label>Nombre</Form.Label>
-            <Form.Control
-              type="text"
-              value={nombre}
-              onChange={(e) => setNombre(e.target.value.replace(/[^a-zA-ZÁÉÍÓÚáéíóúÑñ\s]/g, ""))}
-              isInvalid={!!errores.nombre}
-            />
-            <Form.Control.Feedback type="invalid">{errores.nombre}</Form.Control.Feedback>
-          </Form.Group>
+        {/* Apellido */}
+        <Form.Group className="mb-3 col-md-6">
+          <Form.Label className="fw-bold">Apellido <span className="text-danger">*</span></Form.Label>
+          <Form.Control
+            type="text"
+            placeholder="Ingrese apellido(s)"
+            value={apellido}
+            onChange={(e) => setApellido(e.target.value.replace(/[^a-zA-ZÁÉÍÓÚáéíóúÑñ\s]/g, ""))}
+            isInvalid={!!errores.apellido}
+          />
+          <Form.Text className="text-muted">Solo letras y espacios</Form.Text>
+          <Form.Control.Feedback type="invalid">
+            {errores.apellido}
+          </Form.Control.Feedback>
+        </Form.Group>
+      </div>
 
-          <Form.Group className="mb-3">
-            <Form.Label>Apellido</Form.Label>
-            <Form.Control
-              type="text"
-              value={apellido}
-              onChange={(e) => setApellido(e.target.value.replace(/[^a-zA-ZÁÉÍÓÚáéíóúÑñ\s]/g, ""))}
-              isInvalid={!!errores.apellido}
-            />
-            <Form.Control.Feedback type="invalid">{errores.apellido}</Form.Control.Feedback>
-          </Form.Group>
+      <div className="row">
+        {/* Teléfono */}
+        <Form.Group className="mb-3 col-md-6">
+          <Form.Label className="fw-bold">Teléfono <span className="text-danger">*</span></Form.Label>
+          <Form.Control
+            type="text"
+            placeholder="Ejemplo: 987654321"
+            value={telefono}
+            onChange={(e) => setTelefono(e.target.value.replace(/\D/g, "").slice(0, 9))}
+            isInvalid={!!errores.telefono}
+            maxLength={9}
+          />
+          <Form.Text className="text-muted">9 dígitos, solo números</Form.Text>
+          <Form.Control.Feedback type="invalid">
+            {errores.telefono}
+          </Form.Control.Feedback>
+        </Form.Group>
 
-          <Form.Group className="mb-3">
-            <Form.Label>Teléfono</Form.Label>
-            <Form.Control
-              type="text"
-              value={telefono}
-              onChange={(e) => setTelefono(e.target.value.replace(/\D/g, "").slice(0, 9))}
-              isInvalid={!!errores.telefono}
-            />
-            <Form.Control.Feedback type="invalid">{errores.telefono}</Form.Control.Feedback>
-          </Form.Group>
+        {/* Correo */}
+        <Form.Group className="mb-3 col-md-6">
+          <Form.Label className="fw-bold">Correo Electrónico</Form.Label>
+          <Form.Control
+            type="email"
+            placeholder="ejemplo@dominio.com"
+            value={correo}
+            onChange={(e) => setCorreo(e.target.value)}
+            isInvalid={!!errores.correo}
+          />
+          <Form.Control.Feedback type="invalid">
+            {errores.correo}
+          </Form.Control.Feedback>
+        </Form.Group>
+      </div>
 
-          <Form.Group className="mb-3">
-            <Form.Label>Correo</Form.Label>
-            <Form.Control
-              type="email"
-              value={correo}
-              onChange={(e) => setCorreo(e.target.value)}
-              isInvalid={!!errores.correo}
-            />
-            <Form.Control.Feedback type="invalid">{errores.correo}</Form.Control.Feedback>
-          </Form.Group>
+      {/* Dirección */}
+      <Form.Group className="mb-4">
+        <Form.Label className="fw-bold">Dirección</Form.Label>
+        <Form.Control
+          type="text"
+          placeholder="Ingrese dirección completa"
+          value={direccion}
+          onChange={(e) => setDireccion(e.target.value)}
+          isInvalid={!!errores.direccion}
+        />
+        <Form.Control.Feedback type="invalid">
+          {errores.direccion}
+        </Form.Control.Feedback>
+      </Form.Group>
 
-          <Form.Group className="mb-3">
-            <Form.Label>Dirección</Form.Label>
-            <Form.Control
-              type="text"
-              value={direccion}
-              onChange={(e) => setDireccion(e.target.value)}
-              isInvalid={!!errores.direccion}
-            />
-            <Form.Control.Feedback type="invalid">{errores.direccion}</Form.Control.Feedback>
-          </Form.Group>
+      {/* Estado (solo para edición) */}
+      {entrenadorSeleccionado && (
+        <Form.Group className="mb-3">
+          <Form.Label className="fw-bold">Estado</Form.Label>
+          <Form.Control 
+            type="text" 
+            value={estado === 1 ? "Activo" : "Inactivo"} 
+            disabled 
+            className={estado === 1 ? "text-success fw-bold" : "text-secondary fw-bold"}
+          />
+        </Form.Group>
+      )}
 
-          {entrenadorSeleccionado && (
-            <>
-          <Form.Group className="mb-3">
-            <Form.Label>Estado</Form.Label>
-            <Form.Control type="text" value={estado} disabled />
-          </Form.Group>
-          </>
-            )}
-
-          <Button variant="primary" type="submit">
-            {entrenadorSeleccionado ? "Actualizar" : "Agregar"}
-          </Button>
-        </Form>
-      </Modal.Body>
-    </Modal>
+      <div className="d-flex justify-content-end gap-3 mt-4">
+        <Button 
+          variant="outline-secondary" 
+          onClick={handleClose}
+          className="px-4"
+        >
+          Cancelar
+        </Button>
+        <Button 
+          variant="primary" 
+          type="submit" 
+          className="px-4 fw-bold"
+        >
+          {entrenadorSeleccionado ? (
+            <><i className="bi bi-check-circle me-2"></i>Guardar Cambios</>
+          ) : (
+            <><i className="bi bi-save me-2"></i>Registrar Entrenador</>
+          )}
+        </Button>
+      </div>
+    </Form>
+  </Modal.Body>
+</Modal>
   );
 };
 

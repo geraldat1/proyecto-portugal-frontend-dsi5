@@ -81,22 +81,27 @@ const EntrenadorList = ({ entrenadores, seleccionar, eliminar }) => {
     <>
       {/* Buscador + contador activos */}
       <div className="d-flex justify-content-between align-items-center mb-3">
-        <Form.Group style={{ maxWidth: "300px", marginBottom: 0 }}>
-          <InputGroup size="sm">
-            <InputGroup.Text>
-              <FaSearch />
+        <Form.Group className="mb-0" style={{ maxWidth: "300px" }}>
+          <InputGroup size="sm" className="shadow-sm rounded">
+            <InputGroup.Text className="bg-white border-end-0">
+              <FaSearch className="text-muted" />
             </InputGroup.Text>
             <Form.Control
-              type="text"
-              placeholder="Buscar"
+              type="search"
+              placeholder="Buscar..."
+              aria-label="Buscar"
+              className="border-start-0"
               value={busqueda}
               onChange={(e) => {
                 setBusqueda(e.target.value);
                 setPaginaActual(1);
               }}
+              autoComplete="off"
+              spellCheck="false"
             />
           </InputGroup>
         </Form.Group>
+
 
         <div className="d-flex align-items-center" style={{ fontSize: "1.1rem", fontWeight: "500" }}>
           <FaUserCheck size={20} className="me-2 text-success" />
@@ -126,7 +131,12 @@ const EntrenadorList = ({ entrenadores, seleccionar, eliminar }) => {
               <td>{p.telefono}</td>
               <td>{p.correo}</td>
               <td>{p.direccion}</td>
-              <td>{p.estado === 1 ? "Activo" : "Inactivo"}</td>
+              <td>
+                <span className={`badge d-flex align-items-center ${p.estado === 1 ? 'bg-success' : 'bg-secondary'}`}>
+                  <i className={`bi ${p.estado === 1 ? 'bi-check-circle' : 'bi-x-circle'} me-1`}></i>
+                  {p.estado === 1 ? "Activo" : "Inactivo"}
+                </span>
+              </td>              
               <td>
                 <Button variant="warning" onClick={() => seleccionar(p)}>
                   Editar

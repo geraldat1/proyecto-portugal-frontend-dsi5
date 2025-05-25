@@ -11,6 +11,9 @@ import DetalleplanesList from "../components/detalleplanes/DetalleplanesList";
 import DetalleplanesForm from "../components/detalleplanes/DetalleplanesForm";
 import { Button } from "react-bootstrap";
 
+import { FaPlus } from "react-icons/fa";
+
+
 const Detalleplanes = () => {
   const [detalleplanes, setDetalleplanes] = useState([]);
   const [clientes, setClientes] = useState([]);
@@ -61,15 +64,17 @@ const Detalleplanes = () => {
     <div>
       <h2>Acuerdo de planes</h2>
       <Button
-        className="mb-3"
+        className="mb-3 d-flex align-items-center"
         variant="primary"
         onClick={() => {
           setDetalleplanSeleccionada(null);
           setMostrarModal(true);
         }}
       >
-        Agregar Detalle del plan
+        <FaPlus className="me-2" />
+        Nuevo Acuerdo
       </Button>
+
 
       <DetalleplanesList
         detalleplanes={detalleplanes}

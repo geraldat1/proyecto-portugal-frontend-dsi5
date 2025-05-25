@@ -4,6 +4,8 @@ import EntrenadorList from "../components/entrenadores/EntrenadorList";
 import EntrenadorForm from "../components/entrenadores/EntrenadorForm";
 import { Button } from "react-bootstrap";
 
+import { FaPlus } from "react-icons/fa";
+
 const Entrenadores = () => {
   const [entrenadores, setEntrenadores] = useState([]);
   const [entrenadorSeleccionado, setEntrenadorSeleccionado] = useState(null);
@@ -45,15 +47,18 @@ const Entrenadores = () => {
   return (
     <div>
       <h2>Gestión de Entrenadores</h2>
-      <Button 
-      className="mb-3" 
+      <Button
+      className="mb-3 d-flex align-items-center"
       variant="primary"
-       onClick={() => {
-       setEntrenadorSeleccionado(null);
-       setMostrarModal(true);
-      }
-      }
-       >Agregar Entrenador</Button>
+      onClick={() => {
+        setEntrenadorSeleccionado(null);
+        setMostrarModal(true);
+      }}
+    >
+      <FaPlus className="me-2"  />
+      Agregar Entrenador
+    </Button>
+
 
       <EntrenadorList entrenadores={entrenadores} seleccionar={seleccionarEntrenador} eliminar={eliminar} />
       <EntrenadorForm

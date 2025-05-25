@@ -46,13 +46,13 @@ const Navbar = () => {
   );
 
   return (
-    <BsNavbar expand="lg" style={{ backgroundColor: "#000", color: "#fff" }}>
+  <BsNavbar expand="lg" className="navbar-custom">
       <Container>
         <BsNavbar.Brand as={Link} to="/">
           <img
             src="../imagenes/letra-toreto.png"
             alt="Logo"
-            style={{ width: "70px", height: "auto" }}
+            className="navbar-logo"
           />
         </BsNavbar.Brand>
         <div
@@ -69,13 +69,13 @@ const Navbar = () => {
 
             <NavDropdown title={menuItem(<FaUsers />, "Clientes")} id="archivos-dropdown">
               <NavDropdown.Item as={Link} to="/clientes">
-                {menuItem(<FaUsers />, "Lista de Clientes")}
+                {menuItem(<FaUsers className="text-primary me-2" />, "Registrar Clientes")}
               </NavDropdown.Item>
               <NavDropdown.Item as={Link} to="/detalleplanes">
-                {menuItem(<FaClipboardList />, "Detalle Planes")}
+                {menuItem(<FaClipboardList className="text-success me-2" />, "Acuerdos")}
               </NavDropdown.Item>
               <NavDropdown.Item as={Link} to="/pagosplanes">
-                {menuItem(<FaCreditCard />, "Pagos")}
+                {menuItem(<FaCreditCard className="text-info me-2" />, "Pagos")}
               </NavDropdown.Item>
             </NavDropdown>
 
@@ -94,36 +94,25 @@ const Navbar = () => {
           </Nav>
 
           {user && (
-  <Dropdown 
-    align="end" 
-    className="dropdown-user shadow-sm"
-  >
-    <Dropdown.Toggle 
-      variant="light" 
-      id="dropdown-user"
-      className="dropdown-toggle-user d-flex align-items-center py-2 px-3 border-0 bg-transparent"
-    >
-      <span className="d-inline-flex align-items-center gap-2 text-light">
-        <FaUserCircle size={20} className="text-primary" />
-        <span className="fw-medium">
-          {user.name?.toUpperCase()}
-        </span>
-        <FaChevronDown size={12} className="ms-1" />
-      </span>
-    </Dropdown.Toggle>
+            <Nav className="ms-auto">
+            <Dropdown align="end" className="dropdown-user">
+              <Dropdown.Toggle 
+                as={Nav.Link}
+                id="dropdown-user"
+                className="dropdown-toggle-user d-flex align-items-center py-2 px-3 border-0 no-caret"
+                style={{ cursor: 'pointer' }}
+              >
+                <span className="d-inline-flex align-items-center gap-2">
+                  <FaUserCircle size={20} />
+                  <span className="fw-medium">
+                    {user.name?.toUpperCase()}
+                  </span>
+                  <FaChevronDown size={12} className="ms-1" />
+                </span>
+              </Dropdown.Toggle>
 
-     <Dropdown.Menu 
-        className="dropdown-menu-user border-0 shadow-sm rounded-1 mt-1"
-        style={{ 
-          minWidth: "220px",
-          position: "absolute",
-          left: "0",
-          top: "100%"
-        }}
-      >
-      <Dropdown.Header className="text-muted small">
-        MENÚ DE USUARIO
-      </Dropdown.Header>
+
+      <Dropdown.Menu className="dropdown-menu-user border-0 shadow-sm rounded-1 mt-1">
       
       <Dropdown.Item 
         as={Link} 
@@ -166,6 +155,8 @@ const Navbar = () => {
       </Dropdown.Item>
     </Dropdown.Menu>
   </Dropdown>
+    </Nav>
+
 )}
         </BsNavbar.Collapse>
       </Container>
