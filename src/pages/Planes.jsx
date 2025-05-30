@@ -46,7 +46,7 @@ const Planes = () => {
 
   return (
     <div>
-      <h2>Gestión de Planes</h2>
+      <h2>Lista de Planes</h2>
       <Button
         className="mb-3 d-flex align-items-center gap-2 fw-semibold shadow-sm"
         variant="primary"

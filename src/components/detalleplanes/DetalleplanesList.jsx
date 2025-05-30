@@ -1,7 +1,7 @@
 import React, { useState } from "react"; 
 import { Table, Button, Pagination, Form, InputGroup } from "react-bootstrap";
 import Swal from "sweetalert2";
-import { BiEdit, BiTrash, BiDollar } from "react-icons/bi";
+import { BiEdit, BiBlock, BiDollar } from "react-icons/bi";
 import { FaSearch } from "react-icons/fa";
 import { agregarPagosplan } from "../../services/pagosplanesService";
 
@@ -36,22 +36,23 @@ const DetalleplanesList = ({ detalleplanes, seleccionar, eliminar, clientes, pla
   const detalleplanesPaginadas = detalleplanesOrdenados.slice(indiceInicio, indiceFinal);
 
   const confirmarEliminacion = (id) => {
-    Swal.fire({
-      title: "¿Estás seguro?",
-      text: "¡No podrás revertir esto!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Sí, eliminar",
-      cancelButtonText: "Cancelar",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        eliminar(id);
-        Swal.fire("¡Eliminado!", "El registro ha sido eliminado.", "success");
-      }
-    });
-  };
+  Swal.fire({
+    title: "¿Estás seguro?",
+    text: "¡Esto deshabilitará el registro!",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#3085d6",
+    confirmButtonText: "Sí, deshabilitar",
+    cancelButtonText: "Cancelar",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      eliminar(id);
+      Swal.fire("¡Deshabilitado!", "El registro ha sido deshabilitado.", "success");
+    }
+  });
+};
+
 
   const pagar = async (detalleplan) => {
     const plan = planes.find((plan) => plan.id === detalleplan.id_plan);
@@ -137,10 +138,10 @@ const DetalleplanesList = ({ detalleplanes, seleccionar, eliminar, clientes, pla
             <th>Cliente</th>
             <th>Plan</th>
             <th>Precio</th>
-            <th>Fecha</th>
+            <th>F.Registro</th>
             <th>Hora</th>
-            <th>Desde</th>
-            <th>Hasta</th>
+            <th>F.Venc</th>
+            <th>F.Límite</th>
             <th>Estado</th>
             <th>Acciones</th>
           </tr>
@@ -172,16 +173,32 @@ const DetalleplanesList = ({ detalleplanes, seleccionar, eliminar, clientes, pla
                 </span>
               </td>
               <td className="d-flex gap-2">
-                <Button variant="success" onClick={() => pagar(detalleplan)} title="Pagar">
-                  <BiDollar size={20} />
+                <Button
+                  variant="success"
+                  onClick={() => pagar(detalleplan)}
+                  title="Pagar"
+                  disabled={detalleplan.estado === 0}
+                >
+                  <BiDollar size={22} />
                 </Button>
-                <Button variant="warning" onClick={() => seleccionar(detalleplan)} title="Editar">
+                <Button
+                  variant="warning"
+                  onClick={() => seleccionar(detalleplan)}
+                  title="Editar"
+                  disabled={detalleplan.estado === 0}
+                >
                   <BiEdit size={22} />
                 </Button>
-                <Button variant="danger" onClick={() => confirmarEliminacion(detalleplan.id)} title="Eliminar">
-                  <BiTrash size={22} />
+                <Button
+                  variant="danger"
+                  onClick={() => confirmarEliminacion(detalleplan.id)}
+                  title="Eliminar"
+                  disabled={detalleplan.estado === 0}
+                >
+                  <BiBlock size={22} />
                 </Button>
               </td>
+
             </tr>
           ))}
         </tbody>

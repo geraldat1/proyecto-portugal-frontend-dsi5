@@ -3,123 +3,9 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
-import { Form, Button, Alert } from "react-bootstrap";
-import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
-
-const styles = {
-  background: {
-    backgroundColor: "rgba(10, 10, 10, 0.99)",
-    position: "fixed",
-    top: 0,
-    left: 0,
-    width: "100%",
-    height: "100vh",
-    zIndex: -1,
-  },
-  container: {
-    minHeight: "100vh",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    fontFamily: "'Montserrat', sans-serif",
-  },
-  box: {
-    background: "rgba(20, 20, 20, 0.7)",
-    padding: "0",
-    borderRadius: "8px",
-    color: "#FFFFFF",
-    width: "90%",
-    maxWidth: "700px",
-    display: "flex",
-    overflow: "hidden",
-    boxShadow: "0 0 20px rgba(255, 255, 255, 0.1)",
-    border: "1px solid rgba(255, 255, 255, 0.1)",
-    backdropFilter: "blur(8px)",
-  },
-  leftImageSection: {
-    width: "50%",
-    backgroundImage: "url(../imagenes/fondo-log2.jpg)",
-    backgroundSize: "cover",
-    backgroundPosition: "center",
-    position: "relative",
-  },
-  formSection: {
-    width: "50%",
-    padding: "30px 25px",
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "transparent",
-  },
-  inputIconWrapper: {
-    position: "absolute",
-    left: "10px",
-    top: "50%",
-    transform: "translateY(-50%)",
-    fontSize: "0.9rem",
-    color: "#FFD700",
-  },
-  input: {
-    paddingLeft: "35px",
-    border: "1px solid rgba(255, 215, 0, 0.5)",
-    color: "#FFFFFF",
-    fontWeight: 400,
-    borderRadius: "5px",
-    background: "rgba(0, 0, 0, 0.3)",
-    fontSize: "0.9rem",
-    height: "45px",
-    marginBottom: "15px",
-    transition: "all 0.3s ease",
-  },
-  button: {
-    backgroundColor: "rgba(255, 215, 0, 0.9)",
-    color: "#000000",
-    fontWeight: 600,
-    border: "none",
-    padding: "10px",
-    fontSize: "0.95rem",
-    borderRadius: "5px",
-    transition: "all 0.3s ease",
-    marginTop: "10px",
-    height: "45px",
-    width: "100%",
-    letterSpacing: "0.8px",
-  },
-  eyeIcon: {
-    position: "absolute",
-    right: "10px",
-    top: "50%",
-    transform: "translateY(-50%)",
-    cursor: "pointer",
-    fontSize: "0.9rem",
-    color: "#FFD700",
-  },
-  logo: {
-    width: "80px",
-    height: "auto",
-    marginBottom: "20px",
-    filter: "drop-shadow(0 0 4px rgba(255, 215, 0, 0.4))",
-  },
-  title: {
-    fontSize: "1.5rem",
-    fontWeight: 600,
-    marginBottom: "20px",
-    color: "#FFD700",
-    textAlign: "center",
-    letterSpacing: "0.8px",
-  },
-  alert: {
-    width: "100%",
-    marginBottom: "15px",
-    fontWeight: 500,
-    fontSize: "0.85rem",
-    border: "1px solid rgba(255, 255, 255, 0.2)",
-    padding: "8px 12px",
-    color: "#FFFFFF",
-    borderRadius: "4px",
-  },
-};
+import { Form } from "react-bootstrap";
+import { FaEnvelope, FaLock, FaEye, FaEyeSlash, FaShieldAlt } from "react-icons/fa";
+import { motion } from "framer-motion";
 
 const Login = () => {
   const { setUser } = useContext(AuthContext);
@@ -129,12 +15,15 @@ const Login = () => {
   const [messageType, setMessageType] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
+    document.body.style.background = "#000000";
     return () => {
       document.body.style.overflow = "auto";
+      document.body.style.background = "";
     };
   }, []);
 
@@ -152,25 +41,26 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
 
-    // Validación de campos vacíos
     if (!correo || !clave) {
       setMessage("Por favor, completa todos los campos.");
       setMessageType("error");
+      setIsLoading(false);
       return;
     }
 
-    // Validación de formato de correo electrónico
     if (!validateEmail(correo)) {
       setMessage("Por favor, ingresa un correo electrónico válido.");
       setMessageType("error");
+      setIsLoading(false);
       return;
     }
 
-    // Validación de longitud de la contraseña
     if (clave.length < 6) {
       setMessage("La contraseña debe tener al menos 6 caracteres.");
       setMessageType("error");
+      setIsLoading(false);
       return;
     }
 
@@ -186,116 +76,454 @@ const Login = () => {
       const decoded = jwtDecode(token);
       setUser(decoded);
 
-      // Mostrar mensaje de bienvenida
-      setMessage("¡Bienvenido al sistema!");
+      const nombreUsuario = res.data.user.nombre; // <-- Extraemos el nombre del usuario desde el backend
+
+      setMessage(`¡Bienvenido, ${nombreUsuario}!`);
       setMessageType("success");
 
-      // Redirigir después de un breve retraso
       setTimeout(() => {
         navigate("/");
-      }, 3000);
+      }, 1500);
     } catch (err) {
-      setMessage("Credenciales incorrectas");
+      const errorMsg = err.response?.data?.error || "Credenciales incorrectas";
+
+      if (errorMsg.toLowerCase().includes("deshabilitado")) {
+        setMessage("Tu cuenta está deshabilitada. Contacta con soporte.");
+      } else {
+        setMessage(errorMsg);
+      }
       setMessageType("error");
     }
-  };
+    finally {
+          setIsLoading(false);
+        }
+      };
 
-  // Función para validar el formato del correo electrónico
   const validateEmail = (email) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return re.test(String(email).toLowerCase());
   };
 
   return (
-    <>
-      <div style={styles.background}></div>
-      <div style={styles.container}>
-        <div style={styles.box}>
-          <div style={styles.leftImageSection}></div>
-          <div style={styles.formSection}>
-            <img
-              src="../imagenes/img-toro.png"
-              alt="Logo"
-              style={styles.logo}
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="login-container"
+    >
+      <div className="login-background">
+        <div className="particles-container">
+          {Array.from({ length: 50 }).map((_, i) => (
+            <div
+              key={i}
+              className="particle"
+              style={{
+                width: `${Math.random() * 5 + 1}px`,
+                height: `${Math.random() * 5 + 1}px`,
+                top: `${Math.random() * 100}%`,
+                left: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 15}s`,
+                animationDuration: `${Math.random() * 20 + 10}s`,
+                opacity: Math.random() * 0.5 + 0.2,
+              }}
             />
-            <h2 style={styles.title}>INICIAR SESIÓN</h2>
+          ))}
+        </div>
+      </div>
+
+      <div className="login-content">
+        <motion.div
+          initial={{ scale: 0.95, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.3 }}
+          className="login-card"
+        >
+          <div className="login-image-section">
+            <div className="image-overlay"></div>
+            <div className="image-content">
+              <FaShieldAlt className="security-icon" />
+              <h3>Seguridad Garantizada</h3>
+              <p>Tus datos están protegidos con encriptación de última generación</p>
+            </div>
+          </div>
+
+          <div className="login-form-section">
+            <div className="login-header">
+              <div className="logo-container">
+                <img src="../imagenes/img-toro.png" alt="Logo" className="logo" />
+              </div>
+              <h2>INICIAR SESIÓN</h2>
+              <p>Ingresa tus credenciales para acceder al sistema</p>
+            </div>
 
             {showAlert && (
-              <Alert
-                variant={messageType === "error" ? "danger" : "success"}
-                style={{
-                  ...styles.alert,
-                  backgroundColor: messageType === "error" 
-                    ? "rgba(217, 83, 79, 0.9)" 
-                    : "rgba(92, 184, 92, 0.9)"
-                }}
+              <motion.div
+                initial={{ y: -20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                className={`alert-message ${messageType}`}
               >
                 {message}
-              </Alert>
+              </motion.div>
             )}
 
-            <Form onSubmit={handleSubmit} style={{ width: "100%" }}>
-              <Form.Group style={{ position: "relative", marginBottom: "15px" }}>
-                <div style={styles.inputIconWrapper}>
-                  <FaEnvelope />
-                </div>
-                <Form.Control
+            <Form onSubmit={handleSubmit} className="login-form">
+              <div className="form-group">
+                <FaEnvelope className="input-icon" />
+                <input
                   type="email"
                   placeholder="Correo electrónico"
                   value={correo}
                   onChange={(e) => setEmail(e.target.value)}
-                  style={styles.input}
-                  className="custom-placeholder"
+                  className="form-input"
                 />
-              </Form.Group>
+              </div>
 
-              <Form.Group style={{ position: "relative", marginBottom: "20px" }}>
-                <div style={styles.inputIconWrapper}>
-                  <FaLock />
-                </div>
-                <div
-                  style={styles.eyeIcon}
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? <FaEye /> : <FaEyeSlash />}
-                </div>
-                <Form.Control
+              <div className="form-group">
+                <FaLock className="input-icon" />
+                <input
                   type={showPassword ? "text" : "password"}
                   placeholder="Contraseña"
                   value={clave}
                   onChange={(e) => setPassword(e.target.value)}
-                  style={styles.input}
-                  className="custom-placeholder"
+                  className="form-input"
                 />
-              </Form.Group>
+                <div
+                  className="eye-icon"
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      setShowPassword(!showPassword);
+                    }
+                  }}
+                >
+                  {showPassword ? <FaEye /> : <FaEyeSlash />}
+                </div>
+              </div>
 
-              <Button type="submit" className="login-button" style={styles.button}>
-                INGRESAR
-              </Button>
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                type="submit"
+                className="login-button"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <span className="spinner"></span>
+                ) : (
+                  "INGRESAR"
+                )}
+              </motion.button>
             </Form>
           </div>
-        </div>
+        </motion.div>
       </div>
 
-      <style>
-        {`
-          .custom-placeholder::placeholder {
-            color: rgba(255, 255, 255, 0.6) !important;
-            font-size: 0.85rem;
-          }
+      <style jsx global>{`
+        :root {
+          --primary-color: #000000;
+          --secondary-color: #1a1a1a;
+          --accent-color: #ffd700;
+          --dark-color: #0f0c29;
+          --light-color: #f8f9fa;
+          --success-color: #00c851;
+          --error-color: #ff4444;
+          --gold-color: #ffd700;
+        }
 
-          .login-button:hover {
-            background-color: #FFFFFF !important;
-            color: #000000 !important;
-            transform: translateY(-1px);
-          }
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+          font-family: 'Montserrat', sans-serif;
+        }
 
-          body {
-            font-family: 'Montserrat', sans-serif;
+        body {
+          overflow: hidden;
+          background-color: #000000;
+        }
+
+        .login-container {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          min-height: 100vh;
+          position: relative;
+          overflow: hidden;
+          background-color: #000000;
+        }
+
+        .login-background {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-color: #000000;
+          z-index: -2;
+        }
+
+        .particles-container {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          overflow: hidden;
+          z-index: -1;
+        }
+
+        .particle {
+          position: absolute;
+          background: rgba(255, 215, 0, 0.5);
+          border-radius: 50%;
+          animation: float 15s infinite linear;
+        }
+
+        @keyframes float {
+          0% {
+            transform: translateY(0) rotate(0deg);
+            opacity: 1;
           }
-        `}
-      </style>
-    </>
+          100% {
+            transform: translateY(-1000px) rotate(720deg);
+            opacity: 0;
+          }
+        }
+
+        .login-content {
+          width: 100%;
+          max-width: 900px;
+          padding: 0 20px;
+        }
+
+        .login-card {
+          background: rgba(0, 0, 0, 0.8);
+          backdrop-filter: blur(10px);
+          border-radius: 15px;
+          overflow: hidden;
+          box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+          border: 1px solid rgba(255, 215, 0, 0.3);
+          color: var(--light-color);
+          display: flex;
+          height: 550px;
+          width: 100%;
+        }
+
+        .login-image-section {
+          width: 50%;
+          background: url('../imagenes/fondo-log2.jpg') center/cover no-repeat;
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-end;
+          padding: 30px;
+          filter: brightness(0.9);
+        }
+
+        .image-overlay {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent);
+          z-index: 0;
+        }
+
+        .image-content {
+          position: relative;
+          z-index: 1;
+          color: white;
+        }
+
+        .security-icon {
+          font-size: 40px;
+          color: var(--gold-color);
+          margin-bottom: 15px;
+        }
+
+        .login-image-section h3 {
+          font-size: 22px;
+          margin-bottom: 10px;
+          color: var(--gold-color);
+          text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+        }
+
+        .login-image-section p {
+          font-size: 14px;
+          opacity: 0.9;
+          text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+        }
+
+        .login-form-section {
+          width: 50%;
+          padding: 40px;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          background: rgba(0, 0, 0, 0.7);
+        }
+
+        .login-header {
+          text-align: center;
+          margin-bottom: 30px;
+        }
+
+        .logo-container {
+          margin-bottom: 20px;
+        }
+
+        .logo {
+          width: 120px;
+          height: auto;
+          filter: drop-shadow(0 0 3px var(--gold-color));
+        }
+
+        .login-header h2 {
+          font-size: 26px;
+          margin-bottom: 8px;
+          color: var(--gold-color);
+        }
+
+        .login-header p {
+          font-size: 14px;
+          opacity: 0.7;
+          color: var(--light-color);
+        }
+
+        .alert-message {
+          padding: 12px 20px;
+          border-radius: 8px;
+          margin-bottom: 15px;
+          text-align: center;
+          font-weight: 600;
+          font-size: 14px;
+          user-select: none;
+        }
+
+        .alert-message.success {
+          background-color: var(--success-color);
+          color: white;
+        }
+
+        .alert-message.error {
+          background-color: var(--error-color);
+          color: white;
+        }
+
+        .login-form {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .form-group {
+          position: relative;
+          margin-bottom: 25px;
+        }
+
+        .form-input {
+          width: 100%;
+          padding: 12px 40px 12px 40px;
+          font-size: 16px;
+          border-radius: 10px;
+          border: none;
+          outline: none;
+          background: rgba(255, 255, 255, 0.1);
+          color: var(--light-color);
+          transition: background 0.3s;
+        }
+
+        .form-input::placeholder {
+          color: rgba(255, 255, 255, 0.6);
+        }
+
+        .form-input:focus {
+          background: rgba(255, 255, 255, 0.2);
+        }
+
+        .input-icon {
+          position: absolute;
+          top: 50%;
+          left: 12px;
+          transform: translateY(-50%);
+          font-size: 18px;
+          color: var(--gold-color);
+        }
+
+        .eye-icon {
+          position: absolute;
+          top: 50%;
+          right: 12px;
+          transform: translateY(-50%);
+          font-size: 18px;
+          color: var(--gold-color);
+          cursor: pointer;
+          user-select: none;
+        }
+
+        .eye-icon:focus {
+          outline: 2px solid var(--gold-color);
+          outline-offset: 2px;
+          border-radius: 4px;
+        }
+
+        .login-button {
+          background-color: var(--gold-color);
+          border: none;
+          padding: 12px 0;
+          border-radius: 10px;
+          font-weight: 700;
+          font-size: 16px;
+          color: #000;
+          cursor: pointer;
+          transition: background-color 0.3s ease;
+          user-select: none;
+        }
+
+        .login-button:hover:enabled {
+          background-color: #e6c200;
+        }
+
+        .login-button:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
+        .spinner {
+          display: inline-block;
+          width: 18px;
+          height: 18px;
+          border: 3px solid rgba(0, 0, 0, 0.1);
+          border-top-color: #000;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+          margin: 0 auto;
+        }
+
+        @keyframes spin {
+          to {
+            transform: rotate(360deg);
+          }
+        }
+
+        @media (max-width: 768px) {
+          .login-card {
+            flex-direction: column;
+            height: auto;
+          }
+          .login-image-section,
+          .login-form-section {
+            width: 100%;
+          }
+          .login-image-section {
+            height: 200px;
+          }
+        }
+      `}</style>
+    </motion.div>
   );
 };
 

@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
-import Swal from "sweetalert2"; // opcional para mostrar errores visualmente
+import Swal from "sweetalert2";
+import Select from "react-select";
 
-const AsistenciaForm = ({ show, handleClose, agregar, actualizar, asistenciaSeleccionada }) => {
+
+const AsistenciaForm = ({ show, handleClose, agregar, actualizar, asistenciaSeleccionada, entrenadores, detallesPlanes, clientes, planes  }) => {
   const [fecha, setFecha] = useState("");
   const [hora_entrada, setHoraEnt] = useState("");
   const [hora_salida, setHoraSal] = useState("");
-  const [id_cliente, setIdCliente] = useState("");
+  const [id_detalle, setIdDetalle] = useState("");
   const [id_entrenador, setIdEntrenador] = useState("");
   const [id_usuario, setIdUsuario] = useState("");
-  const [id_rutina, setIdRutina] = useState("");
   const [estado, setEstado] = useState("");
 
   const [errores, setErrores] = useState({});
@@ -19,19 +20,17 @@ const AsistenciaForm = ({ show, handleClose, agregar, actualizar, asistenciaSele
       setFecha(asistenciaSeleccionada.fecha);
       setHoraEnt(asistenciaSeleccionada.hora_entrada);
       setHoraSal(asistenciaSeleccionada.hora_salida);
-      setIdCliente(asistenciaSeleccionada.id_cliente);
+      setIdDetalle(asistenciaSeleccionada.id_detalle);
       setIdEntrenador(asistenciaSeleccionada.id_entrenador);
       setIdUsuario(asistenciaSeleccionada.id_usuario);
-      setIdRutina(asistenciaSeleccionada.id_rutina);
       setEstado(asistenciaSeleccionada.estado);
     } else {
       setFecha("");
       setHoraEnt("");
       setHoraSal("");
-      setIdCliente("");
+      setIdDetalle("");
       setIdEntrenador("");
       setIdUsuario("");
-      setIdRutina("");
       setEstado("");
     }
     setErrores({});
@@ -40,16 +39,12 @@ const AsistenciaForm = ({ show, handleClose, agregar, actualizar, asistenciaSele
   const validar = () => {
     const nuevosErrores = {};
 
-    if (!id_cliente || String(id_cliente).trim() === "") {
-      nuevosErrores.id_cliente = "El ID del cliente es obligatorio";
+    if (!id_detalle || String(id_detalle).trim() === "") {
+      nuevosErrores.id_detalle = "El ID del detalle es obligatorio";
     }
 
     if (!id_entrenador || String(id_entrenador).trim() === "") {
       nuevosErrores.id_entrenador = "El ID del entrenador es obligatorio";
-    }
-
-    if (!id_rutina || String(id_rutina).trim() === "") {
-      nuevosErrores.id_rutina = "El ID de la rutina es obligatorio";
     }
 
     setErrores(nuevosErrores);
@@ -59,117 +54,210 @@ const AsistenciaForm = ({ show, handleClose, agregar, actualizar, asistenciaSele
   const manejarEnvio = (e) => {
     e.preventDefault();
     if (!validar()) {
-      // Opcional: mostrar alerta si hay errores
       Swal.fire("Campos inválidos", "Por favor revisa los datos ingresados", "error");
       return;
     }
-  
-    const nuevaAsistencia = { id_cliente, id_entrenador, id_rutina };
-  
+
+    const nuevaAsistencia = { id_detalle, id_entrenador };
+
     if (asistenciaSeleccionada) {
       actualizar(asistenciaSeleccionada.id_asistencia, {
         ...nuevaAsistencia,
         fecha,
         hora_entrada,
-        hora_salida: hora_salida && hora_salida.trim() === "" ? null : hora_salida, // Evitar trim() en null
+        hora_salida: hora_salida?.trim() || null,
         id_usuario: parseInt(id_usuario),
         estado: parseInt(estado),
+        
       });
+
+        Swal.fire({
+        icon: "info",
+        title: "Registro actualizado",
+        text: "La asistencia fue actualizada correctamente.",
+        timer: 2000,
+        showConfirmButton: false,
+    });
+
     } else {
       agregar(nuevaAsistencia);
+       Swal.fire({
+      icon: "success",
+      title: "Asistencia registrada",
+      text: "La asistencia fue registrada exitosamente.",
+      timer: 2000,
+      showConfirmButton: false,
+    });
     }
-  
-    // Limpiar formulario después de enviar
+
     setFecha("");
     setHoraEnt("");
     setHoraSal("");
-    setIdCliente("");
+    setIdDetalle("");
     setIdEntrenador("");
     setIdUsuario("");
-    setIdRutina("");
     setEstado("");
-  
+
     setErrores({});
-    handleClose(); // cerrar modal luego de enviar
+    handleClose();
   };
 
   return (
-    <Modal show={show} onHide={handleClose}>
-      <Modal.Header closeButton>
-        <Modal.Title>{asistenciaSeleccionada ? "Editar Asistencia" : "Agregar Asistencia"}</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <Form onSubmit={manejarEnvio}>
+<Modal 
+  show={show} 
+  onHide={handleClose}
+  backdrop="static"
+  keyboard={false}
+  size="lg"
+  centered
+>
+  <Modal.Header closeButton className="bg-light">
+    <Modal.Title className="fw-bold">
+      {asistenciaSeleccionada ? (
+        <><i className="bi bi-pencil-square me-2"></i>Editar Asistencia</>
+      ) : (
+        <><i className="bi bi-calendar-plus me-2"></i>Registrar Nueva Asistencia</>
+      )}
+    </Modal.Title>
+  </Modal.Header>
+  
+  <Modal.Body>
+    <Form onSubmit={manejarEnvio}>
+      <div className="row">
 
-          <Form.Group className="mb-3">
-            <Form.Label>ID Cliente</Form.Label>
-            <Form.Control
-              type="text"
-              value={id_cliente}
-              onChange={(e) => setIdCliente(e.target.value)}
-              isInvalid={!!errores.id_cliente}
-            />
-            <Form.Control.Feedback type="invalid">{errores.id_cliente}</Form.Control.Feedback>
-          </Form.Group>
-
-          <Form.Group className="mb-3">
-            <Form.Label>ID Entrenador</Form.Label>
-            <Form.Control
-              type="text"
-              value={id_entrenador}
-              onChange={(e) => setIdEntrenador(e.target.value)}
-              isInvalid={!!errores.id_entrenador}
-            />
-            <Form.Control.Feedback type="invalid">{errores.id_entrenador}</Form.Control.Feedback>
-          </Form.Group>
-
-          <Form.Group className="mb-3">
-            <Form.Label>ID Rutina</Form.Label>
-            <Form.Control
-              type="text"
-              value={id_rutina}
-              onChange={(e) => setIdRutina(e.target.value)}
-              isInvalid={!!errores.id_rutina}
-            />
-            <Form.Control.Feedback type="invalid">{errores.id_rutina}</Form.Control.Feedback>
-          </Form.Group>
-
-          {asistenciaSeleccionada && (
-            <>
-              <Form.Group className="mb-3">
-                <Form.Label>Fecha</Form.Label>
-                <Form.Control type="text" value={fecha|| ""} disabled />
-              </Form.Group>
-
-              <Form.Group className="mb-3">
-                <Form.Label>Hora de Entrada</Form.Label>
-                <Form.Control type="text" value={hora_entrada|| ""} disabled />
-              </Form.Group>
-
-              <Form.Group className="mb-3">
-                <Form.Label>Hora de Salida</Form.Label>
-                <Form.Control type="text" value={hora_salida|| ""} disabled />
-              </Form.Group>
-
-              <Form.Group className="mb-3">
-                <Form.Label>ID Usuario</Form.Label>
-                <Form.Control type="text" value={id_usuario|| ""} disabled />
-              </Form.Group>
-
-              <Form.Group className="mb-3">
-                <Form.Label>Estado</Form.Label>
-                <Form.Control type="text" value={estado|| ""} disabled />
-              </Form.Group>
-
-            </>
+        {/* Select Cliente (Plan) con búsqueda por nombre o DNI */}
+        <Form.Group className="mb-3 col-md-6">
+          <Form.Label className="fw-bold">
+            Cliente (Plan) <span className="text-danger">*</span>
+          </Form.Label>
+          <Select
+            options={detallesPlanes
+              .filter((detalle) => detalle.estado !== 0)
+              .map((detalle) => {
+                const cliente = clientes.find((c) => c.id === detalle.id_cliente);
+                const plan = planes.find((p) => p.id === detalle.id_plan);
+                return {
+                  value: detalle.id,
+                  label: `${cliente?.nombre || "Cliente"} - DNI: ${cliente?.dni || "N/D"} (${plan?.plan || "Plan"})`,
+                };
+              })}
+            onChange={(selectedOption) =>
+              setIdDetalle(selectedOption ? selectedOption.value : "")
+            }
+            value={
+              detallesPlanes
+                .filter((detalle) => detalle.estado !== 0)
+                .map((detalle) => {
+                  const cliente = clientes.find((c) => c.id === detalle.id_cliente);
+                  const plan = planes.find((p) => p.id === detalle.id_plan);
+                  return {
+                    value: detalle.id,
+                    label: `${cliente?.nombre || "Cliente"} - DNI: ${cliente?.dni || "N/D"} (${plan?.plan || "Plan"})`,
+                  };
+                })
+                .find((option) => option.value === id_detalle) || null
+            }
+            placeholder="Buscar por nombre o DNI..."
+            classNamePrefix={!!errores.id_detalle ? "is-invalid" : ""}
+            isDisabled={!!asistenciaSeleccionada}
+          />
+          {errores.id_detalle && (
+            <div className="invalid-feedback d-block">{errores.id_detalle}</div>
           )}
+          <Form.Text className="text-muted">
+            Escriba nombre o DNI para buscar al cliente
+          </Form.Text>
+        </Form.Group>
 
-          <Button variant="primary" type="submit">
-            {asistenciaSeleccionada ? "Actualizar" : "Agregar"}
-          </Button>
-        </Form>
-      </Modal.Body>
-    </Modal>
+      {/* Select Entrenador con búsqueda solo por nombre */}
+      <Form.Group className="mb-3 col-md-6">
+        <Form.Label className="fw-bold">
+          Entrenador <span className="text-danger">*</span>
+        </Form.Label>
+        <Select
+          options={entrenadores
+            .filter((entrenador) => entrenador.estado !== 0)
+            .map((entrenador) => ({
+              value: entrenador.id,
+              label: entrenador.nombre,
+            }))
+          }
+          onChange={(selectedOption) =>
+            setIdEntrenador(selectedOption ? selectedOption.value : "")
+          }
+          value={
+            entrenadores
+              .filter((entrenador) => entrenador.estado !== 0)
+              .map((entrenador) => ({
+                value: entrenador.id,
+                label: entrenador.nombre,
+              }))
+              .find((option) => option.value === id_entrenador) || null
+          }
+          placeholder="Buscar entrenador por nombre..."
+          classNamePrefix={!!errores.id_entrenador ? "is-invalid" : ""}
+          isDisabled={!!asistenciaSeleccionada}
+        />
+        {errores.id_entrenador && (
+          <div className="invalid-feedback d-block">{errores.id_entrenador}</div>
+        )}
+      </Form.Group>
+
+
+
+      </div>
+
+      {/* Campos de solo lectura para edición */}
+      {asistenciaSeleccionada && (
+        <div className="row">
+          <Form.Group className="mb-3 col-md-6">
+            <Form.Label className="fw-bold">F.Registro</Form.Label>
+            <Form.Control 
+              type="text" 
+              value={fecha ? new Date(fecha).toLocaleDateString('es-PE') : "No registrada"} 
+              disabled 
+              plaintext 
+              className="form-control-plaintext ps-2 border-bottom"
+            />
+          </Form.Group>
+
+
+          <Form.Group className="mb-3 col-md-6">
+            <Form.Label className="fw-bold">Hora de Entrada</Form.Label>
+            <Form.Control 
+              type="text" 
+              value={hora_entrada || "No registrada"} 
+              disabled 
+              plaintext 
+              className="form-control-plaintext ps-2 border-bottom"
+            />
+          </Form.Group>
+        </div>
+      )}
+
+      <div className="d-flex justify-content-end gap-3 mt-4">
+        <Button 
+          variant="outline-secondary" 
+          onClick={handleClose}
+          className="px-4"
+        >
+          Cancelar
+        </Button>
+        <Button 
+          variant="primary" 
+          type="submit"
+          className="px-4 fw-bold"
+        >
+          {asistenciaSeleccionada ? (
+            <><i className="bi bi-check-circle me-2"></i>Registrar Salida</>
+          ) : (
+            <><i className="bi bi-save me-2"></i>Registrar Asistencia</>
+          )}
+        </Button>
+      </div>
+    </Form>
+  </Modal.Body>
+</Modal>
   );
 };
 

@@ -1,43 +1,66 @@
 import React, { useState } from "react";
-import { Table, Button, Pagination } from "react-bootstrap";
-import Swal from "sweetalert2";
+import { Table, Button, Pagination, Form, InputGroup } from "react-bootstrap";
+import { FaCheck, FaSearch, FaCalendarAlt } from "react-icons/fa";
 
-const AsistenciaList = ({ asistencias, seleccionar, eliminar }) => {
+const AsistenciaList = ({ asistencias, seleccionar, entrenadores, detallesPlanes, clientes }) => {
   const [paginaActual, setPaginaActual] = useState(1);
+  const [busqueda, setBusqueda] = useState("");
+  const [fecha, setFecha] = useState("");
+  const [asistenciasActualizadas, setAsistenciasActualizadas] = useState(new Set());
+
   const elementosPorPagina = 5;
 
-  const totalPaginas = Math.ceil(asistencias.length / elementosPorPagina);
+  const obtenerNombreEntrenador = (id_entrenador) => {
+    const entrenador = entrenadores.find(e => e.id === id_entrenador);
+    return entrenador ? entrenador.nombre : "Desconocido";
+  };
+
+  const obtenerNombreClientePorDetalle = (id_detalle) => {
+    const detalle = detallesPlanes.find(d => String(d.id) === String(id_detalle));
+    if (!detalle) return "Detalle desconocido";
+    const cliente = clientes.find(c => String(c.id) === String(detalle.id_cliente));
+    return cliente ? cliente.nombre : "Cliente desconocido";
+  };
+
+  const manejarSeleccion = async (asistencia) => {
+    try {
+      // Esperamos que seleccionar retorne true si la actualización fue exitosa
+      const exito = await seleccionar(asistencia);
+      if (exito) {
+        setAsistenciasActualizadas(prev => new Set(prev).add(asistencia.id_asistencia));
+      }
+    } catch (error) {
+      console.error("Error al actualizar asistencia:", error);
+    }
+  };
+
+  const asistenciasFiltradas = asistencias.filter((a) => {
+    const clienteNombre = obtenerNombreClientePorDetalle(a.id_detalle).toLowerCase();
+    const entrenadorNombre = obtenerNombreEntrenador(a.id_entrenador).toLowerCase();
+    const filtroBusqueda = busqueda.toLowerCase();
+
+    if (!fecha) return clienteNombre.includes(filtroBusqueda) || entrenadorNombre.includes(filtroBusqueda);
+
+    const fechaAsistenciaStr = new Date(a.fecha).toISOString().split("T")[0];
+    const fechaFiltroStr = fecha;
+
+    return (clienteNombre.includes(filtroBusqueda) || entrenadorNombre.includes(filtroBusqueda)) && (fechaAsistenciaStr === fechaFiltroStr);
+  });
+
+  const asistenciasOrdenadas = [...asistenciasFiltradas].sort((a, b) => b.id_asistencia - a.id_asistencia);
+
+  const totalPaginas = Math.ceil(asistenciasOrdenadas.length / elementosPorPagina);
   const indiceInicio = (paginaActual - 1) * elementosPorPagina;
   const indiceFinal = indiceInicio + elementosPorPagina;
-  const asistenciasPaginadas = asistencias.slice(indiceInicio, indiceFinal);
-
-  const confirmarEliminacion = (id_asistencia) => {
-    Swal.fire({
-      title: "¿Estás seguro?",
-      text: "¡No podrás revertir esto!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Sí, eliminar",
-      cancelButtonText: "Cancelar",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        eliminar(id_asistencia);
-        Swal.fire("¡Eliminado!", "El registro ha sido eliminado.", "success");
-      }
-    });
-  };
+  const asistenciasPaginadas = asistenciasOrdenadas.slice(indiceInicio, indiceFinal);
 
   const irPrimeraPagina = () => setPaginaActual(1);
   const irUltimaPagina = () => setPaginaActual(totalPaginas);
   const irAnterior = () => setPaginaActual((prev) => Math.max(prev - 1, 1));
   const irSiguiente = () => setPaginaActual((prev) => Math.min(prev + 1, totalPaginas));
 
-  // Calcular el rango de páginas a mostrar
   const obtenerItemsPaginacion = () => {
     const paginas = [];
-
     let inicio = Math.max(paginaActual - 2, 1);
     let fin = Math.min(paginaActual + 2, totalPaginas);
 
@@ -49,11 +72,7 @@ const AsistenciaList = ({ asistencias, seleccionar, eliminar }) => {
 
     for (let i = inicio; i <= fin; i++) {
       paginas.push(
-        <Pagination.Item
-          key={i}
-          active={i === paginaActual}
-          onClick={() => setPaginaActual(i)}
-        >
+        <Pagination.Item key={i} active={i === paginaActual} onClick={() => setPaginaActual(i)}>
           {i}
         </Pagination.Item>
       );
@@ -62,55 +81,138 @@ const AsistenciaList = ({ asistencias, seleccionar, eliminar }) => {
     return paginas;
   };
 
+  const limpiarFiltros = () => {
+    setBusqueda("");
+    setFecha("");
+    setPaginaActual(1);
+  };
+
   return (
     <>
+      {/* Filtros de búsqueda y fecha */}
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <Form.Group className="mb-0" style={{ maxWidth: "300px" }}>
+          <InputGroup size="sm">
+            <InputGroup.Text className="bg-white border-end-0">
+              <FaSearch className="text-muted" />
+            </InputGroup.Text>
+            <Form.Control
+              type="text"
+              placeholder="Buscar por cliente o entrenador"
+              className="border-start-0"
+              value={busqueda}
+              onChange={(e) => {
+                setBusqueda(e.target.value);
+                setPaginaActual(1);
+              }}
+            />
+          </InputGroup>
+        </Form.Group>
+      </div>
+
+      <div className="d-flex align-items-center mb-3 gap-2">
+        <div className="d-flex align-items-center gap-2">
+          <FaCalendarAlt className="text-secondary" />
+          <Form.Control
+            type="date"
+            size="sm"
+            className="w-auto"
+            value={fecha}
+            onChange={(e) => {
+              setFecha(e.target.value);
+              setPaginaActual(1);
+            }}
+          />
+        </div>
+
+        <Button
+          variant="outline-primary"
+          size="sm"
+          onClick={() => {
+            const hoy = new Date();
+            const fechaLocal = hoy.toLocaleDateString('es-PE', {
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit'
+            });
+            const [day, month, year] = fechaLocal.split('/');
+            const fechaHoy = `${year}-${month}-${day}`;
+            setFecha(fechaHoy);
+            setPaginaActual(1);
+          }}
+        >
+          Hoy
+        </Button>
+        <Button
+          variant="outline-secondary"
+          size="sm"
+          onClick={limpiarFiltros}
+          disabled={!fecha && !busqueda}
+        >
+          Limpiar filtros
+        </Button>
+      </div>
+
+      {/* Tabla */}
       <Table striped bordered hover>
         <thead>
           <tr>
             <th>ID</th>
-            <th>Fecha</th>
+            <th>F.Registro</th>
             <th>Hora de Entrada</th>
             <th>Hora de Salida</th>
-            <th>ID Cliente</th>
-            <th>ID Entrenador</th>
-            <th>ID Usuario</th>
-            <th>ID Rutina</th>
+            <th>Cliente</th>
+            <th>Entrenador</th>
             <th>Estado</th>
             <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
-          {asistenciasPaginadas.map((asistencias) => (
-            <tr key={asistencias.id_asistencia}>
-              <td>{asistencias.id_asistencia}</td>
-              <td>{new Date(asistencias.fecha).toLocaleDateString()}</td>
-              <td>{asistencias.hora_entrada}</td>
-              <td>{asistencias.hora_salida}</td>
-              <td>{asistencias.id_cliente}</td>
-              <td>{asistencias.id_entrenador}</td>
-              <td>{asistencias.id_usuario}</td>
-              <td>{asistencias.id_rutina}</td>
-              <td>{asistencias.estado === 1 ? "En Gym" : "Salido"}</td>
-              <td>
-                <Button variant="info" onClick={() => seleccionar(asistencias)}>
-                  Editar
-                </Button>{" "}
-                <Button variant="danger" onClick={() => confirmarEliminacion(asistencias.id_asistencia)}>
-                  Eliminar
-                </Button>
+          {asistenciasPaginadas.length > 0 ? (
+            asistenciasPaginadas.map((asistencia) => (
+              <tr key={asistencia.id_asistencia}>
+                <td>{asistencia.id_asistencia}</td>
+                <td>{new Date(asistencia.fecha).toLocaleDateString()}</td>
+                <td>{asistencia.hora_entrada}</td>
+                <td>{asistencia.hora_salida}</td>
+                <td>{obtenerNombreClientePorDetalle(asistencia.id_detalle)}</td>
+                <td>{obtenerNombreEntrenador(asistencia.id_entrenador)}</td>
+                <td>
+                  <span className={`badge ${asistencia.estado === 1 ? 'bg-success' : 'bg-danger'}`}>
+                    {asistencia.estado === 1 ? "En Gym" : "Salido"}
+                  </span>
+                </td>
+                <td>
+                  <Button
+                    variant="success"
+                    onClick={() => manejarSeleccion(asistencia)}
+                    disabled={asistenciasActualizadas.has(asistencia.id_asistencia) || asistencia.estado === 0}
+                  >
+                    <FaCheck />
+                  </Button>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="8" className="text-center text-muted">
+                No se encontraron asistencias con los filtros aplicados
               </td>
             </tr>
-          ))}
+          )}
         </tbody>
       </Table>
 
-      <Pagination className="justify-content-center">
-        <Pagination.First onClick={irPrimeraPagina} disabled={paginaActual === 1} />
-        <Pagination.Prev onClick={irAnterior} disabled={paginaActual === 1} />
-        {obtenerItemsPaginacion()}
-        <Pagination.Next onClick={irSiguiente} disabled={paginaActual === totalPaginas} />
-        <Pagination.Last onClick={irUltimaPagina} disabled={paginaActual === totalPaginas} />
-      </Pagination>
+      {/* Paginación */}
+      {asistenciasFiltradas.length > 0 && (
+        <Pagination className="justify-content-center">
+          <Pagination.First onClick={irPrimeraPagina} disabled={paginaActual === 1} />
+          <Pagination.Prev onClick={irAnterior} disabled={paginaActual === 1} />
+          {obtenerItemsPaginacion()}
+          <Pagination.Next onClick={irSiguiente} disabled={paginaActual === totalPaginas} />
+          <Pagination.Last onClick={irUltimaPagina} disabled={paginaActual === totalPaginas} />
+        </Pagination>
+      )}
     </>
   );
 };

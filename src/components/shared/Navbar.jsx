@@ -22,10 +22,10 @@ import {
   FaUserTie,
   FaLock,
   FaSignOutAlt,
-  FaInfoCircle,
   FaBars,
   FaChevronDown
 } from "react-icons/fa";
+
 import '../shared/css/estiloNavbar.css';
 
 const Navbar = () => {
@@ -72,7 +72,7 @@ const Navbar = () => {
                 {menuItem(<FaUsers className="text-primary me-2" />, "Registrar Clientes")}
               </NavDropdown.Item>
               <NavDropdown.Item as={Link} to="/detalleplanes">
-                {menuItem(<FaClipboardList className="text-success me-2" />, "Acuerdos")}
+                {menuItem(<FaClipboardList className="text-success me-2" />, "Asignar Planes")}
               </NavDropdown.Item>
               <NavDropdown.Item as={Link} to="/pagosplanes">
                 {menuItem(<FaCreditCard className="text-info me-2" />, "Pagos")}
@@ -85,12 +85,15 @@ const Navbar = () => {
             <Nav.Link as={Link} to="/entrenadores">
               {menuItem(<FaDumbbell />, "Entrenadores")}
             </Nav.Link>
-            <Nav.Link as={Link} to="/rutinas">
-              {menuItem(<FaTasks />, "Rutinas")}
-            </Nav.Link>
-            <Nav.Link as={Link} to="/planes">
-              {menuItem(<FaBoxOpen />, "Planes")}
-            </Nav.Link>
+
+            <NavDropdown title={menuItem(<FaTasks />, "Servicios")} id="servicios-dropdown">
+              <NavDropdown.Item as={Link} to="/planes">
+                  {menuItem(<FaBoxOpen className="text-success me-2" />, "Planes")}
+                </NavDropdown.Item>
+              <NavDropdown.Item as={Link} to="/rutinas">
+                {menuItem(<FaTasks className="text-danger me-2" />, "Rutinas")}
+              </NavDropdown.Item>
+            </NavDropdown>
           </Nav>
 
           {user && (
@@ -114,6 +117,7 @@ const Navbar = () => {
 
       <Dropdown.Menu className="dropdown-menu-user border-0 shadow-sm rounded-1 mt-1">
       
+      {/*
       <Dropdown.Item 
         as={Link} 
         to="/acercade"
@@ -121,7 +125,8 @@ const Navbar = () => {
       >
         {menuItem(<FaInfoCircle className="text-info me-2" />, "Acerca de Mi APP")}
       </Dropdown.Item>
-      
+      */}
+
       <Dropdown.Item 
         as={Link} 
         to="/configuracion"

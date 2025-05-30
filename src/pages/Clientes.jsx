@@ -46,7 +46,7 @@ const Clientes = () => {
 
   return (
     <div>
-      <h2>Clientes Registrados</h2>
+      <h2>Registro de Cliente</h2>
       <Button
         className="mb-3 d-flex align-items-center"
         variant="primary"
@@ -66,6 +66,8 @@ const Clientes = () => {
         agregar={agregar}
         actualizar={actualizar}
         clienteSeleccionado={clienteSeleccionado}
+        clientes={clientes} 
+
       />
     </div>
   );

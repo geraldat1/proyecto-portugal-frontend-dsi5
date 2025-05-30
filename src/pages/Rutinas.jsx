@@ -4,6 +4,9 @@ import RutinaList from "../components/rutinas/RutinaLIst";
 import RutinaForm from "../components/rutinas/RutinaForm";
 import { Button } from "react-bootstrap";
 
+import { FaPlus } from "react-icons/fa";
+
+
 const Rutinas = () => {
   const [rutinas, setRutinas] = useState([]);
   const [rutinaSeleccionada, setRutinaSeleccionada] = useState(null);
@@ -44,16 +47,18 @@ const Rutinas = () => {
 
   return (
     <div>
-      <h2>Gestión de Rutinas</h2>
-      <Button 
-      className="mb-3" 
-      variant="primary"
-       onClick={() => {
-       setRutinaSeleccionada(null);
-       setMostrarModal(true);
-      }
-      }
-       >Agregar Rutina</Button>
+      <h2>Lista de Rutinas</h2>
+      <Button
+        className="mb-3"
+        variant="primary"
+        onClick={() => {
+          setRutinaSeleccionada(null);
+          setMostrarModal(true);
+        }}
+      >
+        <FaPlus className="me-2" />
+        Agregar Rutina
+      </Button>
 
       <RutinaList rutinas={rutinas} seleccionar={seleccionarRutina} eliminar={eliminar} />
       <RutinaForm

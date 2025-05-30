@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import { Table, Button, Pagination } from "react-bootstrap";
 import Swal from "sweetalert2";
 
+import { BiEdit, BiBlock } from "react-icons/bi";
+
+
 const UsuarioList = ({ usuarios, seleccionar, eliminar }) => {
   const [paginaActual, setPaginaActual] = useState(1);
   const elementosPorPagina = 5;
@@ -12,22 +15,23 @@ const UsuarioList = ({ usuarios, seleccionar, eliminar }) => {
   const usuariosPaginados = usuarios.slice(indiceInicio, indiceFinal);
 
   const confirmarEliminacion = (id) => {
-    Swal.fire({
-      title: "¿Estás seguro?",
-      text: "¡No podrás revertir esto!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Sí, eliminar",
-      cancelButtonText: "Cancelar",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        eliminar(id);
-        Swal.fire("¡Eliminado!", "El registro ha sido eliminado.", "success");
-      }
-    });
-  };
+  Swal.fire({
+    title: "¿Estás seguro?",
+    text: "¡El usuario será deshabilitado y no podrá acceder!",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#3085d6",
+    confirmButtonText: "Sí, deshabilitar",
+    cancelButtonText: "Cancelar",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      eliminar(id);
+      Swal.fire("¡Deshabilitado!", "El usuario ha sido deshabilitado.", "success");
+    }
+  });
+};
+
 
   const irPrimeraPagina = () => setPaginaActual(1);
   const irUltimaPagina = () => setPaginaActual(totalPaginas);
@@ -61,19 +65,7 @@ const UsuarioList = ({ usuarios, seleccionar, eliminar }) => {
     return paginas;
   };
 
-  // Funciones para mostrar texto según valor numérico
-  const mostrarRol = (rol) => {
-    if (rol === "1" || rol === 1) return "Administrador";
-    if (rol === "2" || rol === 2) return "Empleado";
-    return "Desconocido";
-  };
-
-  const mostrarEstado = (estado) => {
-    if (estado === "1" || estado === 1) return "Activo";
-    if (estado === "0" || estado === 0) return "Deshabilitado";
-    return "Desconocido";
-  };
-
+ 
   return (
     <>
       <Table striped bordered hover responsive>
@@ -102,26 +94,38 @@ const UsuarioList = ({ usuarios, seleccionar, eliminar }) => {
               {/* <td>{p.clave}</td> Eliminado */}
               <td>{p.telefono}</td>
               {/* Campo foto eliminado */}
-              <td>{mostrarRol(p.rol)}</td>
-              <td>{new Date(p.fecha).toLocaleDateString()}</td>
-              <td>{mostrarEstado(p.estado)}</td>
               <td>
-                <Button
-                  variant="warning"
-                  size="sm"
-                  onClick={() => seleccionar(p)}
+                <span className={`badge ${p.rol === 1 || p.rol === '1' ? 'bg-success' : 'bg-primary'}`}>
+                  {p.rol === 1 || p.rol === '1' ? 'Administrador' : 'Empleado'}
+                </span>
+              </td>
+              <td>{new Date(p.fecha).toLocaleDateString()}</td>
+              <td>
+                <span className={`badge ${p.estado === 1 || p.estado === '1' ? 'bg-success' : 'bg-secondary'}`}>
+                  {p.estado === 1 || p.estado === '1' ? 'Activo' : 'Deshabilitado'}
+                </span>
+              </td>
+              <td>
+                <Button 
+                  variant="warning" 
+                  onClick={() => seleccionar(p)} 
+                  title="Editar" 
+                  disabled={p.estado === 0 || p.estado === '0'}  // Aquí está la condición
                   className="me-2"
                 >
-                  Editar
+                  <BiEdit size={22} />
                 </Button>
-                <Button
-                  variant="danger"
-                  size="sm"
-                  onClick={() => confirmarEliminacion(p.id)}
+                <Button 
+                  variant="danger" 
+                  onClick={() => confirmarEliminacion(p.id)} 
+                  title="Deshabilitar" 
+                  disabled={p.estado === 0 || p.estado === '0'}  // Y aquí también
                 >
-                  Eliminar
+                  <BiBlock size={22} />
                 </Button>
+
               </td>
+
             </tr>
           ))}
         </tbody>

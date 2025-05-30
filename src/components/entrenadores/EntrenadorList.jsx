@@ -3,6 +3,9 @@ import { Table, Button, Pagination, Form, InputGroup } from "react-bootstrap";
 import Swal from "sweetalert2";
 import { FaUserCheck, FaSearch } from "react-icons/fa";
 
+import { BiEdit, BiBlock } from "react-icons/bi";
+
+
 const EntrenadorList = ({ entrenadores, seleccionar, eliminar }) => {
   const [paginaActual, setPaginaActual] = useState(1);
   const [busqueda, setBusqueda] = useState("");
@@ -29,22 +32,23 @@ const EntrenadorList = ({ entrenadores, seleccionar, eliminar }) => {
   const entrenadoresActivos = entrenadores.filter(ent => ent.estado === 1).length;
 
   const confirmarEliminacion = (id) => {
-    Swal.fire({
-      title: "¿Estás seguro?",
-      text: "¡No podrás revertir esto!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Sí, eliminar",
-      cancelButtonText: "Cancelar",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        eliminar(id);
-        Swal.fire("¡Eliminado!", "El registro ha sido eliminado.", "success");
-      }
-    });
-  };
+  Swal.fire({
+    title: "¿Estás seguro?",
+    text: "El entrenador será deshabilitado.",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#3085d6",
+    confirmButtonText: "Sí, deshabilitar",
+    cancelButtonText: "Cancelar",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      eliminar(id);
+      Swal.fire("¡Deshabilitado!", "El entrenador ha sido deshabilitado.", "success");
+    }
+  });
+};
+
 
   const irPrimeraPagina = () => setPaginaActual(1);
   const irUltimaPagina = () => setPaginaActual(totalPaginas);
@@ -132,19 +136,30 @@ const EntrenadorList = ({ entrenadores, seleccionar, eliminar }) => {
               <td>{p.correo}</td>
               <td>{p.direccion}</td>
               <td>
-                <span className={`badge d-flex align-items-center ${p.estado === 1 ? 'bg-success' : 'bg-secondary'}`}>
-                  <i className={`bi ${p.estado === 1 ? 'bi-check-circle' : 'bi-x-circle'} me-1`}></i>
+                <span className={`badge ${p.estado === 1 ? 'bg-success' : 'bg-secondary'}`}>
                   {p.estado === 1 ? "Activo" : "Inactivo"}
                 </span>
               </td>              
+  
               <td>
-                <Button variant="warning" onClick={() => seleccionar(p)}>
-                  Editar
-                </Button>{" "}
-                <Button variant="danger" onClick={() => confirmarEliminacion(p.id)}>
-                  Eliminar
-                </Button>
-              </td>
+              <Button
+                variant="warning"
+                onClick={() => seleccionar(p)}
+                title="Editar"
+                disabled={p.estado === 0}
+              >
+                <BiEdit size={22} />
+              </Button>{" "}
+              <Button
+                variant="danger"
+                onClick={() => confirmarEliminacion(p.id)}
+                title="Deshabilitar"
+                disabled={p.estado === 0}
+              >
+                <BiBlock size={22} />
+              </Button>
+            </td>
+
             </tr>
           ))}
         </tbody>

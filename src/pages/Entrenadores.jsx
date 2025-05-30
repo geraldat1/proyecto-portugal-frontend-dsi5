@@ -46,7 +46,7 @@ const Entrenadores = () => {
 
   return (
     <div>
-      <h2>Gestión de Entrenadores</h2>
+      <h2>Registro de Entrenadores</h2>
       <Button
       className="mb-3 d-flex align-items-center"
       variant="primary"

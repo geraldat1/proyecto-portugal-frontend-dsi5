@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import Swal from "sweetalert2"; // opcional para mostrar errores visualmente
 
-const ClienteForm = ({ show, handleClose, agregar, actualizar, clienteSeleccionado }) => {
+const ClienteForm = ({ show, handleClose, agregar, actualizar, clienteSeleccionado, clientes }) => {
   const [dni, setDni] = useState("");
   const [nombre, setNombre] = useState("");
   const [telefono, setTelefono] = useState("");
@@ -62,13 +62,23 @@ const ClienteForm = ({ show, handleClose, agregar, actualizar, clienteSelecciona
   };
 
   const manejarEnvio = (e) => {
-    e.preventDefault();
-    if (!validar()) {
-      Swal.fire("Campos inválidos", "Por favor revisa los datos ingresados", "error");
-      return;
-    }
+  e.preventDefault();
+  if (!validar()) {
+    Swal.fire("Campos inválidos", "Por favor revisa los datos ingresados", "error");
+    return;
+  }
 
-    const nuevoCliente = { dni, nombre, telefono, direccion };
+  // Validación de duplicado
+  const dniDuplicado = clientes.some(
+    (c) => c.dni === dni && (!clienteSeleccionado || c.id !== clienteSeleccionado.id)
+  );
+
+  if (dniDuplicado) {
+    Swal.fire("DNI duplicado", "Ya existe un cliente con este DNI", "warning");
+    return;
+  }
+
+  const nuevoCliente = { dni, nombre, telefono, direccion };
 
   if (clienteSeleccionado) {
     actualizar(clienteSeleccionado.id, {
@@ -77,7 +87,6 @@ const ClienteForm = ({ show, handleClose, agregar, actualizar, clienteSelecciona
       estado: parseInt(estado),
       id_user: parseInt(id_user),
     });
-
     Swal.fire({
       icon: "info",
       title: "Registro actualizado",
@@ -92,7 +101,6 @@ const ClienteForm = ({ show, handleClose, agregar, actualizar, clienteSelecciona
       estado: parseInt(estado),
       id_user: parseInt(id_user),
     });
-
     Swal.fire({
       icon: "success",
       title: "Cliente agregado",
@@ -102,17 +110,18 @@ const ClienteForm = ({ show, handleClose, agregar, actualizar, clienteSelecciona
     });
   }
 
-    setDni("");
-    setNombre("");
-    setTelefono("");
-    setDireccion("");
-    setFecha("");
-    setEstado("");
-    setIdUser("");
+  // Limpiar
+  setDni("");
+  setNombre("");
+  setTelefono("");
+  setDireccion("");
+  setFecha("");
+  setEstado("");
+  setIdUser("");
+  setErrores({});
+  handleClose();
+};
 
-    setErrores({});
-    handleClose(); // cerrar modal luego de enviar
-  };
 
   return (
     <Modal 

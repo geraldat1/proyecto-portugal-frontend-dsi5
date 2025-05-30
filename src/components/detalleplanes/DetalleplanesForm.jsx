@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
+import Select from 'react-select';
+
 import Swal from "sweetalert2";
 
 // Funciones auxiliares para manejo de fechas con zona horaria
@@ -159,47 +161,71 @@ const DetalleplanesForm = ({
       </Modal.Header>
       <Modal.Body>
         <Form onSubmit={manejarEnvio}>
-          {/* Select Cliente */}
+
+          {/* Select Cliente con búsqueda por nombre o DNI */}
           <Form.Group className="mb-3">
-            <Form.Label className="fw-bold">Cliente <span className="text-danger">*</span></Form.Label>
-            <Form.Select
-              value={id_cliente}
-              onChange={(e) => setIdCliente(e.target.value)}
-              isInvalid={!!errores.id_cliente}
-              className={id_cliente ? "" : "text-muted"}
-            >
-              <option value="" disabled>Selecciona un cliente</option>
-              {clientes.map((cliente) => (
-                <option key={cliente.id} value={cliente.id}>
-                  {cliente.nombre}
-                </option>
-              ))}
-            </Form.Select>
-            <Form.Control.Feedback type="invalid">
-              {errores.id_cliente}
-            </Form.Control.Feedback>
+            <Form.Label className="fw-bold">
+              Cliente <span className="text-danger">*</span>
+            </Form.Label>
+            <Select
+              options={clientes
+                .filter((cliente) => cliente.estado !== 0)
+                .map((cliente) => ({
+                  value: cliente.id,
+                  label: `${cliente.nombre} - DNI: ${cliente.dni}`,
+                }))
+              }
+              onChange={(selectedOption) => setIdCliente(selectedOption ? selectedOption.value : "")}
+              value={clientes
+                .filter((cliente) => cliente.estado !== 0)
+                .map((cliente) => ({
+                  value: cliente.id,
+                  label: `${cliente.nombre} - DNI: ${cliente.dni}`,
+                }))
+                .find(option => option.value === id_cliente) || null
+              }
+              placeholder="Selecciona un cliente"
+              classNamePrefix={!!errores.id_cliente ? "is-invalid" : ""}
+            />
+            {errores.id_cliente && (
+              <div className="invalid-feedback d-block">{errores.id_cliente}</div>
+            )}
           </Form.Group>
 
-          {/* Select Plan */}
+          {/* Select Plan con búsqueda por nombre */}
           <Form.Group className="mb-3">
-            <Form.Label className="fw-bold">Plan <span className="text-danger">*</span></Form.Label>
-            <Form.Select
-              value={id_plan}
-              onChange={(e) => setIdPlan(e.target.value)}
-              isInvalid={!!errores.id_plan}
-              className={id_plan ? "" : "text-muted"}
-            >
-              <option value="" disabled>Selecciona un plan</option>
-              {planes.map((plan) => (
-                <option key={plan.id} value={plan.id}>
-                  {plan.plan} - {plan.descripcion && `${plan.descripcion.substring(0, 30)}...`}
-                </option>
-              ))}
-            </Form.Select>
-            <Form.Control.Feedback type="invalid">
-              {errores.id_plan}
-            </Form.Control.Feedback>
+            <Form.Label className="fw-bold">
+              Plan <span className="text-danger">*</span>
+            </Form.Label>
+            <Select
+              options={planes
+                .filter((plan) => plan.estado !== 0)
+                .map((plan) => ({
+                  value: plan.id,
+                  label: plan.plan, // Solo muestra el nombre del plan
+                }))
+              }
+              onChange={(selectedOption) =>
+                setIdPlan(selectedOption ? selectedOption.value : "")
+              }
+              value={
+                planes
+                  .filter((plan) => plan.estado !== 0)
+                  .map((plan) => ({
+                    value: plan.id,
+                    label: plan.plan,
+                  }))
+                  .find((option) => option.value === id_plan) || null
+              }
+              placeholder="Buscar plan por nombre..."
+              classNamePrefix={!!errores.id_plan ? "is-invalid" : ""}
+            />
+            {errores.id_plan && (
+              <div className="invalid-feedback d-block">{errores.id_plan}</div>
+            )}
           </Form.Group>
+
+
 
           <div className="row">
             {/* Fecha Vencimiento */}

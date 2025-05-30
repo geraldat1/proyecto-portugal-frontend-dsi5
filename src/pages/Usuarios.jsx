@@ -4,6 +4,9 @@ import UsuarioList from "../components/usuarios/UsuarioList";
 import UsuarioForm from "../components/usuarios/UsuarioForm";
 import { Button } from "react-bootstrap";
 
+import { FaUserPlus } from "react-icons/fa";
+
+
 const Usuarios = () => {
   const [usuarios, setUsuarios] = useState([]);
   const [usuarioSeleccionado, setUsuarioSeleccionado] = useState(null);
@@ -44,16 +47,19 @@ const Usuarios = () => {
 
   return (
     <div>
-      <h2>Gestión de Usuarios</h2>
+      <h2>Administración de Usuarios</h2>
       <Button 
-      className="mb-3" 
+      className="mb-3 d-flex align-items-center gap-2" 
       variant="primary"
-       onClick={() => {
-       setUsuarioSeleccionado(null);
-       setMostrarModal(true);
-      }
-      }
-       >Agregar Persona</Button>
+      onClick={() => {
+        setUsuarioSeleccionado(null);
+        setMostrarModal(true);
+      }}
+    >
+      <FaUserPlus />
+      Agregar Usuario
+    </Button>
+
 
       <UsuarioList usuarios={usuarios} seleccionar={seleccionarUsuario} eliminar={eliminar} />
       <UsuarioForm

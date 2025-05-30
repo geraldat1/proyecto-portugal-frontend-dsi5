@@ -32,7 +32,7 @@ export const obtenerAsistencias = async () => {
 };
 
 // Agregar una asistencias
-export const agregarAsistencia= async (asistencia) => {
+export const agregarAsistencia = async (asistencia) => {
   try {
     const respuesta = await fetch(API_URL, {
       method: "POST",
@@ -40,11 +40,18 @@ export const agregarAsistencia= async (asistencia) => {
       body: JSON.stringify(asistencia),
     });
 
+    const data = await respuesta.json(); // Siempre intenta parsear la respuesta
+    
     if (!respuesta.ok) {
-      throw new Error(`Error ${respuesta.status} al agregar asistencia`);
+      // Si hay un mensaje de error del backend, úsalo
+      const errorMsg = data.error || `Error ${respuesta.status} al agregar asistencia`;
+      throw new Error(errorMsg);
     }
+    
+    return data;
   } catch (error) {
-    manejarError(error);
+    console.error("Error detallado en agregarAsistencia:", error);
+    throw error;
   }
 };
 

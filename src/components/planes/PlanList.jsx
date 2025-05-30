@@ -1,187 +1,168 @@
 import React, { useState } from "react";
-import { Card, Button, Pagination, Row, Col, Badge } from "react-bootstrap";
+import { Card, Button, Badge } from "react-bootstrap";
 import Swal from "sweetalert2";
-
-import { FaEdit, FaTrash } from "react-icons/fa";
+import { FaEdit, FaBan} from "react-icons/fa";
 
 const PlanList = ({ planes, seleccionar, eliminar }) => {
-  const [paginaActual, setPaginaActual] = useState(1);
-  const elementosPorPagina = 5;
+  const [paginaActual] = useState(1);
+  const elementosPorPagina = 8;
 
-  const totalPaginas = Math.ceil(planes.length / elementosPorPagina);
   const indiceInicio = (paginaActual - 1) * elementosPorPagina;
   const indiceFinal = indiceInicio + elementosPorPagina;
-  const planesPaginadas = planes.slice(indiceInicio, indiceFinal);
+  const planesPaginados = planes.slice(indiceInicio, indiceFinal);
 
-  const confirmarEliminacion = (id) => {
-    Swal.fire({
-      title: "¿Estás seguro?",
-      text: "¡No podrás revertir esto!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Sí, eliminar",
-      cancelButtonText: "Cancelar",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        eliminar(id);
-        Swal.fire("¡Eliminado!", "El registro ha sido eliminado.", "success");
-      }
-    });
-  };
-
-  const irPrimeraPagina = () => setPaginaActual(1);
-  const irUltimaPagina = () => setPaginaActual(totalPaginas);
-  const irAnterior = () => setPaginaActual((prev) => Math.max(prev - 1, 1));
-  const irSiguiente = () => setPaginaActual((prev) => Math.min(prev + 1, totalPaginas));
-
-  const obtenerItemsPaginacion = () => {
-    const paginas = [];
-
-    let inicio = Math.max(paginaActual - 2, 1);
-    let fin = Math.min(paginaActual + 2, totalPaginas);
-
-    if (paginaActual <= 2) {
-      fin = Math.min(5, totalPaginas);
-    } else if (paginaActual >= totalPaginas - 1) {
-      inicio = Math.max(totalPaginas - 4, 1);
+ const confirmarEliminacion = (id) => {
+  Swal.fire({
+    title: "¿Desactivar plan?",
+    text: "Este plan será desactivado. ¿Deseas continuar?",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#f31260",
+    cancelButtonColor: "#006FEE",
+    confirmButtonText: "Sí, desactivar",
+    cancelButtonText: "Cancelar",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      eliminar(id);
+      Swal.fire("¡Desactivado!", "El plan ha sido desactivado.", "success");
     }
-
-    for (let i = inicio; i <= fin; i++) {
-      paginas.push(
-        <Pagination.Item
-          key={i}
-          active={i === paginaActual}
-          onClick={() => setPaginaActual(i)}
-        >
-          {i}
-        </Pagination.Item>
-      );
-    }
-
-    return paginas;
-  };
+  });
+};
 
   return (
     <>
-      <Row xs={1} md={2} lg={3} className="g-4">
-        {planesPaginadas.map((plan) => (
-          <Col key={plan.id}>
-            <Card className="h-100 shadow-sm border-0" style={{ transition: 'transform 0.2s', borderRadius: '12px' }}>
+      <style>{`
+        .plan-card {
+          display: flex;
+          flex-direction: column;
+          height: 100%;
+          transition: all 0.3s ease;
+        }
+        
+        .card-img-container {
+          position: relative;
+          overflow: hidden;
+          border-radius: 10px 10px 0 0;
+          aspect-ratio: 16/9;
+        }
+        
+        .card-img-container img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          transition: transform 0.5s ease;
+        }
+        
+        .card-body-content {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+        }
+        
+        @media (max-width: 576px) {
+          .plan-card {
+            min-width: 100%;
+          }
+        }
+        
+        @media (min-width: 577px) and (max-width: 768px) {
+          .plan-card {
+            min-width: 100%;
+          }
+        }
+      `}</style>
+
+      <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+        {planesPaginados.map((plan) => (
+          <div key={plan.id} className="col d-flex">
+            <Card 
+              className="plan-card h-100 overflow-hidden"
+              style={{ 
+                border: '1px solid rgba(226, 232, 240, 0.8)',
+                borderRadius: '12px',
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.03)',
+                cursor: 'pointer',
+              }}
+            >
               {plan.imagen && (
-                <div style={{ height: '200px', overflow: 'hidden', borderRadius: '12px 12px 0 0' }}>
+                <div className="card-img-container">
+                  <div className="position-absolute w-100 h-100"
+                    style={{ 
+                      background: 'linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, transparent 60%)',
+                      zIndex: 1,
+                    }}>
+                  </div>
                   <Card.Img 
                     variant="top" 
                     src={plan.imagen} 
                     alt={plan.plan}
-                    style={{ 
-                      height: '100%', 
-                      objectFit: 'cover',
-                      transition: 'transform 0.3s ease'
-                    }}
                   />
                 </div>
               )}
               
-              <Card.Body className="d-flex flex-column p-4">
-                <div className="d-flex justify-content-between align-items-start mb-3">
-                  <Card.Title className="mb-0 fw-bold text-dark" style={{ fontSize: '1.25rem' }}>
+              <Card.Body className="p-3 card-body-content">
+                <div className="d-flex justify-content-between align-items-start mb-2">
+                  <h5 className="card-title mb-0 fw-bold text-truncate">
                     {plan.plan}
-                  </Card.Title>
-                  <Badge 
-                    bg={plan.estado === 1 ? "success" : "secondary"} 
-                    className="ms-2"
-                    style={{ fontSize: '0.75rem' }}
-                  >
+                  </h5>
+                  <Badge bg={plan.estado === 1 ? "success" : "secondary"} className="ms-2 px-2 py-1">
                     {plan.estado === 1 ? "Activo" : "Inactivo"}
                   </Badge>
                 </div>
 
-                <Card.Text className="text-muted mb-3" style={{ fontSize: '0.95rem', lineHeight: '1.5' }}>
+                <p className="text-muted mb-3" style={{ fontSize: '0.8rem', lineHeight: '1.5' }}>
                   {plan.descripcion}
-                </Card.Text>
+                </p>
 
-                <div className="mb-4 mt-auto">
-                  <div className="d-flex justify-content-between align-items-center mb-2">
-                    <span className="text-muted small">Precio</span>
-                    <span className="fw-bold text-primary" style={{ fontSize: '1.5rem' }}>
+                <div className="mt-auto space-y-2 border-top pt-2" style={{ borderColor: 'rgba(226, 232, 240, 0.7)' }}>
+                  <div className="d-flex justify-content-between align-items-center">
+                    <span className="text-muted" style={{ fontSize: '0.75rem' }}>
+                      Precio
+                    </span>
+                    <span className="badge bg-primary bg-opacity-10 text-primary fw-bold px-2 py-1 rounded-pill">
                       S/ {Number(plan.precio_plan).toFixed(2)}
                     </span>
                   </div>
                   
                   <div className="d-flex justify-content-between align-items-center">
-                    <span className="text-muted small">Condición</span>
-                    <Badge bg="info" style={{ fontSize: '0.75rem' }}>
+                    <span className="text-muted" style={{ fontSize: '0.75rem' }}>
+                      Condición
+                    </span>
+                    <Badge bg="light" text="dark" className="px-2 py-1" style={{ fontSize: '0.7rem', border: '1px solid rgba(203, 213, 224, 0.5)' }}>
                       {plan.condicion}
                     </Badge>
                   </div>
                 </div>
+              </Card.Body>
 
-                <div className="d-grid gap-2 d-md-flex justify-content-md-end">
+              <Card.Footer className="bg-transparent border-top-0 d-flex justify-content-end gap-2 p-3">
                 <Button
                   variant="outline-warning"
                   size="sm"
                   onClick={() => seleccionar(plan)}
-                  className="d-flex justify-content-center align-items-center fw-semibold"
-                  style={{ borderRadius: '8px', width: '38px', height: '38px', padding: 0 }}
+                  className="rounded-circle d-flex align-items-center justify-content-center"
+                  style={{ width: '30px', height: '30px', borderColor: 'rgba(251, 191, 36, 0.4)' }}
                   aria-label="Editar"
+                  disabled={plan.estado === 0}  // Aquí
                 >
-                  <FaEdit />
+                  <FaEdit size={12} />
                 </Button>
                 <Button
                   variant="outline-danger"
                   size="sm"
                   onClick={() => confirmarEliminacion(plan.id)}
-                  className="d-flex justify-content-center align-items-center fw-semibold"
-                  style={{ borderRadius: '8px', width: '38px', height: '38px', padding: 0 }}
+                  className="rounded-circle d-flex align-items-center justify-content-center"
+                  style={{ width: '30px', height: '30px', borderColor: 'rgba(220, 53, 69, 0.4)' }}
                   aria-label="Eliminar"
+                  disabled={plan.estado === 0}  // Aquí
                 >
-                  <FaTrash />
+                  <FaBan size={12} />
                 </Button>
-              </div>
-
-              </Card.Body>
+              </Card.Footer>
             </Card>
-          </Col>
+          </div>
         ))}
-      </Row>
-
-      {totalPaginas > 1 && (
-        <div className="d-flex justify-content-center mt-5">
-          <Pagination className="shadow-sm">
-            <Pagination.First 
-              onClick={irPrimeraPagina} 
-              disabled={paginaActual === 1}
-              style={{ borderRadius: '8px 0 0 8px' }}
-            />
-            <Pagination.Prev 
-              onClick={irAnterior} 
-              disabled={paginaActual === 1}
-            />
-            {obtenerItemsPaginacion()}
-            <Pagination.Next 
-              onClick={irSiguiente} 
-              disabled={paginaActual === totalPaginas}
-            />
-            <Pagination.Last 
-              onClick={irUltimaPagina} 
-              disabled={paginaActual === totalPaginas}
-              style={{ borderRadius: '0 8px 8px 0' }}
-            />
-          </Pagination>
-        </div>
-      )}
-
-      <style>{`
-        .card:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
-        }
-        .card-img-top:hover {
-          transform: scale(1.05);
-        }
-      `}</style>
+      </div>
     </>
   );
 };

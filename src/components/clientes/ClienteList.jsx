@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Table, Button, Pagination, Form } from "react-bootstrap";
 import Swal from "sweetalert2";
-import { BiEdit, BiTrash } from "react-icons/bi";
+import { BiEdit, BiBlock } from "react-icons/bi";
 
 import { FaUserCheck, FaSearch } from "react-icons/fa";
 import { InputGroup } from "react-bootstrap";
@@ -35,15 +35,15 @@ const ClienteList = ({ clientes, seleccionar, eliminar }) => {
   const confirmarEliminacion = (id) => {
     Swal.fire({
       title: "¿Estás seguro?",
-      text: "¡No podrás revertir esto!",
+      text: "¡Esto deshabilitará al cliente y no podrá revertirse fácilmente!",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "Sí, eliminar",
+      confirmButtonText: "Sí, deshabilitar",
       cancelButtonText: "Cancelar",
     }).then((result) => {
       if (result.isConfirmed) {
         eliminar(id);
-        Swal.fire("¡Eliminado!", "El registro ha sido eliminado.", "success").then(() => {
+        Swal.fire("¡Deshabilitado!", "El cliente ha sido deshabilitado.", "success").then(() => {
           const boton = document.querySelector("button");
           if (boton) boton.focus();
         });
@@ -141,13 +141,24 @@ const ClienteList = ({ clientes, seleccionar, eliminar }) => {
                 </span>
               </td>
               <td>
-                <Button variant="info" onClick={() => seleccionar(cliente)} title="Editar">
+                <Button 
+                  variant="warning" 
+                  onClick={() => seleccionar(cliente)} 
+                  title="Editar" 
+                  disabled={cliente.estado === 0}
+                >
                   <BiEdit size={22} />
                 </Button>{" "}
-                <Button variant="danger" onClick={() => confirmarEliminacion(cliente.id)} title="Eliminar">
-                  <BiTrash size={22} />
+                <Button 
+                  variant="danger" 
+                  onClick={() => confirmarEliminacion(cliente.id)} 
+                  title="Eliminar"
+                  disabled={cliente.estado === 0}
+                >
+                  <BiBlock  size={22} />
                 </Button>
               </td>
+
             </tr>
           ))}
         </tbody>

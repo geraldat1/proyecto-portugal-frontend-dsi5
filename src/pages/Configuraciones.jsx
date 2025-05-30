@@ -44,7 +44,7 @@ const Configuraciones = () => {
 
   return (
     <div>
-      <h2>Gestión de Configuraciones</h2>
+      <h2>Datos de la Empresa</h2>
       <Button 
       className="mb-3" 
       variant="primary"
