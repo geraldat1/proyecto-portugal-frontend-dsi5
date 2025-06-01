@@ -2,14 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { FiSearch, FiUsers, FiUserCheck, FiClipboard, FiFileText } from 'react-icons/fi';
 import { obtenerClientes } from '../services/clienteService';
 import { obtenerEntrenadores } from '../services/entrenadorService';
-import { obtenerRutinas } from '../services/rutinaService';
+import { obtenerAsistencias } from '../services/asistenciaService';
 import { obtenerPlanes } from '../services/planService';
 
 const Home = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [clientes, setClientes] = useState([]);
   const [entrenadores, setEntrenadores] = useState([]);
-  const [rutinas, setRutinas] = useState([]);
+  const [asistencias, setAsistencias] = useState([]);
   const [planes, setPlanes] = useState([]);
 
   useEffect(() => {
@@ -20,8 +20,24 @@ const Home = () => {
       const todosEntrenadores = await obtenerEntrenadores();
       setEntrenadores(todosEntrenadores.filter(e => e.estado === 1));
 
-      const todasRutinas = await obtenerRutinas();
-      setRutinas(todasRutinas.filter(r => r.estado === 1));
+    const todasAsistencias = await obtenerAsistencias();
+      // Filtrar solo las asistencias del día de hoy (asumiendo que asistencia tiene campo 'fecha')
+      const obtenerFechaPeru = () => {
+      const fechaUtc = new Date();
+      // Perú UTC-5, restamos 5 horas a la hora UTC
+      const fechaPeru = new Date(fechaUtc.getTime() - 5 * 60 * 60 * 1000);
+      return fechaPeru.toISOString().split('T')[0];
+    };
+
+    const formatoFecha = obtenerFechaPeru();
+
+    setAsistencias(
+      todasAsistencias.filter(a => 
+        (a.estado === 0 || a.estado === 1) &&
+        a.fecha &&
+        a.fecha.startsWith(formatoFecha)
+      )
+    );
 
       const todosPlanes = await obtenerPlanes();
       setPlanes(todosPlanes.filter(p => p.estado === 1));
@@ -72,8 +88,8 @@ const Home = () => {
           />
           <Card
             icon={<FiClipboard />}
-            title="Rutinas Activas"
-            value={rutinas.length}
+            title="Asistencias de Hoy"
+            value={asistencias.length}
             backgroundColor="#ffffff"
             textColor="#111111"
             accentColor="#FFD700"

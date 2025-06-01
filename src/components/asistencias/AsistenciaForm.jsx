@@ -13,6 +13,8 @@ const AsistenciaForm = ({ show, handleClose, agregar, actualizar, asistenciaSele
   const [id_usuario, setIdUsuario] = useState("");
   const [estado, setEstado] = useState("");
 
+  
+
   const [errores, setErrores] = useState({});
 
   useEffect(() => {

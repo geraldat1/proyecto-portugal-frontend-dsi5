@@ -167,6 +167,7 @@ const DetalleplanesList = ({ detalleplanes, seleccionar, eliminar, clientes, pla
         </thead>
         <tbody>
           {detalleplanesPaginadas.map((detalleplan) => (
+            
             <tr
               key={detalleplan.id}
               className={
@@ -210,11 +211,7 @@ const DetalleplanesList = ({ detalleplanes, seleccionar, eliminar, clientes, pla
                   variant="success"
                   onClick={() => pagar(detalleplan)}
                   title="Pagar"
-                  disabled={
-                    detalleplan.estado === 0 || // Deshabilitado
-                    detalleplan.estado === 2 || // Ya pagado
-                    estaFueraDeRango(detalleplan.fecha_limite) // Fecha límite vencida
-                  }
+                  disabled={detalleplan.estado !== 1} // Solo estado 1
                 >
                   <BiDollar size={22} />
                 </Button>
@@ -222,20 +219,15 @@ const DetalleplanesList = ({ detalleplanes, seleccionar, eliminar, clientes, pla
                   variant="warning"
                   onClick={() => seleccionar(detalleplan)}
                   title="Editar"
-                  disabled={
-                    detalleplan.estado === 0 ||
-                    detalleplan.estado === 2 || // Ya pagado
-
-                    estaFueraDeRango(detalleplan.fecha_limite)
-                  }
+                  disabled={detalleplan.estado === 0} // Deshabilitado solo cuando estado es 0
                 >
                   <BiEdit size={22} />
                 </Button>
                 <Button
                   variant="danger"
                   onClick={() => confirmarEliminacion(detalleplan.id)}
-                  title="Eliminar"
-                  disabled={detalleplan.estado === 0}
+                  title="Bloquear"
+                  disabled={detalleplan.estado === 0} // Solo deshabilitado en estado 0
                 >
                   <BiBlock size={22} />
                 </Button>
