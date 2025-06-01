@@ -1,29 +1,28 @@
 /* === NAVBAR CUSTOM GENERAL === */
 .navbar-custom {
-  background-color: #000; /* Fondo negro sólido */
+  background-color: #121212; /* Negro profundo (más suave que #000) */
   padding: 0.75rem 1.5rem;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-bottom: 1px solid rgba(249, 229, 20, 0.2); /* Borde inferior sutil amarillo */
 }
 
 .navbar-custom .nav-link {
-  color: white !important;
+  color: #FFFFFF !important; /* Blanco puro para contraste */
   padding: 0.5rem 1rem;
   margin: 0 0.25rem;
   font-weight: 500;
   transition: all 0.3s ease;
   border-bottom: 2px solid transparent;
-  position: relative;
 }
 
 .navbar-custom .nav-link:hover,
 .navbar-custom .nav-link:focus {
-  color: #FFD700 !important;
-  border-bottom: 2px solid #FFD700;
-  background-color: rgba(255, 215, 0, 0.05);
-  border-radius: 4px;
+  color: #F9E514 !important; /* Amarillo base (hover) */
+  border-bottom: 2px solid #F9E514;
+  background-color: rgba(249, 229, 20, 0.08); /* Amarillo con 8% opacidad */
 }
 
 .navbar-logo {
@@ -38,25 +37,22 @@
 
 /* === DROPDOWN GENERAL === */
 .navbar-custom .dropdown-menu {
-  background-color: #111 !important;
+  background-color: #1E1E1E !important; /* Negro más claro que el navbar */
   border-radius: 8px;
   margin-top: 0.5rem;
-  border: none;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(249, 229, 20, 0.3); /* Borde amarillo sutil */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
 }
 
 .navbar-custom .dropdown-menu a {
-  color: white !important;
+  color: #E0E0E0 !important; /* Gris muy claro (no blanco puro) */
   padding: 0.5rem 1.25rem;
   transition: all 0.3s ease;
-  border-bottom: 1px solid transparent;
-  font-size: 0.95rem;
 }
 
 .navbar-custom .dropdown-menu a:hover {
-  background-color: #FFD700 !important;
-  color: #000 !important;
-  border-bottom: 1px solid black;
+  background-color: #F9E514 !important;
+  color: #121212 !important; /* Texto negro al hover */
 }
 
 /* === BOTÓN DROPDOWN TOGGLE GENERAL === */
@@ -111,8 +107,8 @@
 
 /* === BOTÓN USUARIO === */
 .dropdown-toggle-user {
-  background-color: #FFD700 !important;
-  color: black !important;
+  background-color: #F9E514 !important;
+  color: #121212 !important; /* Texto negro */
   border: none;
   padding: 0.5rem 1rem;
   border-radius: 6px;
@@ -120,14 +116,16 @@
   transition: all 0.3s ease;
 }
 
+
 .dropdown-toggle-user:hover {
-  background-color: #f7c600 !important;
-  color: #000 !important;
+  background-color: #E6D112 !important; /* Amarillo más oscuro */
+  transform: translateY(-1px); /* Efecto sutil de elevación */
 }
+
 
 /* === ICONOS === */
 .menu-icon {
-  color: white;
+  color: #FFFFFF;
   font-size: 1.4rem;
   cursor: pointer;
   margin-left: 1rem;
@@ -135,7 +133,8 @@
 }
 
 .menu-icon:hover {
-  color: #FFD700;
+  color: #F9E514;
+  transform: scale(1.1); /* Pequeño zoom al hover */
 }
 
 /* === RESPONSIVE === */

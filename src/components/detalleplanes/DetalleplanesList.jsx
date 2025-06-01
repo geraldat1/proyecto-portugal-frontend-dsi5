@@ -5,7 +5,7 @@ import { BiEdit, BiBlock, BiDollar } from "react-icons/bi";
 import { FaSearch } from "react-icons/fa";
 import { agregarPagosplan } from "../../services/pagosplanesService";
 
-const DetalleplanesList = ({ detalleplanes, seleccionar, eliminar, clientes, planes }) => {
+const DetalleplanesList = ({ detalleplanes, seleccionar, eliminar, clientes, planes, recargarDatos }) => {
   const [paginaActual, setPaginaActual] = useState(1);
   const [busqueda, setBusqueda] = useState("");
   const elementosPorPagina = 5;
@@ -18,6 +18,17 @@ const DetalleplanesList = ({ detalleplanes, seleccionar, eliminar, clientes, pla
   const obtenerPlanDescripcion = (id) => {
     const plan = planes.find((plan) => plan.id === id);
     return plan ? plan.plan : "Plan no encontrado";
+  };
+
+  // Funciones para validación de fechas
+  const esFechaMayor = (fechaComparar) => {
+    const hoy = new Date().setHours(0, 0, 0, 0);
+    const fecha = new Date(fechaComparar).setHours(0, 0, 0, 0);
+    return fecha < hoy;  // true si fechaComparar es anterior a hoy
+  };
+
+  const estaFueraDeRango = (fechaLimite) => {
+    return esFechaMayor(fechaLimite); // true si la fecha límite ya pasó
   };
 
   // Filtrado por cliente o plan
@@ -36,25 +47,33 @@ const DetalleplanesList = ({ detalleplanes, seleccionar, eliminar, clientes, pla
   const detalleplanesPaginadas = detalleplanesOrdenados.slice(indiceInicio, indiceFinal);
 
   const confirmarEliminacion = (id) => {
-  Swal.fire({
-    title: "¿Estás seguro?",
-    text: "¡Esto deshabilitará el registro!",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#d33",
-    cancelButtonColor: "#3085d6",
-    confirmButtonText: "Sí, deshabilitar",
-    cancelButtonText: "Cancelar",
-  }).then((result) => {
-    if (result.isConfirmed) {
-      eliminar(id);
-      Swal.fire("¡Deshabilitado!", "El registro ha sido deshabilitado.", "success");
-    }
-  });
-};
-
+    Swal.fire({
+      title: "¿Estás seguro?",
+      text: "¡Esto deshabilitará el registro!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Sí, deshabilitar",
+      cancelButtonText: "Cancelar",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        eliminar(id);
+        Swal.fire("¡Deshabilitado!", "El registro ha sido deshabilitado.", "success");
+      }
+    });
+  };
 
   const pagar = async (detalleplan) => {
+    // Validaciones frontend
+    if (detalleplan.estado === 2) {
+      return Swal.fire("Advertencia", "Este plan ya ha sido pagado.", "info");
+    }
+
+    if (estaFueraDeRango(detalleplan.fecha_limite)) {
+      return Swal.fire("Error", "La fecha límite ha expirado. No se puede pagar.", "error");
+    }
+
     const plan = planes.find((plan) => plan.id === detalleplan.id_plan);
     if (!plan) {
       Swal.fire("Error", "Plan no encontrado.", "error");
@@ -71,6 +90,7 @@ const DetalleplanesList = ({ detalleplanes, seleccionar, eliminar, clientes, pla
     try {
       await agregarPagosplan(pagosplan);
       Swal.fire("¡Pago realizado!", "El registro ha sido enviado a pagos.", "success");
+      await recargarDatos(); // Actualiza la tabla automáticamente
     } catch (error) {
       Swal.fire("Error", "No se pudo realizar el pago.", "error");
     }
@@ -128,7 +148,6 @@ const DetalleplanesList = ({ detalleplanes, seleccionar, eliminar, clientes, pla
             />
           </InputGroup>
         </Form.Group>
-
       </div>
 
       <Table striped bordered hover>
@@ -148,7 +167,16 @@ const DetalleplanesList = ({ detalleplanes, seleccionar, eliminar, clientes, pla
         </thead>
         <tbody>
           {detalleplanesPaginadas.map((detalleplan) => (
-            <tr key={detalleplan.id}>
+            <tr
+              key={detalleplan.id}
+              className={
+                esFechaMayor(detalleplan.fecha_venc) && !esFechaMayor(detalleplan.fecha_limite)
+                  ? "table-warning"
+                  : esFechaMayor(detalleplan.fecha_limite)
+                  ? "table-danger"
+                  : ""
+              }
+            >
               <td>{detalleplan.id}</td>
               <td>{obtenerClienteNombre(detalleplan.id_cliente)}</td>
               <td>{obtenerPlanDescripcion(detalleplan.id_plan)}</td>
@@ -163,21 +191,30 @@ const DetalleplanesList = ({ detalleplanes, seleccionar, eliminar, clientes, pla
                     ? "bg-warning text-dark" 
                     : detalleplan.estado === 0 
                       ? "bg-danger" 
-                      : "bg-secondary"
+                      : detalleplan.estado === 2
+                        ? "bg-success"
+                        : "bg-secondary"
                 }`}>
                   {detalleplan.estado === 1 
                     ? "Proceso" 
                     : detalleplan.estado === 0 
                       ? "Deshabilitado" 
-                      : "Desconocido"}
+                      : detalleplan.estado === 2
+                        ? "Pagado"
+                        : "Desconocido"}
                 </span>
               </td>
+
               <td className="d-flex gap-2">
                 <Button
                   variant="success"
                   onClick={() => pagar(detalleplan)}
                   title="Pagar"
-                  disabled={detalleplan.estado === 0}
+                  disabled={
+                    detalleplan.estado === 0 || // Deshabilitado
+                    detalleplan.estado === 2 || // Ya pagado
+                    estaFueraDeRango(detalleplan.fecha_limite) // Fecha límite vencida
+                  }
                 >
                   <BiDollar size={22} />
                 </Button>
@@ -185,7 +222,12 @@ const DetalleplanesList = ({ detalleplanes, seleccionar, eliminar, clientes, pla
                   variant="warning"
                   onClick={() => seleccionar(detalleplan)}
                   title="Editar"
-                  disabled={detalleplan.estado === 0}
+                  disabled={
+                    detalleplan.estado === 0 ||
+                    detalleplan.estado === 2 || // Ya pagado
+
+                    estaFueraDeRango(detalleplan.fecha_limite)
+                  }
                 >
                   <BiEdit size={22} />
                 </Button>
@@ -198,7 +240,6 @@ const DetalleplanesList = ({ detalleplanes, seleccionar, eliminar, clientes, pla
                   <BiBlock size={22} />
                 </Button>
               </td>
-
             </tr>
           ))}
         </tbody>

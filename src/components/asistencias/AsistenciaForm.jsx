@@ -4,7 +4,7 @@ import Swal from "sweetalert2";
 import Select from "react-select";
 
 
-const AsistenciaForm = ({ show, handleClose, agregar, actualizar, asistenciaSeleccionada, entrenadores, detallesPlanes, clientes, planes  }) => {
+const AsistenciaForm = ({ show, handleClose, agregar, actualizar, asistenciaSeleccionada, entrenadores, detallesPlanes, clientes, planes, asistencias   }) => {
   const [fecha, setFecha] = useState("");
   const [hora_entrada, setHoraEnt] = useState("");
   const [hora_salida, setHoraSal] = useState("");
@@ -58,6 +58,24 @@ const AsistenciaForm = ({ show, handleClose, agregar, actualizar, asistenciaSele
       return;
     }
 
+    // Verificación de duplicado
+    const hoy = new Date().toISOString().split("T")[0];
+    const asistenciaExistente = asistencias.find(
+      (asis) =>
+        asis.id_detalle === id_detalle &&
+        new Date(asis.fecha).toISOString().split("T")[0] === hoy
+    );
+
+    if (asistenciaExistente && !asistenciaSeleccionada) {
+      Swal.fire({
+        icon: "warning",
+        title: "Registro duplicado",
+        text: "Este cliente ya tiene una asistencia registrada para hoy.",
+        confirmButtonText: "Entendido",
+      });
+      return;
+    }
+
     const nuevaAsistencia = { id_detalle, id_entrenador };
 
     if (asistenciaSeleccionada) {
@@ -68,28 +86,28 @@ const AsistenciaForm = ({ show, handleClose, agregar, actualizar, asistenciaSele
         hora_salida: hora_salida?.trim() || null,
         id_usuario: parseInt(id_usuario),
         estado: parseInt(estado),
-        
       });
 
-        Swal.fire({
+      Swal.fire({
         icon: "info",
         title: "Registro actualizado",
         text: "La asistencia fue actualizada correctamente.",
         timer: 2000,
         showConfirmButton: false,
-    });
+      });
 
     } else {
       agregar(nuevaAsistencia);
-       Swal.fire({
-      icon: "success",
-      title: "Asistencia registrada",
-      text: "La asistencia fue registrada exitosamente.",
-      timer: 2000,
-      showConfirmButton: false,
-    });
+      Swal.fire({
+        icon: "success",
+        title: "Asistencia registrada",
+        text: "La asistencia fue registrada exitosamente.",
+        timer: 2000,
+        showConfirmButton: false,
+      });
     }
 
+    // Reset
     setFecha("");
     setHoraEnt("");
     setHoraSal("");
@@ -97,10 +115,10 @@ const AsistenciaForm = ({ show, handleClose, agregar, actualizar, asistenciaSele
     setIdEntrenador("");
     setIdUsuario("");
     setEstado("");
-
     setErrores({});
     handleClose();
   };
+
 
   return (
 <Modal 
@@ -131,36 +149,37 @@ const AsistenciaForm = ({ show, handleClose, agregar, actualizar, asistenciaSele
             Cliente (Plan) <span className="text-danger">*</span>
           </Form.Label>
           <Select
-            options={detallesPlanes
-              .filter((detalle) => detalle.estado !== 0)
-              .map((detalle) => {
-                const cliente = clientes.find((c) => c.id === detalle.id_cliente);
-                const plan = planes.find((p) => p.id === detalle.id_plan);
-                return {
-                  value: detalle.id,
-                  label: `${cliente?.nombre || "Cliente"} - DNI: ${cliente?.dni || "N/D"} (${plan?.plan || "Plan"})`,
-                };
-              })}
-            onChange={(selectedOption) =>
-              setIdDetalle(selectedOption ? selectedOption.value : "")
-            }
-            value={
-              detallesPlanes
-                .filter((detalle) => detalle.estado !== 0)
-                .map((detalle) => {
-                  const cliente = clientes.find((c) => c.id === detalle.id_cliente);
-                  const plan = planes.find((p) => p.id === detalle.id_plan);
-                  return {
-                    value: detalle.id,
-                    label: `${cliente?.nombre || "Cliente"} - DNI: ${cliente?.dni || "N/D"} (${plan?.plan || "Plan"})`,
-                  };
-                })
-                .find((option) => option.value === id_detalle) || null
-            }
-            placeholder="Buscar por nombre o DNI..."
-            classNamePrefix={!!errores.id_detalle ? "is-invalid" : ""}
-            isDisabled={!!asistenciaSeleccionada}
-          />
+  options={detallesPlanes
+    .filter((detalle) => detalle.estado === 2)  // SOLO estado 2
+    .map((detalle) => {
+      const cliente = clientes.find((c) => c.id === detalle.id_cliente);
+      const plan = planes.find((p) => p.id === detalle.id_plan);
+      return {
+        value: detalle.id,
+        label: `${cliente?.nombre || "Cliente"} - DNI: ${cliente?.dni || "N/D"} (${plan?.plan || "Plan"})`,
+      };
+    })}
+  onChange={(selectedOption) =>
+    setIdDetalle(selectedOption ? selectedOption.value : "")
+  }
+  value={
+    detallesPlanes
+      .filter((detalle) => detalle.estado === 2)  // SOLO estado 2 aquí también
+      .map((detalle) => {
+        const cliente = clientes.find((c) => c.id === detalle.id_cliente);
+        const plan = planes.find((p) => p.id === detalle.id_plan);
+        return {
+          value: detalle.id,
+          label: `${cliente?.nombre || "Cliente"} - DNI: ${cliente?.dni || "N/D"} (${plan?.plan || "Plan"})`,
+        };
+      })
+      .find((option) => option.value === id_detalle) || null
+  }
+  placeholder="Buscar por nombre o DNI..."
+  classNamePrefix={!!errores.id_detalle ? "is-invalid" : ""}
+  isDisabled={!!asistenciaSeleccionada}
+/>
+
           {errores.id_detalle && (
             <div className="invalid-feedback d-block">{errores.id_detalle}</div>
           )}

@@ -162,6 +162,8 @@ const cargarPlanes = async () => {
         detallesPlanes={detallesPlanes} 
         clientes={clientes} 
         planes={planes} 
+        asistencias={asistencias}
+
       />
 
     </div>

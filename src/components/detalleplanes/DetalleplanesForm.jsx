@@ -36,6 +36,8 @@ const DetalleplanesForm = ({
   detalleplanSeleccionada,
   clientes,
   planes,
+  detallePlanesExistentes = [], // nuevos registros existentes
+
 }) => {
   const [id_cliente, setIdCliente] = useState("");
   const [id_plan, setIdPlan] = useState("");
@@ -85,18 +87,43 @@ const DetalleplanesForm = ({
     return Object.keys(nuevosErrores).length === 0;
   };
 
-  const manejarEnvio = (e) => {
+    const addDays = (date, days) => {
+    const result = new Date(date);
+    result.setDate(result.getDate() + days);
+    return result;
+  };
+
+
+
+const validarDuplicado = () => {
+  // Buscamos si ya existe un registro activo o en proceso para el mismo cliente
+  return detallePlanesExistentes.some((dp) => {
+    if (detalleplanSeleccionada && dp.id === detalleplanSeleccionada.id) return false;
+    return (
+      dp.id_cliente === id_cliente &&
+      (dp.estado === 1 || dp.estado === 2)
+    );
+  });
+};
+
+
+ const manejarEnvio = (e) => {
     e.preventDefault();
     if (!validar()) {
       Swal.fire("Campos inválidos", "Por favor revisa los datos ingresados", "error");
       return;
     }
 
+    if (validarDuplicado()) {
+      Swal.fire("Registro duplicado", "Ya existe un registro activo o en proceso para este cliente y plan.", "warning");
+      return;
+    }
+
     const nuevaDetalleplan = { 
       id_cliente, 
       id_plan, 
-      fecha_venc: fecha_venc.toISOString(), // Convertimos a ISO string
-      fecha_limite: fecha_limite.toISOString() // Convertimos a ISO string
+      fecha_venc: fecha_venc.toISOString(),
+      fecha_limite: fecha_limite.toISOString()
     };
 
     if (detalleplanSeleccionada) {
@@ -133,7 +160,7 @@ const DetalleplanesForm = ({
       });
     }
 
-    // Resetear el formulario
+    // Resetear formulario y cerrar modal
     setIdCliente("");
     setIdPlan("");
     setFecha("");
@@ -142,7 +169,6 @@ const DetalleplanesForm = ({
     setFechaLimite(null);
     setIdUser("");
     setEstado("");
-
     setErrores({});
     document.activeElement?.blur();
     handleClose();
@@ -231,13 +257,24 @@ const DetalleplanesForm = ({
             {/* Fecha Vencimiento */}
             <Form.Group className="mb-3 col-md-6">
               <Form.Label className="fw-bold">Fecha Vencimiento <span className="text-danger">*</span></Form.Label>
-              <Form.Control
-                type="date"
-                value={formatDateForInput(fecha_venc)}
-                onChange={(e) => setFechaVenc(parseInputDate(e.target.value))}
-                isInvalid={!!errores.fecha_venc}
-                min={formatDateForInput(new Date())}
-              />
+             <Form.Control
+              type="date"
+              value={formatDateForInput(fecha_venc)}
+              onChange={(e) => {
+                const nuevaFechaVenc = parseInputDate(e.target.value);
+                setFechaVenc(nuevaFechaVenc);
+
+                // Establecer fecha límite automáticamente como 5 días después
+                if (nuevaFechaVenc) {
+                  setFechaLimite(addDays(nuevaFechaVenc, 5));
+                } else {
+                  setFechaLimite(null);
+                }
+              }}
+              isInvalid={!!errores.fecha_venc}
+              min={formatDateForInput(addDays(new Date(), 1))}
+            />
+
               <Form.Text className="text-muted">
                 Fecha cuando expira el plan
               </Form.Text>
@@ -252,10 +289,11 @@ const DetalleplanesForm = ({
               <Form.Control
                 type="date"
                 value={formatDateForInput(fecha_limite)}
-                onChange={(e) => setFechaLimite(parseInputDate(e.target.value))}
+                readOnly
+                disabled
                 isInvalid={!!errores.fecha_limite}
-                min={formatDateForInput(fecha_venc || new Date())}
               />
+
               <Form.Text className="text-muted">
                 Fecha límite para renovación
               </Form.Text>

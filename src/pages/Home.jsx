@@ -36,7 +36,7 @@ const Home = () => {
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
       width: '100%',
       minHeight: '100vh',
-      backgroundColor: '#ffffff',
+      backgroundColor: '#f9f9f9',
       boxSizing: 'border-box'
     }}>
       <div style={{
@@ -55,32 +55,37 @@ const Home = () => {
           marginBottom: '2rem'
         }}>
           <Card
-            icon={<FiUsers style={{ color: '#fff', fontSize: '1.8rem' }} />}
+            icon={<FiUsers />}
             title="Total Clientes"
             value={clientes.length}
-            gradient="linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%)" // Azul vibrante
-            shadowColor="rgba(67, 97, 238, 0.4)"
+            backgroundColor="#111111"
+            textColor="#FFD700"
+            accentColor="#FFD700"
           />
           <Card
-            icon={<FiUserCheck style={{ color: '#fff', fontSize: '1.8rem' }} />}
+            icon={<FiUserCheck />}
             title="Entrenadores"
             value={entrenadores.length}
-            gradient="linear-gradient(135deg, #7209b7 0%, #560bad 100%)" // Púrpura
-            shadowColor="rgba(114, 9, 183, 0.4)"
+            backgroundColor="#FFD700"
+            textColor="#111111"
+            accentColor="#111111"
           />
           <Card
-            icon={<FiClipboard style={{ color: '#fff', fontSize: '1.8rem' }} />}
+            icon={<FiClipboard />}
             title="Rutinas Activas"
             value={rutinas.length}
-            gradient="linear-gradient(135deg, #f72585 0%, #b5179e 100%)" // Rosa magenta
-            shadowColor="rgba(247, 37, 133, 0.4)"
+            backgroundColor="#ffffff"
+            textColor="#111111"
+            accentColor="#FFD700"
+            borderColor="#FFD700"
           />
           <Card
-            icon={<FiFileText style={{ color: '#fff', fontSize: '1.8rem' }} />}
+            icon={<FiFileText />}
             title="Planes Disponibles"
             value={planes.length}
-             gradient="linear-gradient(135deg, #4cc9f0 0%, #4895ef 100%)" // Azul claro
-            shadowColor="rgba(76, 201, 240, 0.4)"
+            backgroundColor="#111111"
+            textColor="#ffffff"
+            accentColor="#FFD700"
           />
         </div>
 
@@ -110,21 +115,19 @@ const Home = () => {
               borderRadius: '8px',
               border: '1px solid #e0e0e0',
               fontSize: '0.95rem',
-              backgroundColor: '#fafafa',
+              backgroundColor: '#ffffff',
               boxSizing: 'border-box',
               boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
               transition: 'all 0.3s ease',
               outline: 'none'
             }}
             onFocus={(e) => {
-              e.target.style.boxShadow = '0 2px 12px rgba(255, 165, 0, 0.15)';
-              e.target.style.borderColor = '#FFA500';
-              e.target.style.backgroundColor = '#fff';
+              e.target.style.boxShadow = '0 2px 12px rgba(255, 215, 0, 0.25)';
+              e.target.style.borderColor = '#FFD700';
             }}
             onBlur={(e) => {
               e.target.style.boxShadow = '0 2px 8px rgba(0,0,0,0.05)';
               e.target.style.borderColor = '#e0e0e0';
-              e.target.style.backgroundColor = '#fafafa';
             }}
           />
         </div>
@@ -132,10 +135,11 @@ const Home = () => {
         {/* Additional content space */}
         <div style={{
           flex: 1,
-          backgroundColor: '#f9f9f9',
+          backgroundColor: '#ffffff',
           borderRadius: '12px',
           padding: '1.5rem',
-          boxShadow: '0 2px 10px rgba(0,0,0,0.05)'
+          boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
+          border: '1px solid #f1f1f1'
         }}>
           {/* Puedes añadir contenido adicional aquí */}
         </div>
@@ -144,104 +148,149 @@ const Home = () => {
   );
 };
 
-const Card = ({ icon, title, value, gradient, shadowColor }) => {
+const Card = ({ 
+  icon, 
+  title, 
+  value, 
+  backgroundColor, 
+  textColor, 
+  accentColor,
+  borderColor = 'transparent'
+}) => {
   const [isHovered, setIsHovered] = useState(false);
+
+  // Clonamos el icono para aplicar estilos avanzados
+  const coloredIcon = React.cloneElement(icon, {
+    style: { 
+      color: accentColor,
+      fontSize: '2rem',
+      transition: 'all 0.3s ease',
+      filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))'
+    }
+  });
 
   return (
     <div
       style={{
-        padding: '1rem',
-        borderRadius: '12px',
-        background: gradient,
+        padding: '1.5rem',
+        borderRadius: '16px',
+        backgroundColor: backgroundColor,
         display: 'flex',
         alignItems: 'center',
-        gap: '18px',
+        gap: '20px',
         boxSizing: 'border-box',
         boxShadow: isHovered
-          ? `0 12px 30px ${shadowColor}, 0 4px 12px rgba(0,0,0,0.07)`
-          : `0 6px 20px ${shadowColor}`,
-        transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-        transform: isHovered ? 'translateY(-5px)' : 'translateY(0)',
+          ? `0 15px 35px rgba(0,0,0,0.2), 0 5px 15px rgba(0,0,0,0.1)`
+          : `0 8px 25px rgba(0,0,0,0.15)`,
+        transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+        transform: isHovered ? 'translateY(-7px) scale(1.02)' : 'translateY(0) scale(1)',
         cursor: 'pointer',
         position: 'relative',
         overflow: 'hidden',
-        height: '100%'
+        height: '100%',
+        border: `1px solid ${borderColor}`
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Decorative background elements */}
+      {/* Contenedor de icono con diseño premium */}
       <div style={{
-        position: 'absolute',
-        top: '-50%',
-        right: '-20%',
-        width: '100px',
-        height: '100px',
+        position: 'relative',
+        padding: '20px',
         borderRadius: '50%',
-        background: 'rgba(255,255,255,0.1)',
-        transform: isHovered ? 'scale(1.5)' : 'scale(1)',
-        transition: 'transform 0.4s ease'
-      }} />
-
-      <div style={{
-        position: 'absolute',
-        bottom: '-30%',
-        left: '-10%',
-        width: '60px',
-        height: '60px',
-        borderRadius: '50%',
-        background: 'rgba(255,255,255,0.08)',
-        transform: isHovered ? 'scale(1.3)' : 'scale(1)',
-        transition: 'transform 0.4s ease'
-      }} />
-
-      {/* Icon container */}
-      <div style={{
-        backgroundColor: 'rgba(255,255,255,0.2)',
-        padding: '16px',
-        borderRadius: '12px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        backdropFilter: 'blur(10px)',
-        border: '1px solid rgba(255,255,255,0.3)',
-        transform: isHovered ? 'rotate(5deg) scale(1.1)' : 'rotate(0deg) scale(1)',
-        transition: 'transform 0.3s ease'
+        transform: isHovered ? 'scale(1.15)' : 'scale(1)',
+        transition: 'all 0.4s ease',
+        zIndex: 1,
+        background: `linear-gradient(145deg, ${backgroundColor}88, ${backgroundColor}00)`,
+        boxShadow: `
+          0 0 0 2px ${accentColor}80,
+          0 8px 20px rgba(0,0,0,0.2),
+          inset 0 -4px 10px ${accentColor}20
+        `,
+        backdropFilter: 'blur(4px)'
       }}>
-        {icon}
+        <div style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: '60px',
+          height: '60px',
+          borderRadius: '50%',
+          background: `${accentColor}20`,
+          filter: 'blur(8px)',
+          zIndex: -1,
+          opacity: isHovered ? 0.8 : 0.4,
+          transition: 'opacity 0.3s ease'
+        }} />
+        {coloredIcon}
       </div>
 
-      {/* Content */}
-      <div style={{ flex: 1 }}>
+      {/* Contenido */}
+      <div style={{ flex: 1, position: 'relative', zIndex: 1 }}>
         <h3 style={{
-          fontSize: '1rem',
-          marginBottom: '6px',
-          color: 'rgba(255,255,255,0.9)',
+          fontSize: '1.1rem',
+          marginBottom: '10px',
+          color: textColor,
           fontWeight: '600',
-          letterSpacing: '0.3px'
+          letterSpacing: '0.3px',
+          opacity: 0.9,
+          textShadow: '0 1px 2px rgba(0,0,0,0.1)'
         }}>
           {title}
         </h3>
         <p style={{
-          fontSize: '2rem',
+          fontSize: '2.5rem',
           margin: 0,
-          fontWeight: '700',
-          color: '#ffffff',
-          textShadow: '0 2px 4px rgba(0,0,0,0.2)',
-          lineHeight: 1
+          fontWeight: '800',
+          color: textColor,
+          lineHeight: 1,
+          textShadow: isHovered ? `0 0 12px ${accentColor}50` : '0 2px 4px rgba(0,0,0,0.1)',
+          transition: 'text-shadow 0.4s ease'
         }}>
           {value}
         </p>
         <div style={{
-          width: '36px',
-          height: '3px',
-          backgroundColor: 'rgba(255,255,255,0.6)',
+          width: '40px',
+          height: '4px',
+          backgroundColor: accentColor,
           borderRadius: '2px',
-          marginTop: '10px',
-          transform: isHovered ? 'scaleX(1.5)' : 'scaleX(1)',
-          transition: 'transform 0.3s ease'
+          marginTop: '15px',
+          transform: isHovered ? 'scaleX(1.8)' : 'scaleX(1)',
+          transition: 'transform 0.4s ease',
+          boxShadow: `0 0 12px ${accentColor}40`
         }} />
       </div>
+      
+      {/* Efecto de brillo al pasar el mouse */}
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        background: `radial-gradient(circle at ${isHovered ? '50% 30%' : '50% 10%'}, ${accentColor}10, transparent 70%)`,
+        zIndex: 0,
+        opacity: isHovered ? 1 : 0,
+        transition: 'opacity 0.4s ease, background 0.4s ease'
+      }} />
+      
+      {/* Patrón de puntos decorativo */}
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        backgroundImage: `radial-gradient(${accentColor}15 1px, transparent 2px)`,
+        backgroundSize: '20px 20px',
+        opacity: isHovered ? 0.3 : 0.1,
+        transition: 'opacity 0.4s ease',
+        zIndex: 0
+      }} />
     </div>
   );
 };

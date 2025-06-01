@@ -26,16 +26,26 @@ const Detalleplanes = () => {
   }, []);
 
   const cargarDatos = async () => {
-    const [datosDetalleplanes, datosClientes, datosPlanes] = await Promise.all([
-      obtenerDetalleplanes(),
-      obtenerClientes(),
-      obtenerPlanes(),
-    ]);
+  const [datosDetalleplanes, datosClientes, datosPlanes] = await Promise.all([
+    obtenerDetalleplanes(),
+    obtenerClientes(),
+    obtenerPlanes(),
+  ]);
 
-    setDetalleplanes(datosDetalleplanes);
-    setClientes(datosClientes);
-    setPlanes(datosPlanes);
-  };
+  // Deshabilitar automáticamente los registros cuya fecha límite ya pasó
+  const hoy = new Date().setHours(0, 0, 0, 0);
+  for (const detalle of datosDetalleplanes) {
+    const fechaLimite = new Date(detalle.fecha_limite).setHours(0, 0, 0, 0);
+    if (fechaLimite < hoy && detalle.estado !== 0) {
+      await actualizarDetalleplan(detalle.id, { ...detalle, estado: 0 });
+    }
+  }
+
+  setDetalleplanes(datosDetalleplanes);
+  setClientes(datosClientes);
+  setPlanes(datosPlanes);
+};
+
 
   const agregar = async (detalleplan) => {
     await agregarDetalleplan(detalleplan);
@@ -60,6 +70,7 @@ const Detalleplanes = () => {
     setMostrarModal(true);
   };
 
+  
   return (
     <div>
       <h2>Asignar Planes</h2>
@@ -82,6 +93,8 @@ const Detalleplanes = () => {
         eliminar={eliminar}
         clientes={clientes}
         planes={planes}
+        recargarDatos={cargarDatos} 
+
       />
 
       <DetalleplanesForm
@@ -92,6 +105,8 @@ const Detalleplanes = () => {
         detalleplanSeleccionada={detalleplanSeleccionada}
         clientes={clientes}
         planes={planes}
+        detallePlanesExistentes={detalleplanes}  // <-- Aquí agregas esta prop
+
       />
     </div>
   );
