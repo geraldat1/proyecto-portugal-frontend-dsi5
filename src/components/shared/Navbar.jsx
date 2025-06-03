@@ -45,6 +45,13 @@ const Navbar = () => {
     </span>
   );
 
+  // Debug: verificar qué contiene el objeto user
+  // console.log('Usuario completo:', user);
+  // console.log('Rol del usuario:', user?.role, user?.rol);
+  
+  // Verificar si el usuario tiene rol '2' (string)
+  const isRole2 = user?.role === '2' || user?.rol === '2';
+
   return (
   <BsNavbar expand="lg" className="navbar-custom">
       <Container>
@@ -72,7 +79,7 @@ const Navbar = () => {
                 {menuItem(<FaUsers className="text-primary me-2" />, "Registrar Clientes")}
               </NavDropdown.Item>
               <NavDropdown.Item as={Link} to="/detalleplanes">
-                {menuItem(<FaClipboardList className="text-success me-2" />, "Asignar Planes")}
+                {menuItem(<FaClipboardList className="text-success me-2" />, "Asignar Membresía")}
               </NavDropdown.Item>
               <NavDropdown.Item as={Link} to="/pagosplanes">
                 {menuItem(<FaCreditCard className="text-info me-2" />, "Pagos")}
@@ -82,18 +89,25 @@ const Navbar = () => {
             <Nav.Link as={Link} to="/asistencias">
               {menuItem(<FaCalendarCheck />, "Asistencias")}
             </Nav.Link>
-            <Nav.Link as={Link} to="/entrenadores">
-              {menuItem(<FaDumbbell />, "Entrenadores")}
-            </Nav.Link>
+            
+            {/* Ocultar Entrenadores para rol 2 */}
+            {!isRole2 && (
+              <Nav.Link as={Link} to="/entrenadores">
+                {menuItem(<FaDumbbell />, "Entrenadores")}
+              </Nav.Link>
+            )}
 
-            <NavDropdown title={menuItem(<FaTasks />, "Servicios")} id="servicios-dropdown">
-              <NavDropdown.Item as={Link} to="/planes">
-                  {menuItem(<FaBoxOpen className="text-success me-2" />, "Planes")}
+            {/* Ocultar Servicios para rol 2 */}
+            {!isRole2 && (
+              <NavDropdown title={menuItem(<FaTasks />, "Servicios")} id="servicios-dropdown">
+                <NavDropdown.Item as={Link} to="/planes">
+                    {menuItem(<FaBoxOpen className="text-success me-2" />, "Planes")}
+                  </NavDropdown.Item>
+                <NavDropdown.Item as={Link} to="/rutinas">
+                  {menuItem(<FaTasks className="text-danger me-2" />, "Rutinas")}
                 </NavDropdown.Item>
-              <NavDropdown.Item as={Link} to="/rutinas">
-                {menuItem(<FaTasks className="text-danger me-2" />, "Rutinas")}
-              </NavDropdown.Item>
-            </NavDropdown>
+              </NavDropdown>
+            )}
           </Nav>
 
           {user && (
@@ -114,55 +128,49 @@ const Navbar = () => {
                 </span>
               </Dropdown.Toggle>
 
-
-      <Dropdown.Menu className="dropdown-menu-user border-0 shadow-sm rounded-1 mt-1">
-      
-      {/*
-      <Dropdown.Item 
-        as={Link} 
-        to="/acercade"
-        className="d-flex align-items-center py-2 px-3"
-      >
-        {menuItem(<FaInfoCircle className="text-info me-2" />, "Acerca de Mi APP")}
-      </Dropdown.Item>
-      */}
-
-      <Dropdown.Item 
-        as={Link} 
-        to="/configuracion"
-        className="d-flex align-items-center py-2 px-3"
-      >
-        {menuItem(<FaCog className="text-secondary me-2" />, "Configuración")}
-      </Dropdown.Item>
-      
-      <Dropdown.Item 
-        as={Link} 
-        to="/usuarios"
-        className="d-flex align-items-center py-2 px-3"
-      >
-        {menuItem(<FaUserTie className="text-success me-2" />, "Empleados")}
-      </Dropdown.Item>
-      
-      <Dropdown.Item 
-        onClick={() => alert("Funcionalidad aún no implementada")}
-        className="d-flex align-items-center py-2 px-3"
-      >
-        {menuItem(<FaLock className="text-warning me-2" />, "Cambiar contraseña")}
-      </Dropdown.Item>
-      
-      <Dropdown.Divider className="my-1" />
-      
-      <Dropdown.Item 
-        onClick={handleLogout}
-        className="d-flex align-items-center py-2 px-3 text-danger"
-      >
-        {menuItem(<FaSignOutAlt className="me-2" />, "Cerrar sesión")}
-      </Dropdown.Item>
-    </Dropdown.Menu>
-  </Dropdown>
-    </Nav>
-
-)}
+              <Dropdown.Menu className="dropdown-menu-user border-0 shadow-sm rounded-1 mt-1">
+                
+                {/* Ocultar Configuración para rol 2 */}
+                {!isRole2 && (
+                  <Dropdown.Item 
+                    as={Link} 
+                    to="/configuracion"
+                    className="d-flex align-items-center py-2 px-3"
+                  >
+                    {menuItem(<FaCog className="text-secondary me-2" />, "Configuración")}
+                  </Dropdown.Item>
+                )}
+                
+                {/* Ocultar Empleados para rol 2 */}
+                {!isRole2 && (
+                  <Dropdown.Item 
+                    as={Link} 
+                    to="/usuarios"
+                    className="d-flex align-items-center py-2 px-3"
+                  >
+                    {menuItem(<FaUserTie className="text-success me-2" />, "Empleados")}
+                  </Dropdown.Item>
+                )}
+                
+                <Dropdown.Item 
+                  onClick={() => alert("Funcionalidad aún no implementada")}
+                  className="d-flex align-items-center py-2 px-3"
+                >
+                  {menuItem(<FaLock className="text-warning me-2" />, "Cambiar contraseña")}
+                </Dropdown.Item>
+                
+                <Dropdown.Divider className="my-1" />
+                
+                <Dropdown.Item 
+                  onClick={handleLogout}
+                  className="d-flex align-items-center py-2 px-3 text-danger"
+                >
+                  {menuItem(<FaSignOutAlt className="me-2" />, "Cerrar sesión")}
+                </Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
+            </Nav>
+          )}
         </BsNavbar.Collapse>
       </Container>
     </BsNavbar>

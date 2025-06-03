@@ -73,7 +73,7 @@ const Detalleplanes = () => {
   
   return (
     <div>
-      <h2>Asignar Planes</h2>
+      <h2>Asignar Membresía</h2>
       <Button
         className="mb-3 d-flex align-items-center"
         variant="primary"

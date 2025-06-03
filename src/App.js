@@ -20,7 +20,6 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 import './App.css';
 
-
 const App = () => {
   const { user, setUser } = useContext(AuthContext);
 
@@ -40,6 +39,23 @@ const App = () => {
     }
   }, [setUser]);
 
+  // Verificar si el usuario tiene rol 2
+  const isRole2 = user?.role === 2;
+
+  // Componente para rutas protegidas por rol
+  const ProtectedRoute = ({ children, requiresAdmin = false }) => {
+    if (!user) {
+      return <Navigate to="/login" />;
+    }
+    
+    // Si la ruta requiere privilegios de admin y el usuario es rol 2, redirigir
+    if (requiresAdmin && isRole2) {
+      return <Navigate to="/" />;
+    }
+    
+    return children;
+  };
+
   return (
     <div className="app-container">
       {user && <Navbar />}
@@ -55,15 +71,27 @@ const App = () => {
           />
           <Route
             path="/entrenadores"
-            element={user ? <Entrenadores /> : <Navigate to="/login" />}
+            element={
+              <ProtectedRoute requiresAdmin={true}>
+                <Entrenadores />
+              </ProtectedRoute>
+            }
           />
           <Route
             path="/rutinas"
-            element={user ? <Rutinas /> : <Navigate to="/login" />}
+            element={
+              <ProtectedRoute requiresAdmin={true}>
+                <Rutinas />
+              </ProtectedRoute>
+            }
           />
           <Route
             path="/planes"
-            element={user ? <Planes /> : <Navigate to="/login" />}
+            element={
+              <ProtectedRoute requiresAdmin={true}>
+                <Planes />
+              </ProtectedRoute>
+            }
           />
           <Route
             path="/pagosplanes"
@@ -79,11 +107,19 @@ const App = () => {
           />
           <Route
             path="/configuracion"
-            element={user ? <Configuracion /> : <Navigate to="/login" />}
+            element={
+              <ProtectedRoute requiresAdmin={true}>
+                <Configuracion />
+              </ProtectedRoute>
+            }
           />
           <Route
             path="/usuarios"
-            element={user ? <Usuarios /> : <Navigate to="/login" />}
+            element={
+              <ProtectedRoute requiresAdmin={true}>
+                <Usuarios />
+              </ProtectedRoute>
+            }
           />
           <Route
             path="/login"

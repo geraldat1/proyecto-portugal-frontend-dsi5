@@ -1,93 +1,101 @@
 import React, { useState } from "react";
-import { Table, Button, Pagination, Form, InputGroup, Card, Badge } from "react-bootstrap";
+import { Table, Button, Form, Badge, Card, Pagination } from "react-bootstrap";
 import Swal from "sweetalert2";
-import { FaUserCheck, FaSearch } from "react-icons/fa";
-import { BiEdit, BiBlock } from "react-icons/bi";
+import { BiEdit, BiBlock, BiSearch } from "react-icons/bi";
+import { FaUserCheck } from "react-icons/fa";
 
 const EntrenadorList = ({ entrenadores, seleccionar, eliminar }) => {
-  const [paginaActual, setPaginaActual] = useState(1);
   const [busqueda, setBusqueda] = useState("");
-  const elementosPorPagina = 5;
+  const [filtroEstado, setFiltroEstado] = useState("todos");
+  const [hoveredCard, setHoveredCard] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
-  const entrenadoresFiltrados = entrenadores.filter((ent) => {
+  // Filtrar entrenadores según búsqueda y estado
+  const entrenadoresFiltrados = entrenadores.filter((entrenador) => {
     const texto = busqueda.toLowerCase();
-    return (
-      ent.nombre.toLowerCase().includes(texto) ||
-      ent.apellido.toLowerCase().includes(texto) ||
-      ent.telefono.toLowerCase().includes(texto) ||
-      ent.correo.toLowerCase().includes(texto) ||
-      ent.direccion.toLowerCase().includes(texto)
-    );
+    const coincideBusqueda = 
+      entrenador.nombre.toLowerCase().includes(texto) ||
+      entrenador.apellido.toLowerCase().includes(texto) ||
+      entrenador.telefono.toLowerCase().includes(texto) ||
+      entrenador.correo.toLowerCase().includes(texto) ||
+      entrenador.direccion.toLowerCase().includes(texto);
+    
+    const coincideEstado = filtroEstado === "todos" || 
+      (filtroEstado === "activos" && entrenador.estado === 1) ||
+      (filtroEstado === "inactivos" && entrenador.estado === 0);
+    
+    return coincideBusqueda && coincideEstado;
   });
 
+  // Ordenar por ID descendente
   const entrenadoresOrdenados = [...entrenadoresFiltrados].sort((a, b) => b.id - a.id);
 
-  const totalPaginas = Math.ceil(entrenadoresOrdenados.length / elementosPorPagina);
-  const indiceInicio = (paginaActual - 1) * elementosPorPagina;
-  const entrenadoresPaginados = entrenadoresOrdenados.slice(indiceInicio, indiceInicio + elementosPorPagina);
+  // Paginación
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = entrenadoresOrdenados.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(entrenadoresOrdenados.length / itemsPerPage);
 
-  const entrenadoresActivos = entrenadores.filter(ent => ent.estado === 1).length;
-  const entrenadoresInactivos = entrenadores.filter(ent => ent.estado === 0).length;
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
+  // Estadísticas
+  const entrenadoresActivos = entrenadores.filter(entrenador => entrenador.estado === 1).length;
+  const entrenadoresInactivos = entrenadores.filter(entrenador => entrenador.estado === 0).length;
+
+  // Confirmar deshabilitación
   const confirmarEliminacion = (id) => {
     Swal.fire({
       title: "¿Estás seguro?",
-      text: "El entrenador será deshabilitado.",
+      text: "¡Esto deshabilitará al entrenador y no podrá revertirse fácilmente!",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
       confirmButtonText: "Sí, deshabilitar",
       cancelButtonText: "Cancelar",
+      confirmButtonColor: "#dc3545",
+      cancelButtonColor: "#6c757d",
     }).then((result) => {
       if (result.isConfirmed) {
         eliminar(id);
-        Swal.fire("¡Deshabilitado!", "El entrenador ha sido deshabilitado.", "success");
+        Swal.fire({
+          title: "¡Deshabilitado!",
+          text: "El entrenador ha sido deshabilitado.",
+          icon: "success",
+          confirmButtonColor: "#0d6efd",
+        }).then(() => {
+          const boton = document.querySelector("button");
+          if (boton) boton.focus();
+        });
       }
     });
   };
 
-  const irPrimeraPagina = () => setPaginaActual(1);
-  const irUltimaPagina = () => setPaginaActual(totalPaginas);
-  const irAnterior = () => setPaginaActual((prev) => Math.max(prev - 1, 1));
-  const irSiguiente = () => setPaginaActual((prev) => Math.min(prev + 1, totalPaginas));
-
-  const obtenerItemsPaginacion = () => {
-    const paginas = [];
-    let inicio = Math.max(paginaActual - 2, 1);
-    let fin = Math.min(paginaActual + 2, totalPaginas);
-
-    if (paginaActual <= 2) {
-      fin = Math.min(5, totalPaginas);
-    } else if (paginaActual >= totalPaginas - 1) {
-      inicio = Math.max(totalPaginas - 4, 1);
-    }
-
-    for (let i = inicio; i <= fin; i++) {
-      paginas.push(
-        <Pagination.Item
-          key={i}
-          active={i === paginaActual}
-          onClick={() => setPaginaActual(i)}
-          className="mx-1 rounded"
-        >
-          {i}
-        </Pagination.Item>
-      );
-    }
-
-    return paginas;
-  };
+  // Estilos para tarjetas interactivas
+  const cardStyle = (cardType) => ({
+    transform: hoveredCard === cardType ? 'translateY(-8px)' : 'translateY(0)',
+    boxShadow: hoveredCard === cardType ? '0 12px 20px rgba(0,0,0,0.15)' : '0 4px 8px rgba(0,0,0,0.1)',
+    transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+    cursor: 'pointer',
+    border: 'none',
+    overflow: 'hidden',
+    position: 'relative',
+    zIndex: hoveredCard === cardType ? 2 : 1,
+  });
 
   return (
-    <div className="p-4 bg-white rounded">
-      {/* Estadísticas */}
+    <div className="p-4 bg-white rounded-3 shadow-sm">
+      {/* Tarjetas de estadísticas interactivas */}
       <div className="d-flex gap-3 mb-4 flex-wrap">
-        <Card className="border-0 bg-primary bg-opacity-10 flex-grow-1">
+        <Card 
+          className="border-0 bg-primary bg-opacity-10 flex-grow-1"
+          style={cardStyle('total')}
+          onMouseEnter={() => setHoveredCard('total')}
+          onMouseLeave={() => setHoveredCard(null)}
+        >
           <Card.Body className="py-3">
             <div className="d-flex justify-content-between align-items-center">
               <div>
-                <Card.Title className="text-primary fw-bold mb-1">TOTAL</Card.Title>
+                <Card.Title className="text-primary fw-bold mb-1 fs-5">TOTAL</Card.Title>
                 <h2 className="mb-0 fw-bold display-6">{entrenadores.length}</h2>
               </div>
               <div className="bg-primary text-white rounded-circle p-3">
@@ -96,13 +104,19 @@ const EntrenadorList = ({ entrenadores, seleccionar, eliminar }) => {
             </div>
             <small className="text-muted">Entrenadores registrados</small>
           </Card.Body>
+          <div className="position-absolute bottom-0 start-0 end-0 bg-primary bg-opacity-20" style={{ height: '4px' }}></div>
         </Card>
         
-        <Card className="border-0 bg-success bg-opacity-10 flex-grow-1">
+        <Card 
+          className="border-0 bg-success bg-opacity-10 flex-grow-1"
+          style={cardStyle('activos')}
+          onMouseEnter={() => setHoveredCard('activos')}
+          onMouseLeave={() => setHoveredCard(null)}
+        >
           <Card.Body className="py-3">
             <div className="d-flex justify-content-between align-items-center">
               <div>
-                <Card.Title className="text-success fw-bold mb-1">ACTIVOS</Card.Title>
+                <Card.Title className="text-success fw-bold mb-1 fs-5">ACTIVOS</Card.Title>
                 <h2 className="mb-0 fw-bold display-6">{entrenadoresActivos}</h2>
               </div>
               <div className="bg-success text-white rounded-circle p-3">
@@ -111,13 +125,19 @@ const EntrenadorList = ({ entrenadores, seleccionar, eliminar }) => {
             </div>
             <small className="text-muted">Entrenadores activos</small>
           </Card.Body>
+          <div className="position-absolute bottom-0 start-0 end-0 bg-success bg-opacity-20" style={{ height: '4px' }}></div>
         </Card>
         
-        <Card className="border-0 bg-secondary bg-opacity-10 flex-grow-1">
+        <Card 
+          className="border-0 bg-secondary bg-opacity-10 flex-grow-1"
+          style={cardStyle('inactivos')}
+          onMouseEnter={() => setHoveredCard('inactivos')}
+          onMouseLeave={() => setHoveredCard(null)}
+        >
           <Card.Body className="py-3">
             <div className="d-flex justify-content-between align-items-center">
               <div>
-                <Card.Title className="text-secondary fw-bold mb-1">INACTIVOS</Card.Title>
+                <Card.Title className="text-secondary fw-bold mb-1 fs-5">INACTIVOS</Card.Title>
                 <h2 className="mb-0 fw-bold display-6">{entrenadoresInactivos}</h2>
               </div>
               <div className="bg-secondary text-white rounded-circle p-3">
@@ -126,43 +146,60 @@ const EntrenadorList = ({ entrenadores, seleccionar, eliminar }) => {
             </div>
             <small className="text-muted">Entrenadores inactivos</small>
           </Card.Body>
+          <div className="position-absolute bottom-0 start-0 end-0 bg-secondary bg-opacity-20" style={{ height: '4px' }}></div>
         </Card>
       </div>
 
-      {/* Buscador */}
-      <div className="d-flex justify-content-between align-items-center mb-4 bg-light p-3 rounded">
-        <div className="d-flex gap-2 flex-wrap w-100">
-          <Form.Group className="mb-0 flex-grow-1" style={{ maxWidth: "500px" }}>
-            <InputGroup>
-              <InputGroup.Text className="bg-white border-end-0">
-                <FaSearch className="text-primary" />
-              </InputGroup.Text>
-              <Form.Control
-                type="search"
-                placeholder="Buscar entrenadores..."
-                className="border-start-0"
-                value={busqueda}
-                onChange={(e) => {
-                  setBusqueda(e.target.value);
-                  setPaginaActual(1);
-                }}
-                autoComplete="off"
-              />
-            </InputGroup>
-          </Form.Group>
-          
-          <div className="d-flex align-items-center text-success fw-bold">
-            <FaUserCheck size={20} className="me-2" />
-            Activos: {entrenadoresActivos}
+      {/* Filtros y buscador compacto */}
+      <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3 bg-light p-3 rounded shadow-sm">
+        <div className="d-flex gap-2 flex-wrap align-items-center">
+          <div className="position-relative">
+            <Form.Control
+              type="text"
+              placeholder="Buscar entrenadores..."
+              className="ps-4 py-2 rounded-pill"
+              value={busqueda}
+              onChange={(e) => {
+                setBusqueda(e.target.value);
+                setCurrentPage(1);
+              }}
+              autoComplete="off"
+              spellCheck={false}
+              style={{ height: "38px", width: "250px" }}
+            />
+            <BiSearch 
+              className="position-absolute top-50 start-0 translate-middle-y ms-2 text-muted" 
+              size={18} 
+              style={{ zIndex: 10 }}
+            />
           </div>
+          
+          <Form.Select 
+            value={filtroEstado} 
+            onChange={(e) => {
+              setFiltroEstado(e.target.value);
+              setCurrentPage(1);
+            }}
+            className="bg-white border-1 rounded-pill"
+            style={{ height: "38px", width: "180px" }}
+          >
+            <option value="todos">Todos los estados</option>
+            <option value="activos">Solo activos</option>
+            <option value="inactivos">Solo inactivos</option>
+          </Form.Select>
+        </div>
+        
+        <div className="text-muted fw-medium">
+          Mostrando <span className="text-primary fw-bold">{entrenadoresOrdenados.length}</span> de 
+          <span className="text-primary fw-bold"> {entrenadores.length}</span> entrenadores
         </div>
       </div>
 
-      {/* Tabla */}
-      <Card className="border-0 shadow-sm mb-4">
-        <div className="table-responsive">
-          <Table hover className="mb-0">
-            <thead className="bg-primary text-white">
+      {/* Tabla de entrenadores */}
+      <Card className="border-0 shadow-sm mb-3">
+        <div className="table-responsive" style={{ maxHeight: "600px", overflowY: "auto" }}>
+          <Table hover className="mb-0" style={{ fontSize: "0.95rem" }}>
+            <thead className="bg-primary text-white" style={{ position: "sticky", top: 0, zIndex: 1 }}>
               <tr>
                 <th className="fw-bold">ID</th>
                 <th className="fw-bold">NOMBRE</th>
@@ -175,42 +212,45 @@ const EntrenadorList = ({ entrenadores, seleccionar, eliminar }) => {
               </tr>
             </thead>
             <tbody>
-              {entrenadoresPaginados.length > 0 ? (
-                entrenadoresPaginados.map((p) => (
-                  <tr key={p.id} className={p.estado === 0 ? "text-muted" : ""}>
-                    <td className="fw-bold">{p.id}</td>
-                    <td className="fw-medium">{p.nombre}</td>
-                    <td className="fw-medium">{p.apellido}</td>
-                    <td className="fw-medium">{p.telefono}</td>
-                    <td className="fw-medium">{p.correo}</td>
-                    <td className="fw-medium">{p.direccion}</td>
-                    <td>
+              {currentItems.length > 0 ? (
+                currentItems.map((entrenador) => (
+                  <tr key={entrenador.id} className={entrenador.estado === 0 ? "text-muted bg-light" : ""}>
+                    <td className="fw-bold fs-6 align-middle">{entrenador.id}</td>
+                    <td className="fw-medium align-middle">{entrenador.nombre}</td>
+                    <td className="fw-medium align-middle">{entrenador.apellido}</td>
+                    <td className="fw-medium align-middle">{entrenador.telefono}</td>
+                    <td className="fw-medium align-middle">{entrenador.correo}</td>
+                    <td className="fw-medium align-middle">{entrenador.direccion}</td>
+                    <td className="align-middle">
                       <Badge 
                         pill 
-                        className={p.estado === 1 ? "bg-success" : "bg-secondary"}
+                        className={entrenador.estado === 1 ? "bg-success fs-6" : "bg-secondary fs-6"}
                       >
-                        {p.estado === 1 ? "ACTIVO" : "INACTIVO"}
+                        {entrenador.estado === 1 ? "ACTIVO" : "INACTIVO"}
                       </Badge>
                     </td>
-                    <td className="text-center">
+                    <td className="align-middle text-center">
                       <div className="d-flex justify-content-center gap-2">
-                        <Button
-                          variant={p.estado === 1 ? "primary" : "secondary"}
-                          onClick={() => seleccionar(p)}
-                          title="Editar"
-                          disabled={p.estado === 0}
-                          className="d-flex align-items-center"
+                        <Button 
+                          variant="outline-primary" 
+                          onClick={() => seleccionar(entrenador)} 
+                          title="Editar" 
+                          disabled={entrenador.estado === 0}
+                          className="d-flex align-items-center justify-content-center p-2 rounded-circle"
+                          style={{ width: "38px", height: "38px" }}
                         >
-                          <BiEdit className="me-1" /> Editar
+                          <BiEdit size={20} />
                         </Button>
-                        <Button
-                          variant={p.estado === 1 ? "danger" : "secondary"}
-                          onClick={() => confirmarEliminacion(p.id)}
-                          title="Deshabilitar"
-                          disabled={p.estado === 0}
-                          className="d-flex align-items-center"
+                        
+                        <Button 
+                          variant={entrenador.estado === 1 ? "outline-danger" : "outline-secondary"}
+                          onClick={() => entrenador.estado === 1 ? confirmarEliminacion(entrenador.id) : null}
+                          title={entrenador.estado === 1 ? "Deshabilitar" : "Ya deshabilitado"}
+                          className="d-flex align-items-center justify-content-center p-2 rounded-circle"
+                          style={{ width: "38px", height: "38px" }}
+                          disabled={entrenador.estado === 0}
                         >
-                          <BiBlock className="me-1" /> Deshabilitar
+                          <BiBlock size={20} />
                         </Button>
                       </div>
                     </td>
@@ -218,12 +258,14 @@ const EntrenadorList = ({ entrenadores, seleccionar, eliminar }) => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="8" className="text-center py-4">
-                    <div className="bg-light rounded-circle d-inline-block p-3 mb-2">
-                      <FaSearch size={30} className="text-primary" />
+                  <td colSpan="8" className="text-center py-5">
+                    <div className="d-flex flex-column align-items-center justify-content-center">
+                      <div className="bg-light rounded-circle p-4 mb-3">
+                        <BiSearch size={40} className="text-primary" />
+                      </div>
+                      <h5 className="text-primary fw-bold">No se encontraron entrenadores</h5>
+                      <p className="text-muted mb-0">Ajusta tus filtros de búsqueda</p>
                     </div>
-                    <h5 className="text-primary fw-bold">No se encontraron entrenadores</h5>
-                    <p className="text-muted">Ajusta tu búsqueda</p>
                   </td>
                 </tr>
               )}
@@ -233,40 +275,49 @@ const EntrenadorList = ({ entrenadores, seleccionar, eliminar }) => {
       </Card>
 
       {/* Paginación */}
-      {entrenadoresFiltrados.length > 0 && (
-        <div className="d-flex justify-content-between align-items-center bg-light p-3 rounded">
-          <div className="text-muted fw-medium">
-            Página <span className="text-primary fw-bold">{paginaActual}</span> de 
-            <span className="text-primary fw-bold"> {totalPaginas}</span>
-          </div>
-          
-          <Pagination className="mb-0">
+      {entrenadoresOrdenados.length > 0 && (
+        <div className="d-flex justify-content-center">
+          <Pagination>
             <Pagination.First 
-              onClick={irPrimeraPagina} 
-              disabled={paginaActual === 1} 
-              className="rounded"
+              onClick={() => paginate(1)} 
+              disabled={currentPage === 1} 
             />
             <Pagination.Prev 
-              onClick={irAnterior} 
-              disabled={paginaActual === 1} 
-              className="rounded mx-1"
+              onClick={() => paginate(currentPage - 1)} 
+              disabled={currentPage === 1} 
             />
-            {obtenerItemsPaginacion()}
+            
+            {Array.from({ length: totalPages }, (_, i) => {
+              // Mostrar solo algunas páginas alrededor de la actual para no saturar
+              if (
+                i === 0 || 
+                i === totalPages - 1 || 
+                (i >= currentPage - 2 && i <= currentPage + 2)
+              ) {
+                return (
+                  <Pagination.Item
+                    key={i + 1}
+                    active={i + 1 === currentPage}
+                    onClick={() => paginate(i + 1)}
+                  >
+                    {i + 1}
+                  </Pagination.Item>
+                );
+              } else if (i === currentPage - 3 || i === currentPage + 3) {
+                return <Pagination.Ellipsis key={i} />;
+              }
+              return null;
+            })}
+            
             <Pagination.Next 
-              onClick={irSiguiente} 
-              disabled={paginaActual === totalPaginas} 
-              className="rounded mx-1"
+              onClick={() => paginate(currentPage + 1)} 
+              disabled={currentPage === totalPages} 
             />
             <Pagination.Last 
-              onClick={irUltimaPagina} 
-              disabled={paginaActual === totalPaginas} 
-              className="rounded"
+              onClick={() => paginate(totalPages)} 
+              disabled={currentPage === totalPages} 
             />
           </Pagination>
-          
-          <div className="text-muted fw-medium">
-            Registros: <span className="text-primary fw-bold">{entrenadoresOrdenados.length}</span>
-          </div>
         </div>
       )}
     </div>

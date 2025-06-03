@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { FiSearch, FiUsers, FiUserCheck, FiClipboard, FiFileText } from 'react-icons/fi';
+import { FiUsers, FiUserCheck, FiClipboard, FiFileText } from 'react-icons/fi';
 import { obtenerClientes } from '../services/clienteService';
 import { obtenerEntrenadores } from '../services/entrenadorService';
 import { obtenerAsistencias } from '../services/asistenciaService';
 import { obtenerPlanes } from '../services/planService';
 
 const Home = () => {
-  const [searchTerm, setSearchTerm] = useState('');
   const [clientes, setClientes] = useState([]);
   const [entrenadores, setEntrenadores] = useState([]);
   const [asistencias, setAsistencias] = useState([]);
@@ -102,49 +101,6 @@ const Home = () => {
             backgroundColor="#111111"
             textColor="#ffffff"
             accentColor="#FFD700"
-          />
-        </div>
-
-        {/* Search Bar Below Cards */}
-        <div style={{
-          position: 'relative',
-          width: '100%',
-          maxWidth: '350px',
-          marginBottom: '2rem'
-        }}>
-          <FiSearch style={{
-            position: 'absolute',
-            left: '16px',
-            top: '50%',
-            transform: 'translateY(-50%)',
-            color: '#7f8c8d',
-            fontSize: '1.1rem'
-          }} />
-          <input
-            type="text"
-            placeholder="Buscar en el sistema..."
-            value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
-            style={{
-              padding: '12px 16px 12px 45px',
-              width: '100%',
-              borderRadius: '8px',
-              border: '1px solid #e0e0e0',
-              fontSize: '0.95rem',
-              backgroundColor: '#ffffff',
-              boxSizing: 'border-box',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-              transition: 'all 0.3s ease',
-              outline: 'none'
-            }}
-            onFocus={(e) => {
-              e.target.style.boxShadow = '0 2px 12px rgba(255, 215, 0, 0.25)';
-              e.target.style.borderColor = '#FFD700';
-            }}
-            onBlur={(e) => {
-              e.target.style.boxShadow = '0 2px 8px rgba(0,0,0,0.05)';
-              e.target.style.borderColor = '#e0e0e0';
-            }}
           />
         </div>
 
