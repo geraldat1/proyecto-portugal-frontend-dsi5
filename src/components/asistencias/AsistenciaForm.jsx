@@ -190,39 +190,41 @@ const AsistenciaForm = ({ show, handleClose, agregar, actualizar, asistenciaSele
           </Form.Text>
         </Form.Group>
 
+
       {/* Select Entrenador con búsqueda solo por nombre */}
-      <Form.Group className="mb-3 col-md-6">
-        <Form.Label className="fw-bold">
-          Entrenador <span className="text-danger">*</span>
-        </Form.Label>
-        <Select
-          options={entrenadores
-            .filter((entrenador) => entrenador.estado !== 0)
-            .map((entrenador) => ({
-              value: entrenador.id,
-              label: entrenador.nombre,
-            }))
-          }
-          onChange={(selectedOption) =>
-            setIdEntrenador(selectedOption ? selectedOption.value : "")
-          }
-          value={
-            entrenadores
-              .filter((entrenador) => entrenador.estado !== 0)
-              .map((entrenador) => ({
-                value: entrenador.id,
-                label: entrenador.nombre,
-              }))
-              .find((option) => option.value === id_entrenador) || null
-          }
-          placeholder="Buscar entrenador por nombre..."
-          classNamePrefix={!!errores.id_entrenador ? "is-invalid" : ""}
-          isDisabled={!!asistenciaSeleccionada}
-        />
-        {errores.id_entrenador && (
-          <div className="invalid-feedback d-block">{errores.id_entrenador}</div>
-        )}
-      </Form.Group>
+    <Form.Group className="mb-3 col-md-6">
+  <Form.Label className="fw-bold">
+    Entrenador <span className="text-danger">*</span>
+  </Form.Label>
+  <Select
+    options={entrenadores
+      .filter((entrenador) => entrenador.estado !== 0)
+      .map((entrenador) => ({
+        value: entrenador.id,
+        label: `${entrenador.nombre} ${entrenador.apellido}`,
+      }))
+    }
+    onChange={(selectedOption) =>
+      setIdEntrenador(selectedOption ? selectedOption.value : "")
+    }
+    value={
+      entrenadores
+        .filter((entrenador) => entrenador.estado !== 0)
+        .map((entrenador) => ({
+          value: entrenador.id,
+          label: `${entrenador.nombre} ${entrenador.apellido}`,
+        }))
+        .find((option) => option.value === id_entrenador) || null
+    }
+    placeholder="Buscar entrenador por nombre o apellido..."
+    classNamePrefix={!!errores.id_entrenador ? "is-invalid" : ""}
+    isDisabled={!!asistenciaSeleccionada}
+  />
+  {errores.id_entrenador && (
+    <div className="invalid-feedback d-block">{errores.id_entrenador}</div>
+  )}
+</Form.Group>
+
 
 
 

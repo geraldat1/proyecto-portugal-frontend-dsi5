@@ -137,7 +137,7 @@ const PlanList = ({ planes, seleccionar, eliminar }) => {
 
               <Card.Footer className="bg-transparent border-top-0 d-flex justify-content-end gap-2 p-3">
                 <Button
-                  variant="outline-warning"
+                  variant="outline-primary"
                   size="sm"
                   onClick={() => seleccionar(plan)}
                   className="rounded-circle d-flex align-items-center justify-content-center"

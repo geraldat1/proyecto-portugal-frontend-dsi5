@@ -13,21 +13,29 @@ const PagosplanesList = ({ pagosplanes }) => {
   const [fecha, setFecha] = useState("");
   const elementosPorPagina = 5;
 
-  const pagosplanesFiltrados = pagosplanes.filter((p) => {
-    const cliente = p.nombre_cliente?.toLowerCase() || "";
-    const plan = p.nombre_plan?.toLowerCase() || "";
-    const dni = p.dni_cliente?.toLowerCase() || "";
-    const cumpleBusqueda = cliente.includes(busqueda.toLowerCase()) || 
-                          plan.includes(busqueda.toLowerCase()) || 
-                          dni.includes(busqueda.toLowerCase());
-    
-    if (!fecha) return cumpleBusqueda;
-  
-    const fechaPagoStr = new Date(p.fecha).toISOString().split("T")[0];
-    const fechaFiltroStr = fecha;
+const pagosplanesFiltrados = pagosplanes.filter((p) => {
+  const cliente = p.nombre_cliente?.toLowerCase() || "";
+  const plan = p.nombre_plan?.toLowerCase() || "";
+  const dni = p.dni_cliente?.toLowerCase() || "";
+  const cumpleBusqueda = cliente.includes(busqueda.toLowerCase()) || 
+                        plan.includes(busqueda.toLowerCase()) || 
+                        dni.includes(busqueda.toLowerCase());
 
-    return cumpleBusqueda && fechaPagoStr === fechaFiltroStr;
-  });
+  if (!fecha) return cumpleBusqueda;
+
+  const fechaFiltroStr = fecha;
+  const fechaPagoStr = new Date(p.fecha).toISOString().split("T")[0];
+  const fechaRegStr = new Date(p.fecha_reg).toISOString().split("T")[0];
+  const fechaVencStr = new Date(p.fecha_venc).toISOString().split("T")[0];
+
+  const coincideFecha = 
+    fechaPagoStr === fechaFiltroStr ||
+    fechaRegStr === fechaFiltroStr ||
+    fechaVencStr === fechaFiltroStr;
+
+  return cumpleBusqueda && coincideFecha;
+});
+
 
   const pagosplanesOrdenados = [...pagosplanesFiltrados].sort((a, b) => b.id - a.id);
   const totalPages = Math.ceil(pagosplanesOrdenados.length / elementosPorPagina);

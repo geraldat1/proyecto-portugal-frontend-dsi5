@@ -11,10 +11,11 @@ const AsistenciaList = ({ asistencias, seleccionar, entrenadores, detallesPlanes
 
   const elementosPorPagina = 5;
 
-  const obtenerNombreEntrenador = (id_entrenador) => {
-    const entrenador = entrenadores.find(e => e.id === id_entrenador);
-    return entrenador ? entrenador.nombre : "Desconocido";
-  };
+const obtenerNombreEntrenador = (id_entrenador) => {
+  const entrenador = entrenadores.find(e => e.id === id_entrenador);
+  return entrenador ? `${entrenador.nombre} ${entrenador.apellido}` : "Desconocido";
+};
+
 
   const obtenerNombreClientePorDetalle = (id_detalle) => {
     const detalle = detallesPlanes.find(d => String(d.id) === String(id_detalle));

@@ -101,7 +101,7 @@ const Navbar = () => {
             {!isRole2 && (
               <NavDropdown title={menuItem(<FaTasks />, "Servicios")} id="servicios-dropdown">
                 <NavDropdown.Item as={Link} to="/planes">
-                    {menuItem(<FaBoxOpen className="text-success me-2" />, "Planes")}
+                    {menuItem(<FaBoxOpen className="text-success me-2" />, "Membresías")}
                   </NavDropdown.Item>
                 <NavDropdown.Item as={Link} to="/rutinas">
                   {menuItem(<FaTasks className="text-danger me-2" />, "Rutinas")}

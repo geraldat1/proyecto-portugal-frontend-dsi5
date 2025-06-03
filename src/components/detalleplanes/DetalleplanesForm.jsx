@@ -218,38 +218,39 @@ const validarDuplicado = () => {
             )}
           </Form.Group>
 
-          {/* Select Plan con búsqueda por nombre */}
-          <Form.Group className="mb-3">
-            <Form.Label className="fw-bold">
-              Plan <span className="text-danger">*</span>
-            </Form.Label>
-            <Select
-              options={planes
-                .filter((plan) => plan.estado !== 0)
-                .map((plan) => ({
-                  value: plan.id,
-                  label: plan.plan, // Solo muestra el nombre del plan
-                }))
-              }
-              onChange={(selectedOption) =>
-                setIdPlan(selectedOption ? selectedOption.value : "")
-              }
-              value={
-                planes
-                  .filter((plan) => plan.estado !== 0)
-                  .map((plan) => ({
-                    value: plan.id,
-                    label: plan.plan,
-                  }))
-                  .find((option) => option.value === id_plan) || null
-              }
-              placeholder="Buscar plan por nombre..."
-              classNamePrefix={!!errores.id_plan ? "is-invalid" : ""}
-            />
-            {errores.id_plan && (
-              <div className="invalid-feedback d-block">{errores.id_plan}</div>
-            )}
-          </Form.Group>
+ {/* Select Plan con búsqueda por nombre y precio */}
+<Form.Group className="mb-3">
+  <Form.Label className="fw-bold">
+    Plan <span className="text-danger">*</span>
+  </Form.Label>
+  <Select
+    options={planes
+      .filter((plan) => plan.estado !== 0)
+      .map((plan) => ({
+        value: plan.id,
+        label: `${plan.plan} - S/ ${plan.precio_plan}`, // Muestra nombre y precio
+      }))
+    }
+    onChange={(selectedOption) =>
+      setIdPlan(selectedOption ? selectedOption.value : "")
+    }
+    value={
+      planes
+        .filter((plan) => plan.estado !== 0)
+        .map((plan) => ({
+          value: plan.id,
+          label: `${plan.plan} - S/ ${plan.precio_plan}`,
+        }))
+        .find((option) => option.value === id_plan) || null
+    }
+    placeholder="Buscar plan por nombre o precio..."
+    classNamePrefix={!!errores.id_plan ? "is-invalid" : ""}
+  />
+  {errores.id_plan && (
+    <div className="invalid-feedback d-block">{errores.id_plan}</div>
+  )}
+</Form.Group>
+
 
 
 
