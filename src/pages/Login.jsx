@@ -221,7 +221,7 @@ const Login = () => {
         </motion.div>
       </div>
 
-      <style jsx global>{`
+      <style jsx>{`
         :root {
           --primary-color: #000000;
           --secondary-color: #1a1a1a;

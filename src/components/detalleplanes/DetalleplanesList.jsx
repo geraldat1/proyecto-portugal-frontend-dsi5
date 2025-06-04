@@ -5,6 +5,7 @@ import { BiEdit, BiBlock, BiDollar } from "react-icons/bi";
 import { FaSearch, FaCalendarAlt, FaTimes } from "react-icons/fa";
 import { agregarPagosplan } from "../../services/pagosplanesService";
 
+
 const DetalleplanesList = ({ detalleplanes, seleccionar, eliminar, clientes, planes, recargarDatos }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [busqueda, setBusqueda] = useState("");
@@ -75,37 +76,150 @@ const DetalleplanesList = ({ detalleplanes, seleccionar, eliminar, clientes, pla
     });
   };
 
-  const pagar = async (detalleplan) => {
-    // Validaciones frontend
-    if (detalleplan.estado === 2) {
-      return Swal.fire("Advertencia", "Este plan ya ha sido pagado.", "info");
-    }
+const pagar = async (detalleplan) => {
+  // Validaciones frontend
+  if (detalleplan.estado === 2) {
+    return Swal.fire({
+      title: "Advertencia",
+      text: "Este plan ya ha sido pagado.",
+      icon: "info",
+      confirmButtonText: "Entendido",
+      customClass: {
+        confirmButton: "btn btn-primary",
+      },
+    });
+  }
 
-    if (estaFueraDeRango(detalleplan.fecha_limite)) {
-      return Swal.fire("Error", "La fecha límite ha expirado. No se puede pagar.", "error");
-    }
+  if (estaFueraDeRango(detalleplan.fecha_limite)) {
+    return Swal.fire({
+      title: "Error",
+      text: "La fecha límite ha expirado. No se puede pagar.",
+      icon: "error",
+      confirmButtonText: "Entendido",
+      customClass: {
+        confirmButton: "btn btn-danger",
+      },
+    });
+  }
 
-    const plan = planes.find((plan) => plan.id === detalleplan.id_plan);
-    if (!plan) {
-      Swal.fire("Error", "Plan no encontrado.", "error");
-      return;
-    }
+  const plan = planes.find((plan) => plan.id === detalleplan.id_plan);
+  if (!plan) {
+    return Swal.fire({
+      title: "Error",
+      text: "Plan no encontrado.",
+      icon: "error",
+      confirmButtonText: "Entendido",
+      customClass: {
+        confirmButton: "btn btn-danger",
+      },
+    });
+  }
 
-    const pagosplan = {
-      id_detalle: detalleplan.id,
-      id_cliente: detalleplan.id_cliente,
-      id_plan: detalleplan.id_plan,
-      precio: plan.precio_plan,
-    };
+  // Método de pago modal
+  const { value: metodo_pago, isConfirmed } = await Swal.fire({
+    title: "<h4 class='fw-bold'>Selecciona el método de pago</h4>",
+    html: `
+      <div class="text-start">
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="metodo_pago" id="efectivo" value="1">
+          <label class="form-check-label" for="efectivo">
+            Efectivo
+          </label>
+        </div>
+        <div class="form-check mt-2">
+          <input class="form-check-input" type="radio" name="metodo_pago" id="yapeplin" value="2">
+          <label class="form-check-label" for="yapeplin">
+            Yape/Plin
+          </label>
+        </div>
+      </div>
+    `,
+    inputValidator: (value) => !value && "Debes seleccionar un método de pago",
+    showCancelButton: true,
+    confirmButtonText: "Continuar",
+    cancelButtonText: "Cancelar",
+    customClass: {
+      confirmButton: "btn btn-primary me-2",
+      cancelButton: "btn btn-outline-secondary",
+    },
+    buttonsStyling: false,
+    focusConfirm: false,
+    preConfirm: () => {
+      return document.querySelector('input[name="metodo_pago"]:checked')?.value;
+    },
+  });
 
-    try {
-      await agregarPagosplan(pagosplan);
-      Swal.fire("¡Pago realizado!", "El registro ha sido enviado a pagos.", "success");
-      await recargarDatos(); // Actualiza la tabla automáticamente
-    } catch (error) {
-      Swal.fire("Error", "No se pudo realizar el pago.", "error");
-    }
+  if (!isConfirmed) return;
+
+  // Confirmación para Yape/Plin
+  if (metodo_pago === "2") {
+    const confirmacionYape = await Swal.fire({
+      title: "<h4 class='fw-bold'>Pago con Yape/Plin</h4>",
+      html: `
+        <div class="text-center">
+          <p class="mb-3">Escanea el siguiente código QR para realizar el pago:</p>
+          <img src="/imagenes/yapeplin.png" alt="Yape/Plin" class="img-fluid rounded border" style="max-width: 250px;" />
+          <div class="mt-3 alert alert-info">
+            <i class="bi bi-info-circle me-2"></i>
+            Confirma el pago antes de continuar
+          </div>
+        </div>
+      `,
+      showCancelButton: true,
+      confirmButtonText: "Pago confirmado",
+      cancelButtonText: "Cancelar",
+      customClass: {
+        confirmButton: "btn btn-success me-2",
+        cancelButton: "btn btn-outline-secondary",
+      },
+      buttonsStyling: false,
+    });
+
+    if (!confirmacionYape.isConfirmed) return;
+  }
+
+  const pagosplan = {
+    id_detalle: detalleplan.id,
+    id_cliente: detalleplan.id_cliente,
+    id_plan: detalleplan.id_plan,
+    precio: plan.precio_plan,
+    metodo_pago: Number(metodo_pago),
   };
+
+  try {
+    await agregarPagosplan(pagosplan);
+    await Swal.fire({
+      title: "<h4 class='fw-bold'>¡Pago realizado!</h4>",
+      html: `
+        <div class="alert alert-success">
+          <i class="bi bi-check-circle-fill me-2"></i>
+          El registro ha sido enviado a pagos.
+        </div>
+      `,
+      icon: "success",
+      confirmButtonText: "Aceptar",
+      customClass: {
+        confirmButton: "btn btn-success",
+      },
+    });
+    await recargarDatos();
+  } catch (error) {
+    await Swal.fire({
+      title: "<h4 class='fw-bold'>Error</h4>",
+      html: `
+        <div class="alert alert-danger">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+          No se pudo realizar el pago.
+        </div>
+      `,
+      icon: "error",
+      confirmButtonText: "Entendido",
+      customClass: {
+        confirmButton: "btn btn-danger",
+      },
+    });
+  }
+};
 
   const limpiarFiltros = () => {
     setBusqueda("");
@@ -321,26 +435,26 @@ const DetalleplanesList = ({ detalleplanes, seleccionar, eliminar, clientes, pla
               disabled={currentPage === 1} 
             />
             
-            {Array.from({ length: totalPages }, (_, i) => {
-              if (
-                i === 0 || 
-                i === totalPages - 1 || 
-                (i >= currentPage - 2 && i <= currentPage + 2)
-              ) {
-                return (
-                  <Pagination.Item
-                    key={i + 1}
-                    active={i + 1 === currentPage}
-                    onClick={() => paginate(i + 1)}
-                  >
-                    {i + 1}
-                  </Pagination.Item>
-                );
-              } else if (i === currentPage - 3 || i === currentPage + 3) {
-                return <Pagination.Ellipsis key={i} />;
-              }
-              return null;
-            })}
+          {Array.from({ length: totalPages }, (_, i) => {
+            if (
+              i === 0 || 
+              i === totalPages - 1 || 
+              (i >= currentPage - 2 && i <= currentPage + 2)
+            ) {
+              return (
+                <Pagination.Item
+                  key={i + 1}
+                  active={i + 1 === currentPage}
+                  onClick={() => paginate(i + 1)}
+                >
+                  {i + 1}
+                </Pagination.Item>
+              );
+            } else if (i === currentPage - 3 || i === currentPage + 3) {
+              return <Pagination.Ellipsis key={`ellipsis-${i}`} />;
+            }
+            return null;
+          })}
             
             <Pagination.Next 
               onClick={() => paginate(currentPage + 1)} 

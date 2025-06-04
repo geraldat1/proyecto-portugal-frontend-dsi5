@@ -1,167 +1,252 @@
-/* === NAVBAR CUSTOM GENERAL === */
-.navbar-custom {
-  background-color: #121212; /* Negro profundo (más suave que #000) */
-  padding: 0.75rem 1.5rem;
+/* === NAVBAR TWO-TONE === */
+.navbar-two-tone {
+  position: relative;
+  z-index: 1000;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* === PARTE SUPERIOR ADMINISTRATIVA MEJORADA === */
+.navbar-top {
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+  color: white;
+  border-bottom: 1px solid rgba(249, 229, 20, 0.3);
+  padding: 0.8rem 0;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+}
+
+.admin-section {
+  position: relative;
+  padding-left: 1.5rem;
+}
+
+.admin-section::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 30px;
+  width: 1px;
+  background: linear-gradient(to bottom, transparent, #d4af37, transparent);
+}
+
+.admin-icon {
+  background: rgba(212, 175, 55, 0.1);
+  border-radius: 50%;
+  padding: 0.5rem;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid rgba(249, 229, 20, 0.2); /* Borde inferior sutil amarillo */
+  justify-content: center;
 }
 
-.navbar-custom .nav-link {
-  color: #FFFFFF !important; /* Blanco puro para contraste */
-  padding: 0.5rem 1rem;
-  margin: 0 0.25rem;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  border-bottom: 2px solid transparent;
+.text-gold {
+  color: #F9E514;
 }
 
-.navbar-custom .nav-link:hover,
-.navbar-custom .nav-link:focus {
-  color: #F9E514 !important; /* Amarillo base (hover) */
-  border-bottom: 2px solid #F9E514;
-  background-color: rgba(249, 229, 20, 0.08); /* Amarillo con 8% opacidad */
+.admin-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: #F9E514;
 }
 
+.admin-subtitle {
+  font-size: 0.75rem;
+  color: #aaa;
+  font-weight: 300;
+  letter-spacing: 0.3px;
+}
+
+/* === LOGO === */
 .navbar-logo {
   width: 70px;
   height: auto;
+  transition: all 0.3s ease;
+  filter: drop-shadow(0 0 5px rgba(212, 175, 55, 0.3));
 }
 
-/* Oculta el caret de Bootstrap */
+/* En tu CSS global o componente */
 .no-caret::after {
   display: none !important;
 }
 
-/* === DROPDOWN GENERAL === */
-.navbar-custom .dropdown-menu {
-  background-color: #1E1E1E !important; /* Negro más claro que el navbar */
-  border-radius: 8px;
-  margin-top: 0.5rem;
-  border: 1px solid rgba(249, 229, 20, 0.3); /* Borde amarillo sutil */
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+
+/* === MENÚ USUARIO - DISEÑO FORMAL === */
+.user-avatar {
+  background: rgba(212, 175, 55, 0.1);
+  border-radius: 50%;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.navbar-custom .dropdown-menu a {
-  color: #E0E0E0 !important; /* Gris muy claro (no blanco puro) */
-  padding: 0.5rem 1.25rem;
+.user-info {
+  text-align: left;
+}
+
+.user-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.user-role {
+  font-size: 0.75rem;
+  color: #F9E514;
+  font-weight: 300;
+}
+
+.dropdown-toggle-user {
+  background: transparent !important;
+  color: #fff !important;
+  border: 1px solid rgba(249, 229, 20, 0.3) !important;
+  padding: 0.4rem 1.2rem !important;
+  border-radius: 30px !important;
+  font-weight: 400;
   transition: all 0.3s ease;
+  backdrop-filter: blur(5px);
 }
 
-.navbar-custom .dropdown-menu a:hover {
-  background-color: #F9E514 !important;
-  color: #121212 !important; /* Texto negro al hover */
+.dropdown-toggle-user:hover {
+  background: rgba(249, 229, 20, 0.1) !important;
+  border: 1px solid #E6D112 !important;
+  transform: translateY(1px);
 }
 
-/* === BOTÓN DROPDOWN TOGGLE GENERAL === */
-.navbar-custom .dropdown-toggle {
-  background-color: transparent !important;
-  color: white !important;
-  border: none;
-  padding: 0.5rem 1rem;
-  font-weight: 500;
-  transition: all 0.3s ease;
-}
-
-.navbar-custom .dropdown-toggle:hover,
-.navbar-custom .dropdown-toggle:focus {
-  color: #FFD700 !important;
-}
-
-/* === USUARIO DROPDOWN === */
-.dropdown-user-wrapper {
-  position: relative;
-  display: inline-block;
-  width: 100%; /* Asegura adaptabilidad en móvil */
-}
-
+/* === MENÚ DESPLEGABLE MEJORADO === */
 .dropdown-menu-user {
-  min-width: 220px;
-  position: absolute;
-  left: 0;
-  top: 100%;
-  z-index: 1000;
-  background-color: #000; /* Asegura visibilidad */
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%) !important;
+  border: 1px solid rgba(200, 170, 50, 0.3) !important;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5) !important;
+  border-radius: 8px !important;
+  overflow: hidden;
 }
 
-.dropdown-menu-user.show {
-  opacity: 1;
-  visibility: visible;
+.dropdown-header {
+  background: rgba(20, 20, 20, 0.8);
+  border-bottom: 1px solid rgba(200, 170, 50, 0.2);
 }
 
 .dropdown-menu-user a {
-  color: #fff;
-  padding: 0.75rem 1.25rem;
-  transition: background-color 0.3s ease, color 0.3s ease;
-  font-size: 0.95rem;
-  display: block;
-  text-decoration: none;
+  color: #e0e0e0 !important;
+  padding: 0.7rem 1.5rem !important;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+  position: relative;
+}
+
+.dropdown-menu-user a::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 3px;
+  background: #F9E514;
+  transform: scaleY(0);
+  transition: transform 0.2s ease;
 }
 
 .dropdown-menu-user a:hover {
-  background-color: #FFD700;
-  color: #000;
+  background: rgba(212, 175, 55, 0.1) !important;
+  padding-left: 1.8rem !important;
 }
 
-/* === BOTÓN USUARIO === */
-.dropdown-toggle-user {
-  background-color: #F9E514 !important;
-  color: #121212 !important; /* Texto negro */
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  font-weight: 600;
+.dropdown-menu-user a:hover::before {
+  transform: scaleY(1);
+}
+
+/* === PARTE INFERIOR BLANCA === */
+.navbar-bottom {
+  background-color: white;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.navbar-custom-bottom {
+  padding: 0.8rem 0;
+}
+
+.navbar-custom-bottom .nav-link {
+  color: #333 !important;
+  padding: 0.6rem 1.5rem;
+  margin: 0 0.1rem;
+  font-weight: 500;
+  font-size: 0.95rem;
   transition: all 0.3s ease;
+  border-bottom: 2px solid transparent;
+  position: relative;
+  letter-spacing: 0.3px;
 }
 
-
-.dropdown-toggle-user:hover {
-  background-color: #E6D112 !important; /* Amarillo más oscuro */
-  transform: translateY(-1px); /* Efecto sutil de elevación */
+.navbar-custom-bottom .nav-link:hover,
+.navbar-custom-bottom .nav-link:focus {
+  color: #0a0a0a !important;
+  border-bottom: 2px solid #F9E514;
+  background-color: rgba(212, 175, 55, 0.05);
 }
 
-
-/* === ICONOS === */
-.menu-icon {
-  color: #FFFFFF;
-  font-size: 1.4rem;
-  cursor: pointer;
-  margin-left: 1rem;
-  transition: color 0.3s ease;
-}
-
-.menu-icon:hover {
+.nav-dropdown .dropdown-toggle::after {
   color: #F9E514;
-  transform: scale(1.1); /* Pequeño zoom al hover */
+  margin-left: 0.5rem;
+}
+
+/* === DROPDOWN EN PARTE BLANCA === */
+.navbar-custom-bottom .dropdown-menu {
+  background-color: white !important;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  padding: 0.5rem 0;
+}
+
+.navbar-custom-bottom .dropdown-menu a {
+  color: #2C2C2C !important;
+  font-size: 0.9rem;
+  padding: 0.6rem 1.5rem;
+  transition: all 0.2s ease;
+}
+
+.navbar-custom-bottom .dropdown-menu a:hover {
+  background-color: #f8f9fa !important;
+  color: #0a0a0a !important;
+  padding-left: 1.8rem;
 }
 
 /* === RESPONSIVE === */
+@media (max-width: 992px) {
+  .admin-section {
+    display: none;
+  }
+  
+  .navbar-top {
+    padding: 0.7rem 0;
+  }
+  
+  .navbar-custom-bottom .navbar-collapse {
+    background-color: white;
+    padding: 1rem;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 4px 6px rgba(18,18,18,0.1);
+  }
+  
+  .navbar-custom-bottom .nav-link {
+    padding: 0.8rem 1rem;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .navbar-logo {
+    width: 65px;
+  }
+  
+  .dropdown-toggle-user {
+    padding: 0.4rem 1rem !important;
+    font-size: 0.9rem;
+  }
+}
+
 @media (max-width: 768px) {
-  .navbar-custom {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .navbar-custom .nav-link,
-  .navbar-custom .dropdown-toggle {
-    padding: 0.5rem;
-    margin: 0.25rem 0;
-  }
-
-  .dropdown-menu-user {
-    position: static;
-    width: 100%;
-    min-width: unset;
-    margin-top: 0.5rem;
-  }
-
-  .dropdown-menu-user {
-    right: 10px; /* Ajustar más a la derecha en pantallas pequeñas */
-  }
-
-  .menu-icon {
-    font-size: 1.6rem;
+  .user-info {
+    display: none;
   }
 }

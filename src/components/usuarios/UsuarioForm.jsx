@@ -9,6 +9,7 @@ const UsuarioForm = ({
   agregar,
   actualizar,
   usuarioSeleccionado,
+  deshabilitarRol = false
 }) => {
   const [usuario, setUsuario] = useState("");
   const [nombre, setNombre] = useState("");
@@ -88,6 +89,7 @@ const UsuarioForm = ({
 
       if (usuarioSeleccionado) {
         await actualizar(usuarioSeleccionado.id, usuarioData);
+        setClave(""); // Limpiar solo el campo contraseña
         Swal.fire({
           icon: "success",
           title: "Usuario actualizado",
@@ -125,7 +127,7 @@ const UsuarioForm = ({
       <Modal.Title className="fw-bold">
         {usuarioSeleccionado ? (
           <>
-            <i className="bi bi-lock me-2"></i>Cambiar Contraseña
+            <i className="bi bi-lock me-2"></i>Datos del Usuario: {usuarioSeleccionado.nombre}
           </>
         ) : (
           <>
@@ -255,6 +257,7 @@ const UsuarioForm = ({
               onChange={(e) => setRol(e.target.value)}
               isInvalid={!!errores.rol}
               required
+              disabled={deshabilitarRol}
             >
               <option value="">Seleccione un rol</option>
               <option value="1">Administrador</option>

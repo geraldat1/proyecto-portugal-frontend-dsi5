@@ -179,9 +179,9 @@ const validarDuplicado = () => {
       <Modal.Header closeButton className="bg-light">
         <Modal.Title className="fw-bold">
           {detalleplanSeleccionada ? (
-            <><i className="bi bi-pencil-square me-2"></i>Editar Detalle Plan</>
+            <><i className="bi bi-pencil-square me-2"></i>Editar Elección</>
           ) : (
-            <><i className="bi bi-plus-circle me-2"></i>Agregar Detalle Plan</>
+            <><i className="bi bi-plus-circle me-2"></i>Agregar Membresía al Cliente</>
           )}
         </Modal.Title>
       </Modal.Header>
@@ -212,6 +212,7 @@ const validarDuplicado = () => {
               }
               placeholder="Selecciona un cliente"
               classNamePrefix={!!errores.id_cliente ? "is-invalid" : ""}
+              isDisabled={!!detalleplanSeleccionada}  // <-- Aquí
             />
             {errores.id_cliente && (
               <div className="invalid-feedback d-block">{errores.id_cliente}</div>
@@ -267,7 +268,7 @@ const validarDuplicado = () => {
 
                 // Establecer fecha límite automáticamente como 5 días después
                 if (nuevaFechaVenc) {
-                  setFechaLimite(addDays(nuevaFechaVenc, 5));
+                  setFechaLimite(addDays(nuevaFechaVenc, 2));
                 } else {
                   setFechaLimite(null);
                 }

@@ -253,7 +253,7 @@ const asistenciasFiltradas = asistencias.filter((a) => {
                   </Pagination.Item>
                 );
               } else if (i === currentPage - 3 || i === currentPage + 3) {
-                return <Pagination.Ellipsis key={i} />;
+                return <Pagination.Ellipsis key={`ellipsis-${i}`} />;
               }
               return null;
             })}

@@ -16,7 +16,7 @@ const Pagosplanes = () => {
 
   return (
     <div>
-      <h2>Registro de Planes Pagados</h2>
+      <h2>Registro de Membresías Pagadas</h2>
       <PagosplanesList pagosplanes={pagosplanes} />
     </div>
   );

@@ -13,29 +13,21 @@ const PagosplanesList = ({ pagosplanes }) => {
   const [fecha, setFecha] = useState("");
   const elementosPorPagina = 5;
 
-const pagosplanesFiltrados = pagosplanes.filter((p) => {
-  const cliente = p.nombre_cliente?.toLowerCase() || "";
-  const plan = p.nombre_plan?.toLowerCase() || "";
-  const dni = p.dni_cliente?.toLowerCase() || "";
-  const cumpleBusqueda = cliente.includes(busqueda.toLowerCase()) || 
-                        plan.includes(busqueda.toLowerCase()) || 
-                        dni.includes(busqueda.toLowerCase());
+  const pagosplanesFiltrados = pagosplanes.filter((p) => {
+    const cliente = p.nombre_cliente?.toLowerCase() || "";
+    const plan = p.nombre_plan?.toLowerCase() || "";
+    const dni = p.dni_cliente?.toLowerCase() || "";
+    const cumpleBusqueda = cliente.includes(busqueda.toLowerCase()) || 
+                          plan.includes(busqueda.toLowerCase()) || 
+                          dni.includes(busqueda.toLowerCase());
+    
+    if (!fecha) return cumpleBusqueda;
+  
+    const fechaPagoStr = new Date(p.fecha).toISOString().split("T")[0];
+    const fechaFiltroStr = fecha;
 
-  if (!fecha) return cumpleBusqueda;
-
-  const fechaFiltroStr = fecha;
-  const fechaPagoStr = new Date(p.fecha).toISOString().split("T")[0];
-  const fechaRegStr = new Date(p.fecha_reg).toISOString().split("T")[0];
-  const fechaVencStr = new Date(p.fecha_venc).toISOString().split("T")[0];
-
-  const coincideFecha = 
-    fechaPagoStr === fechaFiltroStr ||
-    fechaRegStr === fechaFiltroStr ||
-    fechaVencStr === fechaFiltroStr;
-
-  return cumpleBusqueda && coincideFecha;
-});
-
+    return cumpleBusqueda && fechaPagoStr === fechaFiltroStr;
+  });
 
   const pagosplanesOrdenados = [...pagosplanesFiltrados].sort((a, b) => b.id - a.id);
   const totalPages = Math.ceil(pagosplanesOrdenados.length / elementosPorPagina);
@@ -174,7 +166,7 @@ const generarReporteGeneral = () => {
       // Tabla principal con estilo formal
 autoTable(doc, {
   startY: 80,
-  head: [["ID", "Detalle", "Cliente", "DNI", "Plan", "Precio", "Fecha Rp.", "Hora Rp.", "F. Reg.", "F. Venc.", "Estado"]],
+  head: [["ID", "Det", "Cliente", "DNI", "Plan", "Precio", "M. Pago", "F. Rp.", "Hr. Rp.", "F. Reg.", "F. Venc.", "Estado"]],
   body: pagosplanesOrdenados.map((p) => [
     p.id || "N/A",
     p.id_detalle || "N/A",
@@ -182,6 +174,11 @@ autoTable(doc, {
     p.dni_cliente || "Sin DNI",
     p.nombre_plan || "Sin plan",
     `S/ ${parseFloat(p.precio || 0).toFixed(2)}`,
+ (p.metodo_pago === 1 || p.metodo_pago === "1")
+      ? "Efectivo"
+      : (p.metodo_pago === 2 || p.metodo_pago === "2")
+      ? "Yape/Plin"
+      : "Desconocido",
     p.fecha ? new Date(p.fecha).toLocaleDateString("es-PE") : "Sin fecha",
     p.hora || "Sin hora",
     p.fecha_reg ? new Date(p.fecha_reg).toLocaleDateString("es-PE") : "Sin fecha",
@@ -209,19 +206,21 @@ autoTable(doc, {
         alternateRowStyles: {
           fillColor: [255, 255, 255]   // Sin filas alternadas de color
         },
-  columnStyles: {
-    0: { halign: 'center', cellWidth: 11 },   // ID
-    1: { halign: 'center', cellWidth: 14 },   // Detalle
-    2: { halign: 'left', cellWidth: 20 },     // Cliente
-    3: { halign: 'center', cellWidth: 21 },   // DNI
-    4: { halign: 'left', cellWidth: 20 },     // Plan
-    5: { halign: 'right', cellWidth: 18 },    // Precio
-    6: { halign: 'center', cellWidth: 19 },   // Fecha Rp.
-    7: { halign: 'center', cellWidth: 19 },   // Hora Rp.
-    8: { halign: 'center', cellWidth: 19 },   // F. Registro
-    9: { halign: 'center', cellWidth: 19 },   // F. Vencimiento
-    10: { halign: 'center', cellWidth: 18 }   // Estado
-  },
+        columnStyles: {
+          0: { halign: 'center' },
+          1: { halign: 'center' },
+          2: { halign: 'left' },
+          3: { halign: 'center' },
+          4: { halign: 'left' },
+          5: { halign: 'right' },
+          6: { halign: 'center' },
+          7: { halign: 'center' },
+          8: { halign: 'center' },
+          9: { halign: 'center' },
+          10: { halign: 'center' },
+          11: { halign: 'center' }
+
+        },
         didParseCell: (data) => {
           // Mantener colores diferenciados solo para el estado, pero más sutiles
           if (data.section === 'body' && data.column.index === 8) {
@@ -554,6 +553,7 @@ autoTable(doc, {
                 <th className="fw-bold">DNI</th>
                 <th className="fw-bold">PLAN</th>
                 <th className="fw-bold">PRECIO</th>
+                <th className="fw-bold">M. PAGO</th>
                 <th className="fw-bold">FECHA RP.</th>
                 <th className="fw-bold">HORA RP.</th>
                 <th className="fw-bold">FECHA REG.</th>
@@ -572,6 +572,13 @@ autoTable(doc, {
                     <td className="fw-medium align-middle">{p.dni_cliente?.trim() ? p.dni_cliente : "Sin DNI"}</td>
                     <td className="fw-medium align-middle">{p.nombre_plan}</td>
                     <td className="fw-medium align-middle text-end">S/ {parseFloat(p.precio).toFixed(2)}</td>
+                    <td className="fw-medium align-middle">
+                      {p.metodo_pago === 1 || p.metodo_pago === "1"
+                        ? "Efectivo"
+                        : p.metodo_pago === 2 || p.metodo_pago === "2"
+                        ? "Yape/Plin"
+                        : "Desconocido"}
+                    </td>
                     <td className="fw-medium align-middle">{new Date(p.fecha).toLocaleDateString("es-PE")}</td>
                     <td className="fw-medium align-middle">{p.hora}</td>
                     <td className="fw-medium align-middle">{new Date(p.fecha_reg).toLocaleDateString("es-PE")}</td>
@@ -626,25 +633,25 @@ autoTable(doc, {
             />
             
             {Array.from({ length: totalPages }, (_, i) => {
-              if (
-                i === 0 || 
-                i === totalPages - 1 || 
-                (i >= currentPage - 2 && i <= currentPage + 2)
-              ) {
-                return (
-                  <Pagination.Item
-                    key={i + 1}
-                    active={i + 1 === currentPage}
-                    onClick={() => paginate(i + 1)}
-                  >
-                    {i + 1}
-                  </Pagination.Item>
-                );
-              } else if (i === currentPage - 3 || i === currentPage + 3) {
-                return <Pagination.Ellipsis key={i} />;
-              }
-              return null;
-            })}
+            if (
+              i === 0 || 
+              i === totalPages - 1 || 
+              (i >= currentPage - 2 && i <= currentPage + 2)
+            ) {
+              return (
+                <Pagination.Item
+                  key={i + 1}
+                  active={i + 1 === currentPage}
+                  onClick={() => paginate(i + 1)}
+                >
+                  {i + 1}
+                </Pagination.Item>
+              );
+            } else if (i === currentPage - 3 || i === currentPage + 3) {
+              return <Pagination.Ellipsis key={`ellipsis-${i}`} />;
+            }
+            return null;
+          })}
             
             <Pagination.Next 
               onClick={() => paginate(currentPage + 1)} 
