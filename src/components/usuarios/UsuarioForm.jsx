@@ -273,7 +273,7 @@ const UsuarioForm = ({
               Cancelar
             </Button>
             <Button variant="primary" type="submit" className="px-4 fw-bold">
-              {usuarioSeleccionado ? "Guardar Cambios" : "Registrar Usuario"}
+              {usuarioSeleccionado ? "Actualizar Datos" : "Registrar Usuario"}
             </Button>
           </div>
         </Form>

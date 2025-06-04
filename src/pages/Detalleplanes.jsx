@@ -83,7 +83,7 @@ const Detalleplanes = () => {
         }}
       >
         <FaPlus className="me-2" />
-        Nuevo Proceso
+        Agregar Membresía al Cliente
       </Button>
 
 

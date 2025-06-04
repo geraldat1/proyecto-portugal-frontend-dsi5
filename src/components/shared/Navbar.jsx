@@ -65,6 +65,9 @@ const Navbar = () => {
 
   const isRole2 = user?.role === '2' || user?.rol === '2';
 
+  const isRole1or2 = user?.role === '1' || user?.rol === '1' || user?.role === '2' || user?.rol === '2';
+
+
   const handleCambiarContrasena = () => {
     // Prepara los datos del usuario logueado para el formulario
     setUsuarioSeleccionado({
@@ -248,7 +251,7 @@ const Navbar = () => {
         agregar={null}
         actualizar={actualizarUsuario}
         usuarioSeleccionado={usuarioSeleccionado}
-        deshabilitarRol={isRole2}
+        deshabilitarRol={isRole1or2}
       />
     </div>
   );

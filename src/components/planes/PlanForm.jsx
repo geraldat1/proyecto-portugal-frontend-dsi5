@@ -224,22 +224,7 @@ const PlanForm = ({ show, handleClose, agregar, actualizar, planSeleccionado }) 
         </Form.Group>
       </div>
 
-      {planSeleccionado && (
-        <div className="row mt-2">
-          <div className="col-md-6">
-            <Form.Group className="mb-3">
-              <Form.Label className="fw-bold">Estado</Form.Label>
-              <Form.Control type="text" value={estado} disabled />
-            </Form.Group>
-          </div>
-          <div className="col-md-6">
-            <Form.Group className="mb-3">
-              <Form.Label className="fw-bold">ID Usuario</Form.Label>
-              <Form.Control type="text" value={id_user} disabled />
-            </Form.Group>
-          </div>
-        </div>
-      )}
+ 
 
       <div className="d-flex justify-content-end gap-3 mt-4">
         <Button 

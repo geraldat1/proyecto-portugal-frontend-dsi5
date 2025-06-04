@@ -17,16 +17,25 @@ const PagosplanesList = ({ pagosplanes }) => {
     const cliente = p.nombre_cliente?.toLowerCase() || "";
     const plan = p.nombre_plan?.toLowerCase() || "";
     const dni = p.dni_cliente?.toLowerCase() || "";
-    const cumpleBusqueda = cliente.includes(busqueda.toLowerCase()) || 
-                          plan.includes(busqueda.toLowerCase()) || 
-                          dni.includes(busqueda.toLowerCase());
-    
+    const cumpleBusqueda =
+      cliente.includes(busqueda.toLowerCase()) ||
+      plan.includes(busqueda.toLowerCase()) ||
+      dni.includes(busqueda.toLowerCase());
+
     if (!fecha) return cumpleBusqueda;
-  
+
     const fechaPagoStr = new Date(p.fecha).toISOString().split("T")[0];
+    const fechaRegStr = p.fecha_reg ? new Date(p.fecha_reg).toISOString().split("T")[0] : "";
+    const fechaVencStr = p.fecha_venc ? new Date(p.fecha_venc).toISOString().split("T")[0] : "";
     const fechaFiltroStr = fecha;
 
-    return cumpleBusqueda && fechaPagoStr === fechaFiltroStr;
+    // Cumple si alguna de las fechas coincide
+    const coincideFecha =
+      fechaPagoStr === fechaFiltroStr ||
+      fechaRegStr === fechaFiltroStr ||
+      fechaVencStr === fechaFiltroStr;
+
+    return cumpleBusqueda && coincideFecha;
   });
 
   const pagosplanesOrdenados = [...pagosplanesFiltrados].sort((a, b) => b.id - a.id);
@@ -166,7 +175,7 @@ const generarReporteGeneral = () => {
       // Tabla principal con estilo formal
 autoTable(doc, {
   startY: 80,
-  head: [["ID", "Det", "Cliente", "DNI", "Plan", "Precio", "M. Pago", "F. Rp.", "Hr. Rp.", "F. Reg.", "F. Venc.", "Estado"]],
+  head: [["ID", "Det", "Cliente", "DNI", "Plan", "Precio", "M. Pago", "F. Pago.", "Hr. Pago.", "F. Inicio.", "F. Venc.", "Estado"]],
   body: pagosplanesOrdenados.map((p) => [
     p.id || "N/A",
     p.id_detalle || "N/A",
@@ -547,16 +556,15 @@ autoTable(doc, {
           <Table hover className="mb-0" style={{ fontSize: "0.95rem" }}>
             <thead className="bg-primary text-white" style={{ position: "sticky", top: 0, zIndex: 1 }}>
               <tr>
-                <th className="fw-bold">N°</th>
-                <th className="fw-bold">DETALLE</th>
+                <th className="fw-bold">N° PAGO</th>
                 <th className="fw-bold">CLIENTE</th>
                 <th className="fw-bold">DNI</th>
                 <th className="fw-bold">PLAN</th>
                 <th className="fw-bold">PRECIO</th>
                 <th className="fw-bold">M. PAGO</th>
-                <th className="fw-bold">FECHA RP.</th>
-                <th className="fw-bold">HORA RP.</th>
-                <th className="fw-bold">FECHA REG.</th>
+                <th className="fw-bold">FECHA PAGO</th>
+                <th className="fw-bold">HORA PAGO</th>
+                <th className="fw-bold">FECHA INICIO</th>
                 <th className="fw-bold">FECHA VENC.</th>
                 <th className="fw-bold">ESTADO</th>
                 <th className="fw-bold text-center">ACCIÓN</th>
@@ -567,17 +575,24 @@ autoTable(doc, {
                 currentItems.map((p) => (
                   <tr key={p.id}>
                     <td className="fw-bold fs-6 align-middle">{p.id}</td>
-                    <td className="fw-medium align-middle">{p.id_detalle}</td>
                     <td className="fw-medium align-middle">{p.nombre_cliente}</td>
                     <td className="fw-medium align-middle">{p.dni_cliente?.trim() ? p.dni_cliente : "Sin DNI"}</td>
                     <td className="fw-medium align-middle">{p.nombre_plan}</td>
                     <td className="fw-medium align-middle text-end">S/ {parseFloat(p.precio).toFixed(2)}</td>
-                    <td className="fw-medium align-middle">
-                      {p.metodo_pago === 1 || p.metodo_pago === "1"
-                        ? "Efectivo"
-                        : p.metodo_pago === 2 || p.metodo_pago === "2"
-                        ? "Yape/Plin"
-                        : "Desconocido"}
+                    <td className="align-middle">
+                      <span className={`badge rounded-pill ${
+                        p.metodo_pago === 1 || p.metodo_pago === "1" 
+                          ? "bg-primary" 
+                          : p.metodo_pago === 2 || p.metodo_pago === "2" 
+                            ? "bg-info" 
+                            : "bg-secondary"
+                      }`}>
+                        {p.metodo_pago === 1 || p.metodo_pago === "1"
+                          ? "Efectivo"
+                          : p.metodo_pago === 2 || p.metodo_pago === "2"
+                          ? "Yape/Plin"
+                          : "Desconocido"}
+                      </span>
                     </td>
                     <td className="fw-medium align-middle">{new Date(p.fecha).toLocaleDateString("es-PE")}</td>
                     <td className="fw-medium align-middle">{p.hora}</td>

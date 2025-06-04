@@ -77,100 +77,180 @@ const DetalleplanesList = ({ detalleplanes, seleccionar, eliminar, clientes, pla
   };
 
 const pagar = async (detalleplan) => {
-  // Validaciones frontend
+  // Función helper para formatear precios de forma segura
+  const formatPrice = (price) => {
+    const num = Number(price);
+    return isNaN(num) ? '0.00' : num.toFixed(2);
+  };
+
+  // Validaciones frontend con diseño mejorado
   if (detalleplan.estado === 2) {
     return Swal.fire({
-      title: "Advertencia",
-      text: "Este plan ya ha sido pagado.",
+      title: "<h4 class='fw-bold text-primary'>Plan ya pagado</h4>",
+      html: `
+        <div class="text-center">
+          <i class="bi bi-info-circle text-primary" style="font-size: 3rem;"></i>
+          <p class="mt-3">Este plan ya ha sido pagado anteriormente.</p>
+        </div>
+      `,
       icon: "info",
       confirmButtonText: "Entendido",
       customClass: {
-        confirmButton: "btn btn-primary",
+        confirmButton: "btn btn-primary px-4 py-2",
+        popup: 'rounded-15'
       },
+      buttonsStyling: false
     });
   }
 
   if (estaFueraDeRango(detalleplan.fecha_limite)) {
     return Swal.fire({
-      title: "Error",
-      text: "La fecha límite ha expirado. No se puede pagar.",
+      title: "<h4 class='fw-bold text-danger'>Fecha límite expirada</h4>",
+      html: `
+        <div class="text-center">
+          <i class="bi bi-calendar-x text-danger" style="font-size: 3rem;"></i>
+          <p class="mt-3">La fecha límite para este pago ha expirado.</p>
+          <p class="text-muted">Por favor contacte al administrador.</p>
+        </div>
+      `,
       icon: "error",
       confirmButtonText: "Entendido",
       customClass: {
-        confirmButton: "btn btn-danger",
+        confirmButton: "btn btn-danger px-4 py-2",
+        popup: 'rounded-15'
       },
+      buttonsStyling: false
     });
   }
 
   const plan = planes.find((plan) => plan.id === detalleplan.id_plan);
   if (!plan) {
     return Swal.fire({
-      title: "Error",
-      text: "Plan no encontrado.",
+      title: "<h4 class='fw-bold text-danger'>Plan no encontrado</h4>",
+      html: `
+        <div class="text-center">
+          <i class="bi bi-exclamation-triangle text-warning" style="font-size: 3rem;"></i>
+          <p class="mt-3">No se encontró información del plan asociado.</p>
+        </div>
+      `,
       icon: "error",
       confirmButtonText: "Entendido",
       customClass: {
-        confirmButton: "btn btn-danger",
+        confirmButton: "btn btn-danger px-4 py-2",
+        popup: 'rounded-15'
       },
+      buttonsStyling: false
     });
   }
 
-  // Método de pago modal
+  // Validación y conversión segura del precio
+  const precio = Number(plan.precio_plan);
+  if (isNaN(precio) || precio <= 0) {
+    return Swal.fire({
+      title: "<h4 class='fw-bold text-danger'>Error en el precio</h4>",
+      html: `
+        <div class="text-center">
+          <i class="bi bi-currency-exchange text-danger" style="font-size: 3rem;"></i>
+          <p class="mt-3">El precio del plan no es válido o está mal formateado.</p>
+          <p class="text-muted">Precio recibido: ${plan.precio_plan}</p>
+        </div>
+      `,
+      icon: "error",
+      confirmButtonText: "Entendido",
+      customClass: {
+        confirmButton: "btn btn-danger px-4 py-2",
+        popup: 'rounded-15'
+      },
+      buttonsStyling: false
+    });
+  }
+
+  // Método de pago modal con diseño mejorado
   const { value: metodo_pago, isConfirmed } = await Swal.fire({
-    title: "<h4 class='fw-bold'>Selecciona el método de pago</h4>",
+    title: "<h4 class='fw-bold text-dark mb-4'>Método de pago</h4>",
     html: `
       <div class="text-start">
-        <div class="form-check">
-          <input class="form-check-input" type="radio" name="metodo_pago" id="efectivo" value="1">
-          <label class="form-check-label" for="efectivo">
-            Efectivo
-          </label>
+        <div class="payment-method-card mb-3 p-3 rounded-3 border" onclick="document.getElementById('efectivo').click()">
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="metodo_pago" id="efectivo" value="1">
+            <label class="form-check-label d-flex align-items-center" for="efectivo">
+              <i class="bi bi-cash-coin text-success me-3" style="font-size: 1.5rem;"></i>
+              <div>
+                <h6 class="mb-0 fw-bold">Efectivo</h6>
+                <small class="text-muted">Pago en efectivo al administrador</small>
+              </div>
+            </label>
+          </div>
         </div>
-        <div class="form-check mt-2">
-          <input class="form-check-input" type="radio" name="metodo_pago" id="yapeplin" value="2">
-          <label class="form-check-label" for="yapeplin">
-            Yape/Plin
-          </label>
+        
+        <div class="payment-method-card p-3 rounded-3 border" onclick="document.getElementById('yapeplin').click()">
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="metodo_pago" id="yapeplin" value="2">
+            <label class="form-check-label d-flex align-items-center" for="yapeplin">
+              <i class="bi bi-phone text-primary me-3" style="font-size: 1.5rem;"></i>
+              <div>
+                <h6 class="mb-0 fw-bold">Yape/Plin</h6>
+                <small class="text-muted">Pago digital mediante QR</small>
+              </div>
+            </label>
+          </div>
         </div>
       </div>
     `,
-    inputValidator: (value) => !value && "Debes seleccionar un método de pago",
     showCancelButton: true,
-    confirmButtonText: "Continuar",
+    confirmButtonText: "Continuar <i class='bi bi-arrow-right ms-2'></i>",
     cancelButtonText: "Cancelar",
     customClass: {
-      confirmButton: "btn btn-primary me-2",
-      cancelButton: "btn btn-outline-secondary",
+      confirmButton: "btn btn-primary px-4 py-2 me-2",
+      cancelButton: "btn btn-outline-secondary px-4 py-2",
+      popup: 'rounded-15'
     },
     buttonsStyling: false,
     focusConfirm: false,
     preConfirm: () => {
-      return document.querySelector('input[name="metodo_pago"]:checked')?.value;
+      const value = document.querySelector('input[name="metodo_pago"]:checked')?.value;
+      if (!value) {
+        Swal.showValidationMessage('Debes seleccionar un método de pago');
+        return false;
+      }
+      return value;
     },
   });
 
   if (!isConfirmed) return;
 
-  // Confirmación para Yape/Plin
+  // Confirmación para Yape/Plin con diseño mejorado
   if (metodo_pago === "2") {
     const confirmacionYape = await Swal.fire({
-      title: "<h4 class='fw-bold'>Pago con Yape/Plin</h4>",
+      title: "<h4 class='fw-bold text-dark mb-4'>Confirmación de pago</h4>",
       html: `
         <div class="text-center">
-          <p class="mb-3">Escanea el siguiente código QR para realizar el pago:</p>
-          <img src="/imagenes/yapeplin.png" alt="Yape/Plin" class="img-fluid rounded border" style="max-width: 250px;" />
-          <div class="mt-3 alert alert-info">
-            <i class="bi bi-info-circle me-2"></i>
-            Confirma el pago antes de continuar
+          <div class="qr-container bg-white p-4 rounded-3 shadow-sm d-inline-block mb-3">
+            <img src="/imagenes/yapeplin.png" alt="Yape/Plin" class="img-fluid" style="width: 200px;" />
+          </div>
+          <div class="payment-instructions bg-light p-3 rounded-3 text-start mb-3">
+            <h6 class="fw-bold mb-2"><i class="bi bi-info-circle-fill text-primary me-2"></i>Instrucciones:</h6>
+            <ol class="ps-3 mb-0">
+              <li>Abre la app de Yape o Plin</li>
+              <li>Selecciona pagar con QR</li>
+              <li>Escanea el código mostrado</li>
+              <li>Confirma el monto: <span class="fw-bold">S/ ${formatPrice(precio)}</span></li>
+              <li>Completa la transacción</li>
+            </ol>
+          </div>
+          <div class="alert alert-primary d-flex align-items-center">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            <span>Por favor confirma el pago antes de continuar</span>
           </div>
         </div>
       `,
       showCancelButton: true,
-      confirmButtonText: "Pago confirmado",
-      cancelButtonText: "Cancelar",
+      confirmButtonText: "Pago confirmado <i class='bi bi-check-lg ms-2'></i>",
+      cancelButtonText: "Cancelar pago",
       customClass: {
-        confirmButton: "btn btn-success me-2",
-        cancelButton: "btn btn-outline-secondary",
+        confirmButton: "btn btn-success px-4 py-2 me-2",
+        cancelButton: "btn btn-outline-danger px-4 py-2",
+        popup: 'rounded-15'
       },
       buttonsStyling: false,
     });
@@ -182,41 +262,57 @@ const pagar = async (detalleplan) => {
     id_detalle: detalleplan.id,
     id_cliente: detalleplan.id_cliente,
     id_plan: detalleplan.id_plan,
-    precio: plan.precio_plan,
+    precio: precio,
     metodo_pago: Number(metodo_pago),
   };
 
   try {
     await agregarPagosplan(pagosplan);
     await Swal.fire({
-      title: "<h4 class='fw-bold'>¡Pago realizado!</h4>",
+      title: "<h4 class='fw-bold text-success mb-4'>¡Pago exitoso!</h4>",
       html: `
-        <div class="alert alert-success">
-          <i class="bi bi-check-circle-fill me-2"></i>
-          El registro ha sido enviado a pagos.
+        <div class="text-center">
+          <div class="success-animation mb-3">
+            <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+          </div>
+          <h5 class="fw-bold mb-2">Monto pagado: S/ ${formatPrice(precio)}</h5>
+          <p class="text-muted">El registro ha sido enviado al sistema de pagos.</p>
+          <div class="alert alert-success mt-3">
+            <i class="bi bi-receipt me-2"></i>
+            Recibirás un comprobante por correo electrónico.
+          </div>
         </div>
       `,
       icon: "success",
-      confirmButtonText: "Aceptar",
+      confirmButtonText: "Aceptar <i class='bi bi-check-lg ms-2'></i>",
       customClass: {
-        confirmButton: "btn btn-success",
+        confirmButton: "btn btn-success px-4 py-2",
+        popup: 'rounded-15'
       },
+      buttonsStyling: false
     });
     await recargarDatos();
   } catch (error) {
+    console.error("Error al procesar el pago:", error);
     await Swal.fire({
-      title: "<h4 class='fw-bold'>Error</h4>",
+      title: "<h4 class='fw-bold text-danger mb-4'>Error en el pago</h4>",
       html: `
-        <div class="alert alert-danger">
-          <i class="bi bi-exclamation-triangle-fill me-2"></i>
-          No se pudo realizar el pago.
+        <div class="text-center">
+          <i class="bi bi-x-circle-fill text-danger" style="font-size: 4rem;"></i>
+          <p class="mt-3">No se pudo completar el proceso de pago.</p>
+          <div class="alert alert-danger mt-3">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            Error: ${error.message || 'Por favor intente nuevamente o contacte al administrador.'}
+          </div>
         </div>
       `,
       icon: "error",
-      confirmButtonText: "Entendido",
+      confirmButtonText: "Entendido <i class='bi bi-emoji-frown ms-2'></i>",
       customClass: {
-        confirmButton: "btn btn-danger",
+        confirmButton: "btn btn-danger px-4 py-2",
+        popup: 'rounded-15'
       },
+      buttonsStyling: false
     });
   }
 };
