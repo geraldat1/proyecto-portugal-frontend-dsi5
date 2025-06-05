@@ -175,7 +175,7 @@ const generarReporteGeneral = () => {
       // Tabla principal con estilo formal
 autoTable(doc, {
   startY: 80,
-  head: [["ID", "Det", "Cliente", "DNI", "Plan", "Precio", "M. Pago", "F. Pago.", "Hr. Pago.", "F. Inicio.", "F. Venc.", "Estado"]],
+  head: [["ID", "Det", "Cliente", "DNI", "Plan", "Precio", "M. Pago", "F. Pago.", "Hr. Pago.", "F. Registro", "F. Venc.", "Estado"]],
   body: pagosplanesOrdenados.map((p) => [
     p.id || "N/A",
     p.id_detalle || "N/A",
@@ -564,7 +564,7 @@ autoTable(doc, {
                 <th className="fw-bold">M. PAGO</th>
                 <th className="fw-bold">FECHA PAGO</th>
                 <th className="fw-bold">HORA PAGO</th>
-                <th className="fw-bold">FECHA INICIO</th>
+                <th className="fw-bold">FECHA REGISTRO</th>
                 <th className="fw-bold">FECHA VENC.</th>
                 <th className="fw-bold">ESTADO</th>
                 <th className="fw-bold text-center">ACCIÓN</th>

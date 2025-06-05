@@ -143,7 +143,6 @@ const pagar = async (detalleplan) => {
     });
   }
 
-  // Validación y conversión segura del precio
   const precio = Number(plan.precio_plan);
   if (isNaN(precio) || precio <= 0) {
     return Swal.fire({
@@ -165,34 +164,66 @@ const pagar = async (detalleplan) => {
     });
   }
 
-  // Método de pago modal con diseño mejorado
+  // Método de pago modal con resumen de datos
   const { value: metodo_pago, isConfirmed } = await Swal.fire({
     title: "<h4 class='fw-bold text-dark mb-4'>Método de pago</h4>",
     html: `
-      <div class="text-start">
-        <div class="payment-method-card mb-3 p-3 rounded-3 border" onclick="document.getElementById('efectivo').click()">
-          <div class="form-check">
-            <input class="form-check-input" type="radio" name="metodo_pago" id="efectivo" value="1">
-            <label class="form-check-label d-flex align-items-center" for="efectivo">
-              <i class="bi bi-cash-coin text-success me-3" style="font-size: 1.5rem;"></i>
-              <div>
-                <h6 class="mb-0 fw-bold">Efectivo</h6>
-                <small class="text-muted">Pago en efectivo al administrador</small>
-              </div>
-            </label>
+      <div class="mb-4">
+        <div class="text-start mb-3">
+          <ul class="list-group mb-2">
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <span class="fw-bold">Cliente:</span>
+              <span>${obtenerClienteNombre(detalleplan.id_cliente)}</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <span class="fw-bold">Plan:</span>
+              <span>${obtenerPlanDescripcion(detalleplan.id_plan)}</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <span class="fw-bold">Precio:</span>
+              <span>S/ ${formatPrice(precio)}</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <span class="fw-bold">Fecha registro:</span>
+              <span>${new Date(detalleplan.fecha).toLocaleDateString()}</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <span class="fw-bold">Fecha vencimiento:</span>
+              <span>${new Date(detalleplan.fecha_venc).toLocaleDateString()}</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <span class="fw-bold">Fecha límite:</span>
+              <span>${new Date(detalleplan.fecha_limite).toLocaleDateString()}</span>
+            </li>
+          </ul>
+          <div class="alert alert-info mb-0">
+            Verifica los datos antes de continuar con el pago.
           </div>
         </div>
-        
-        <div class="payment-method-card p-3 rounded-3 border" onclick="document.getElementById('yapeplin').click()">
-          <div class="form-check">
-            <input class="form-check-input" type="radio" name="metodo_pago" id="yapeplin" value="2">
-            <label class="form-check-label d-flex align-items-center" for="yapeplin">
-              <i class="bi bi-phone text-primary me-3" style="font-size: 1.5rem;"></i>
-              <div>
-                <h6 class="mb-0 fw-bold">Yape/Plin</h6>
-                <small class="text-muted">Pago digital mediante QR</small>
-              </div>
-            </label>
+        <div class="text-start">
+          <div class="payment-method-card mb-3 p-3 rounded-3 border" onclick="document.getElementById('efectivo').click()">
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="metodo_pago" id="efectivo" value="1">
+              <label class="form-check-label d-flex align-items-center" for="efectivo">
+                <i class="bi bi-cash-coin text-success me-3" style="font-size: 1.5rem;"></i>
+                <div>
+                  <h6 class="mb-0 fw-bold">Efectivo</h6>
+                  <small class="text-muted">Pago en efectivo al administrador</small>
+                </div>
+              </label>
+            </div>
+          </div>
+          <div class="payment-method-card p-3 rounded-3 border" onclick="document.getElementById('yapeplin').click()">
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="metodo_pago" id="yapeplin" value="2">
+              <label class="form-check-label d-flex align-items-center" for="yapeplin">
+                <i class="bi bi-phone text-primary me-3" style="font-size: 1.5rem;"></i>
+                <div>
+                  <h6 class="mb-0 fw-bold">Yape/Plin</h6>
+                  <small class="text-muted">Pago digital mediante QR</small>
+                </div>
+              </label>
+            </div>
           </div>
         </div>
       </div>
