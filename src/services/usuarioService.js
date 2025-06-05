@@ -80,3 +80,19 @@ export const eliminarUsuario = async (id) => {
     manejarError(error);
   }
 };
+
+// Obtener usuario por ID
+export const obtenerUsuarioPorId = async (id) => {
+  try {
+    const respuesta = await fetch(`${API_URL}/${id}`, {
+      headers: getAuthHeaders(),
+    });
+    if (!respuesta.ok) {
+      throw new Error(`Error ${respuesta.status} al obtener usuario`);
+    }
+    return await respuesta.json();
+  } catch (error) {
+    manejarError(error);
+    return null;
+  }
+};

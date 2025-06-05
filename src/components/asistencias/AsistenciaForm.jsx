@@ -134,7 +134,7 @@ const AsistenciaForm = ({ show, handleClose, agregar, actualizar, asistenciaSele
   <Modal.Header closeButton className="bg-light">
     <Modal.Title className="fw-bold">
       {asistenciaSeleccionada ? (
-        <><i className="bi bi-pencil-square me-2"></i>Editar Asistencia</>
+        <><i className="bi bi-pencil-square me-2"></i>Registrar Salida de Cliente</>
       ) : (
         <><i className="bi bi-calendar-plus me-2"></i>Registrar Nueva Asistencia</>
       )}
@@ -148,7 +148,7 @@ const AsistenciaForm = ({ show, handleClose, agregar, actualizar, asistenciaSele
         {/* Select Cliente (Plan) con búsqueda por nombre o DNI */}
         <Form.Group className="mb-3 col-md-6">
           <Form.Label className="fw-bold">
-            Cliente (Plan) <span className="text-danger">*</span>
+            Seleccionar Cliente Suscrito <span className="text-danger">*</span>
           </Form.Label>
           <Select
   options={detallesPlanes
@@ -194,7 +194,7 @@ const AsistenciaForm = ({ show, handleClose, agregar, actualizar, asistenciaSele
       {/* Select Entrenador con búsqueda solo por nombre */}
     <Form.Group className="mb-3 col-md-6">
   <Form.Label className="fw-bold">
-    Entrenador <span className="text-danger">*</span>
+   Seleccionar Entrenador <span className="text-danger">*</span>
   </Form.Label>
   <Select
     options={entrenadores

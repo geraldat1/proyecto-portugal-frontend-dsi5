@@ -20,12 +20,13 @@ const UsuarioForm = ({
   const [telefono, setTelefono] = useState("");
   const [rol, setRol] = useState("");
   const [errores, setErrores] = useState({});
-  const [mostrarClave, setMostrarClave] = useState(false);
+  const [mostrarClave, setMostrarClave] = useState(null);
 
   // Para cambiar contraseña
   const [claveActual, setClaveActual] = useState("");
   const [nuevaClave, setNuevaClave] = useState("");
   const [confirmarClave, setConfirmarClave] = useState(""); // NUEVO
+  const [confirmarClaveActualizar, setConfirmarClaveActualizar] = useState(""); // NUEVO
 
   const { user } = useContext(AuthContext); // Obtén el usuario logueado
 
@@ -47,6 +48,7 @@ const UsuarioForm = ({
     setClaveActual("");
     setNuevaClave("");
     setConfirmarClave(""); // NUEVO
+    setConfirmarClaveActualizar(""); // NUEVO
     setErrores({});
   }, [usuarioSeleccionado, modo]);
 
@@ -56,7 +58,11 @@ const UsuarioForm = ({
     // Modo editar datos de usuario logueado (sin contraseña)
     if (modo === "config") {
       if (!usuario.trim()) nuevosErrores.usuario = "El usuario es obligatorio";
-      if (!nombre.trim()) nuevosErrores.nombre = "El nombre es obligatorio";
+      if (!nombre.trim()) {
+        nuevosErrores.nombre = "El nombre es obligatorio";
+      } else if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(nombre)) {
+        nuevosErrores.nombre = "El nombre solo debe contener letras";
+      }
       if (!correo.trim()) {
         nuevosErrores.correo = "El correo es obligatorio";
       } else if (!/\S+@\S+\.\S+/.test(correo)) {
@@ -104,6 +110,9 @@ const UsuarioForm = ({
         nuevosErrores.rol = "El rol es obligatorio";
       } else if (!["1", "2"].includes(rol)) {
         nuevosErrores.rol = "El rol debe ser Administrador o Empleado";
+      }
+      if (usuarioSeleccionado && clave.trim() && clave !== confirmarClaveActualizar) {
+        nuevosErrores.confirmarClaveActualizar = "Las contraseñas no coinciden";
       }
     }
 
@@ -229,11 +238,11 @@ const validarClaveActual = async () => {
       <Modal.Header closeButton className="bg-light">
         <Modal.Title className="fw-bold">
           {modo === "config"
-            ? <>Datos del Usuario: {usuarioSeleccionado?.nombre}</>
+            ? <>Configuración de la Cuenta de Usuario: {usuarioSeleccionado?.nombre}</>
             : modo === "password"
             ? <>Cambiar Contraseña</>
             : usuarioSeleccionado
-            ? <><i className="bi bi-lock me-2"></i>Datos del Usuario: {usuarioSeleccionado.nombre}</>
+            ? <><i className="bi bi-lock me-2"></i>Editar Información del Usuario: {usuarioSeleccionado.nombre}</>
             : <><i className="bi bi-person-plus me-2"></i>Agregar Nuevo Usuario</>
           }
         </Modal.Title>
@@ -273,7 +282,11 @@ const validarClaveActual = async () => {
                     type="text"
                     placeholder="Ingrese nombre completo"
                     value={nombre}
-                    onChange={(e) => setNombre(e.target.value)}
+                    onChange={(e) => {
+                      // Solo permite letras, espacios y tildes
+                      const valor = e.target.value;
+                      if (/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]*$/.test(valor)) setNombre(valor);
+                    }}
                     isInvalid={!!errores.nombre}
                     required
                   />
@@ -351,14 +364,23 @@ const validarClaveActual = async () => {
                 <Form.Label className="fw-bold">
                   Contraseña Actual <span className="text-danger">*</span>
                 </Form.Label>
-                <Form.Control
-                  type={mostrarClave ? "text" : "password"}
-                  placeholder="Ingrese su contraseña actual"
-                  value={claveActual}
-                  onChange={(e) => setClaveActual(e.target.value)}
-                  isInvalid={!!errores.claveActual}
-                  required
-                />
+                <div className="input-group">
+                  <Form.Control
+                    type={mostrarClave === "actual" ? "text" : "password"}
+                    placeholder="Ingrese su contraseña actual"
+                    value={claveActual}
+                    onChange={(e) => setClaveActual(e.target.value)}
+                    isInvalid={!!errores.claveActual}
+                    required
+                  />
+                  <Button
+                    variant="outline-secondary"
+                    onClick={() => setMostrarClave(mostrarClave === "actual" ? null : "actual")}
+                    type="button"
+                  >
+                    {mostrarClave === "actual" ? <BsEye /> : <BsEyeSlash />}
+                  </Button>
+                </div>
                 <Form.Control.Feedback type="invalid">
                   {errores.claveActual}
                 </Form.Control.Feedback>
@@ -367,14 +389,23 @@ const validarClaveActual = async () => {
                 <Form.Label className="fw-bold">
                   Nueva Contraseña <span className="text-danger">*</span>
                 </Form.Label>
-                <Form.Control
-                  type={mostrarClave ? "text" : "password"}
-                  placeholder="Ingrese la nueva contraseña"
-                  value={nuevaClave}
-                  onChange={(e) => setNuevaClave(e.target.value)}
-                  isInvalid={!!errores.nuevaClave}
-                  required
-                />
+                <div className="input-group">
+                  <Form.Control
+                    type={mostrarClave === "nueva" ? "text" : "password"}
+                    placeholder="Ingrese la nueva contraseña"
+                    value={nuevaClave}
+                    onChange={(e) => setNuevaClave(e.target.value)}
+                    isInvalid={!!errores.nuevaClave}
+                    required
+                  />
+                  <Button
+                    variant="outline-secondary"
+                    onClick={() => setMostrarClave(mostrarClave === "nueva" ? null : "nueva")}
+                    type="button"
+                  >
+                    {mostrarClave === "nueva" ? <BsEye /> : <BsEyeSlash />}
+                  </Button>
+                </div>
                 <Form.Control.Feedback type="invalid">
                   {errores.nuevaClave}
                 </Form.Control.Feedback>
@@ -383,26 +414,27 @@ const validarClaveActual = async () => {
                 <Form.Label className="fw-bold">
                   Confirmar Nueva Contraseña <span className="text-danger">*</span>
                 </Form.Label>
-                <Form.Control
-                  type={mostrarClave ? "text" : "password"}
-                  placeholder="Confirme la nueva contraseña"
-                  value={confirmarClave}
-                  onChange={(e) => setConfirmarClave(e.target.value)}
-                  isInvalid={!!errores.confirmarClave}
-                  required
-                />
+                <div className="input-group">
+                  <Form.Control
+                    type={mostrarClave === "confirmar" ? "text" : "password"}
+                    placeholder="Confirme la nueva contraseña"
+                    value={confirmarClave}
+                    onChange={(e) => setConfirmarClave(e.target.value)}
+                    isInvalid={!!errores.confirmarClave}
+                    required
+                  />
+                  <Button
+                    variant="outline-secondary"
+                    onClick={() => setMostrarClave(mostrarClave === "confirmar" ? null : "confirmar")}
+                    type="button"
+                  >
+                    {mostrarClave === "confirmar" ? <BsEye /> : <BsEyeSlash />}
+                  </Button>
+                </div>
                 <Form.Control.Feedback type="invalid">
                   {errores.confirmarClave}
                 </Form.Control.Feedback>
               </Form.Group>
-              <Button
-                variant="outline-secondary"
-                onClick={() => setMostrarClave(!mostrarClave)}
-                type="button"
-                className="mb-3"
-              >
-                {mostrarClave ? <BsEyeSlash /> : <BsEye />} Mostrar/Ocultar
-              </Button>
             </>
           )}
 
@@ -439,7 +471,11 @@ const validarClaveActual = async () => {
                     type="text"
                     placeholder="Ingrese nombre completo"
                     value={nombre}
-                    onChange={(e) => setNombre(e.target.value)}
+                    onChange={(e) => {
+                      // Solo permite letras, espacios y tildes
+                      const valor = e.target.value;
+                      if (/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]*$/.test(valor)) setNombre(valor);
+                    }}
                     isInvalid={!!errores.nombre}
                     required
                   />
@@ -484,7 +520,7 @@ const validarClaveActual = async () => {
                     onClick={() => setMostrarClave(!mostrarClave)}
                     type="button"
                   >
-                    {mostrarClave ? <BsEyeSlash /> : <BsEye />}
+                    {mostrarClave ? <BsEye /> : <BsEyeSlash />}
                   </Button>
                 </div>
                 <Form.Control.Feedback type="invalid">
@@ -496,6 +532,35 @@ const validarClaveActual = async () => {
                   </Form.Text>
                 )}
               </Form.Group>
+
+              {usuarioSeleccionado && (
+                <Form.Group className="mb-3" controlId="confirmarClaveActualizarInput">
+                  <Form.Label className="fw-bold">
+                    Confirmar Contraseña <span className="text-danger">*</span>
+                  </Form.Label>
+                  <div className="input-group">
+                    <Form.Control
+                      type={mostrarClave ? "text" : "password"}
+                      placeholder="Confirme la contraseña"
+                      value={confirmarClaveActualizar}
+                      onChange={(e) => setConfirmarClaveActualizar(e.target.value)}
+                      isInvalid={!!errores.confirmarClaveActualizar}
+                      required={!!clave}
+                      disabled={!clave}
+                    />
+                    <Button
+                      variant="outline-secondary"
+                      onClick={() => setMostrarClave(!mostrarClave)}
+                      type="button"
+                    >
+                      {mostrarClave ? <BsEye /> : <BsEyeSlash />}
+                    </Button>
+                  </div>
+                  <Form.Control.Feedback type="invalid">
+                    {errores.confirmarClaveActualizar}
+                  </Form.Control.Feedback>
+                </Form.Group>
+              )}
 
               <Form.Group className="mb-3" controlId="telefonoInput">
                 <Form.Label className="fw-bold">

@@ -12,28 +12,39 @@ import {
   FaUserCircle,
   FaHome,
   FaUsers,
-  FaClipboardList,
-  FaCreditCard,
+  FaRegAddressCard,      // Nuevo para Suscripciones
+  FaUserCheck,           // Nuevo para Suscripciones de Clientes
+  FaFileInvoiceDollar,   // Nuevo para Reporte de Pagos
   FaCalendarCheck,
   FaDumbbell,
-  FaTasks,
-  FaBoxOpen,
-  FaCog,
+  FaConciergeBell,       // Nuevo para Servicios
+  FaRunning,             // Nuevo para Rutinas
+  FaClipboardList,       // Nuevo para Planes
   FaUserTie,
-  FaLock,
   FaSignOutAlt,
   FaBars,
-  FaChevronDown
+  FaChevronDown,
+  FaInfoCircle,          // Nuevo para Acerca de
+  FaUserCog,             // Nuevo para Configuración de Cuenta
+  FaKey                  // Nuevo para Cambiar Contraseña
 } from "react-icons/fa";
 import UsuarioForm from "../usuarios/UsuarioForm"; // Ajusta la ruta si es necesario
 import Swal from "sweetalert2";
-import { actualizarUsuario as actualizarUsuarioService } from "../../services/usuarioService";
+import { actualizarUsuario as actualizarUsuarioService, obtenerUsuarioPorId } from "../../services/usuarioService";
 
 import '../shared/css/estiloNavbar.css';
 
 const Navbar = () => {
   const { user, setUser } = useContext(AuthContext);
   const navigate = useNavigate();
+
+  // Leer usuario de localStorage al montar el componente
+  React.useEffect(() => {
+    const userLS = localStorage.getItem("user");
+    if (userLS) {
+      setUser(JSON.parse(userLS));
+    }
+  }, [setUser]);
 
   // Estado para el modal de cambiar contraseña
   const [showModal, setShowModal] = React.useState(false);
@@ -44,8 +55,20 @@ const Navbar = () => {
   const actualizarUsuario = async (id, usuarioData) => {
     try {
       await actualizarUsuarioService(id, usuarioData);
-      // Actualiza el usuario en el contexto si es necesario
-      setUser((prev) => ({ ...prev, ...usuarioData }));
+      // Obtener los datos actualizados del backend
+      const usuarioActualizado = await obtenerUsuarioPorId(id);
+      if (usuarioActualizado) {
+        const userData = {
+          ...user,
+          ...usuarioActualizado,
+          name: usuarioActualizado.nombre, // para compatibilidad con el token/contexto
+          role: usuarioActualizado.rol,
+        };
+        setUser(userData);
+        // Guardar en localStorage para persistencia tras recarga
+        localStorage.setItem("user", JSON.stringify(userData));
+      }
+      Swal.fire("Éxito", "Datos actualizados correctamente", "success");
     } catch (error) {
       Swal.fire("Error", "No se pudo actualizar el usuario", "error");
     }
@@ -53,6 +76,7 @@ const Navbar = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("user"); // Limpia también el usuario
     setUser(null);
     navigate("/login");
   };
@@ -165,7 +189,7 @@ const Navbar = () => {
                       to="/configuracion"
                       className="d-flex align-items-center py-2 px-3"
                     >
-                      {menuItem(<FaCog className="text-gold me-2" />, "Acerca de")}
+                      {menuItem(<FaInfoCircle className="text-gold me-2" />, "Acerca de")}
                     </Dropdown.Item>
                   )}
                   
@@ -182,13 +206,13 @@ const Navbar = () => {
                     onClick={handleConfigCuenta}
                     className="d-flex align-items-center py-2 px-3"
                   >
-                    {menuItem(<FaLock className="text-gold me-2" />, "Config. de Cuenta")}
+                    {menuItem(<FaUserCog className="text-gold me-2" />, "Configuración de Cuenta")}
                   </Dropdown.Item>
                   <Dropdown.Item 
                     onClick={handleCambiarContrasena}
                     className="d-flex align-items-center py-2 px-3"
                   >
-                    {menuItem(<FaLock className="text-gold me-2" />, "Cambiar Contraseña")}
+                    {menuItem(<FaKey className="text-gold me-2" />, "Cambiar Contraseña")}
                   </Dropdown.Item>
                   
                   <Dropdown.Divider className="my-1" />
@@ -221,15 +245,15 @@ const Navbar = () => {
                 </Nav.Link>
 
                 <NavDropdown 
-                  title={menuItem(<FaClipboardList />, "Eleccion y Pagos")} 
+                  title={menuItem(<FaRegAddressCard />, "Suscripciones")} 
                   id="pagos-dropdown"
                   className="nav-dropdown"
                 >
                   <NavDropdown.Item as={Link} to="/detalleplanes">
-                    {menuItem(<FaClipboardList className="text-success me-2" />, "Pagar Membresía")}
+                    {menuItem(<FaUserCheck className="text-success me-2" />, "Suscripciones de Clientes")}
                   </NavDropdown.Item>
                   <NavDropdown.Item as={Link} to="/pagosplanes">
-                    {menuItem(<FaCreditCard className="text-info me-2" />, "Reporte de Pagos")}
+                    {menuItem(<FaFileInvoiceDollar className="text-info me-2" />, "Reporte de Pagos")}
                   </NavDropdown.Item>
                 </NavDropdown>
 
@@ -245,15 +269,15 @@ const Navbar = () => {
 
                 {!isRole2 && (
                   <NavDropdown 
-                    title={menuItem(<FaTasks />, "Servicios")} 
+                    title={menuItem(<FaConciergeBell />, "Servicios")} 
                     id="servicios-dropdown"
                     className="nav-dropdown"
                   >
                     <NavDropdown.Item as={Link} to="/planes">
-                      {menuItem(<FaBoxOpen className="text-success me-2" />, "Membresías")}
+                      {menuItem(<FaClipboardList className="text-success me-2" />, "Planes")}
                     </NavDropdown.Item>
                     <NavDropdown.Item as={Link} to="/rutinas">
-                      {menuItem(<FaTasks className="text-danger me-2" />, "Rutinas")}
+                      {menuItem(<FaRunning className="text-danger me-2" />, "Rutinas")}
                     </NavDropdown.Item>
                   </NavDropdown>
                 )}

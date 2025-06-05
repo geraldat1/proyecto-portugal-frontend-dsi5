@@ -15,10 +15,11 @@ const Pagosplanes = () => {
   };
 
   return (
-    <div>
-      <h2>Registro de Membresías Pagadas</h2>
-      <PagosplanesList pagosplanes={pagosplanes} />
-    </div>
+  <div>
+    <h2>Suscripciones Pagadas</h2>
+    <p className="text-muted">Aquí puedes ver todas las suscripciones que han sido pagadas correctamente.</p>
+    <PagosplanesList pagosplanes={pagosplanes} />
+  </div>
   );
 };
 

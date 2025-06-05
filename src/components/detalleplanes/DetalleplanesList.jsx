@@ -83,7 +83,7 @@ const pagar = async (detalleplan) => {
     return isNaN(num) ? '0.00' : num.toFixed(2);
   };
 
-  // Validaciones frontend con diseño mejorado
+  // Validaciones frontend con diseño profesional
   if (detalleplan.estado === 2) {
     return Swal.fire({
       title: "<h4 class='fw-bold text-primary'>Plan ya pagado</h4>",
@@ -164,75 +164,78 @@ const pagar = async (detalleplan) => {
     });
   }
 
-  // Método de pago modal con resumen de datos
+  // Modal de método de pago con datos ordenados profesionalmente
   const { value: metodo_pago, isConfirmed } = await Swal.fire({
-    title: "<h4 class='fw-bold text-dark mb-4'>Método de pago</h4>",
+    width: 800,
+    title: "<h4 class='fw-bold text-dark mb-4'>Verifica los datos del cliente y selecciona el método de pago</h4>",
     html: `
-      <div class="mb-4">
-        <div class="text-start mb-3">
-          <ul class="list-group mb-2">
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-              <span class="fw-bold">Cliente:</span>
-              <span>${obtenerClienteNombre(detalleplan.id_cliente)}</span>
-            </li>
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-              <span class="fw-bold">Plan:</span>
-              <span>${obtenerPlanDescripcion(detalleplan.id_plan)}</span>
-            </li>
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-              <span class="fw-bold">Precio:</span>
-              <span>S/ ${formatPrice(precio)}</span>
-            </li>
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-              <span class="fw-bold">Fecha registro:</span>
-              <span>${new Date(detalleplan.fecha).toLocaleDateString()}</span>
-            </li>
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-              <span class="fw-bold">Fecha vencimiento:</span>
-              <span>${new Date(detalleplan.fecha_venc).toLocaleDateString()}</span>
-            </li>
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-              <span class="fw-bold">Fecha límite:</span>
-              <span>${new Date(detalleplan.fecha_limite).toLocaleDateString()}</span>
-            </li>
-          </ul>
-          <div class="alert alert-info mb-0">
-            Verifica los datos antes de continuar con el pago.
-          </div>
-        </div>
-        <div class="text-start">
-          <div class="payment-method-card mb-3 p-3 rounded-3 border" onclick="document.getElementById('efectivo').click()">
-            <div class="form-check">
-              <input class="form-check-input" type="radio" name="metodo_pago" id="efectivo" value="1">
-              <label class="form-check-label d-flex align-items-center" for="efectivo">
-                <i class="bi bi-cash-coin text-success me-3" style="font-size: 1.5rem;"></i>
-                <div>
-                  <h6 class="mb-0 fw-bold">Efectivo</h6>
-                  <small class="text-muted">Pago en efectivo al administrador</small>
-                </div>
-              </label>
+      <div class="row g-4 align-items-stretch">
+        <div class="col-md-6">
+          <div class="card border-0 shadow-sm h-100" style="background: #f6f8fa;">
+            <div class="card-body">
+              <h6 class="fw-bold text-primary mb-3">
+                <i class="bi bi-person-badge me-2"></i>Datos del cliente
+              </h6>
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item px-0 py-1 border-0">
+                  <span class="fw-bold">Cliente:</span> ${obtenerClienteNombre(detalleplan.id_cliente)}
+                </li>
+                <li class="list-group-item px-0 py-1 border-0">
+                  <span class="fw-bold">Plan:</span> ${obtenerPlanDescripcion(detalleplan.id_plan)}
+                </li>
+                <li class="list-group-item px-0 py-1 border-0">
+                  <span class="fw-bold">Precio:</span> <span class="text-success fw-bold">S/ ${formatPrice(precio)}</span>
+                </li>
+                <li class="list-group-item px-0 py-1 border-0">
+                  <span class="fw-bold">Fecha de registro:</span> ${new Date(detalleplan.fecha).toLocaleDateString()}
+                </li>
+                <li class="list-group-item px-0 py-1 border-0">
+                  <span class="fw-bold">Fecha de vencimiento:</span> ${new Date(detalleplan.fecha_venc).toLocaleDateString()}
+                </li>
+                <li class="list-group-item px-0 py-1 border-0">
+                  <span class="fw-bold">Fecha límite de pago:</span> ${new Date(detalleplan.fecha_limite).toLocaleDateString()}
+                </li>
+              </ul>
             </div>
           </div>
-          <div class="payment-method-card p-3 rounded-3 border" onclick="document.getElementById('yapeplin').click()">
-            <div class="form-check">
-              <input class="form-check-input" type="radio" name="metodo_pago" id="yapeplin" value="2">
-              <label class="form-check-label d-flex align-items-center" for="yapeplin">
-                <i class="bi bi-phone text-primary me-3" style="font-size: 1.5rem;"></i>
-                <div>
-                  <h6 class="mb-0 fw-bold">Yape/Plin</h6>
-                  <small class="text-muted">Pago digital mediante QR</small>
+        </div>
+        <div class="col-md-6 d-flex flex-column justify-content-center">
+          <div class="card border-0 shadow-sm h-100" style="background: #f6f8fa;">
+            <div class="card-body d-flex flex-column justify-content-center">
+              <h6 class="fw-bold text-primary mb-4">
+                <i class="bi bi-credit-card-2-front me-2"></i>Elige el método de pago
+              </h6>
+              <div class="d-flex flex-row justify-content-center gap-4 mb-4">
+                <div class="form-check text-center" style="min-width: 120px;">
+                  <input class="form-check-input" type="radio" name="metodo_pago" id="efectivo" value="1" style="transform: scale(1.5); margin-bottom: 10px;">
+                  <label class="form-check-label" for="efectivo" style="cursor:pointer;">
+                    <i class="bi bi-cash-coin text-success" style="font-size:2.8rem;"></i>
+                    <div class="fw-bold mt-2">Efectivo</div>
+                    <div class="text-muted small">Pago presencial</div>
+                  </label>
                 </div>
-              </label>
+                <div class="form-check text-center" style="min-width: 120px;">
+                  <input class="form-check-input" type="radio" name="metodo_pago" id="yapeplin" value="2" style="transform: scale(1.5); margin-bottom: 10px;">
+                  <label class="form-check-label" for="yapeplin" style="cursor:pointer;">
+                    <i class="bi bi-qr-code text-info" style="font-size:2.8rem;"></i>
+                    <div class="fw-bold mt-2">Yape/Plin</div>
+                    <div class="text-muted small">Pago digital QR</div>
+                  </label>
+                </div>
+              </div>
+              <div class="alert alert-info small mb-0 text-center">
+                Selecciona el método de pago y continúa con el proceso.
+              </div>
             </div>
           </div>
         </div>
       </div>
     `,
     showCancelButton: true,
-    confirmButtonText: "Continuar <i class='bi bi-arrow-right ms-2'></i>",
+    confirmButtonText: "Continuar",
     cancelButtonText: "Cancelar",
     customClass: {
-      confirmButton: "btn btn-primary px-4 py-2 me-2",
+      confirmButton: "btn btn-primary px-4 py-2 me-2 fw-bold",
       cancelButton: "btn btn-outline-secondary px-4 py-2",
       popup: 'rounded-15'
     },
@@ -241,35 +244,23 @@ const pagar = async (detalleplan) => {
     preConfirm: () => {
       const value = document.querySelector('input[name="metodo_pago"]:checked')?.value;
       if (!value) {
-        Swal.showValidationMessage('Debes seleccionar un método de pago');
+        Swal.showValidationMessage('Por favor selecciona un método de pago');
         return false;
       }
       return value;
-    },
+    }
   });
 
   if (!isConfirmed) return;
 
-  // Confirmación para Yape/Plin con diseño mejorado
+  // Confirmación para Yape/Plin
   if (metodo_pago === "2") {
     const confirmacionYape = await Swal.fire({
       title: "<h4 class='fw-bold text-dark mb-4'>Confirmación de pago</h4>",
       html: `
         <div class="text-center">
-          <div class="qr-container bg-white p-4 rounded-3 shadow-sm d-inline-block mb-3">
-            <img src="/imagenes/yapeplin.png" alt="Yape/Plin" class="img-fluid" style="width: 200px;" />
-          </div>
-          <div class="payment-instructions bg-light p-3 rounded-3 text-start mb-3">
-            <h6 class="fw-bold mb-2"><i class="bi bi-info-circle-fill text-primary me-2"></i>Instrucciones:</h6>
-            <ol class="ps-3 mb-0">
-              <li>Abre la app de Yape o Plin</li>
-              <li>Selecciona pagar con QR</li>
-              <li>Escanea el código mostrado</li>
-              <li>Confirma el monto: <span class="fw-bold">S/ ${formatPrice(precio)}</span></li>
-              <li>Completa la transacción</li>
-            </ol>
-          </div>
-          <div class="alert alert-primary d-flex align-items-center">
+          <img src="/imagenes/yapeplin.png" alt="Yape/Plin" class="img-fluid" style="width: 200px; height: 200px; object-fit: contain;" />
+          <div class="alert alert-primary d-flex align-items-center justify-content-center mt-3">
             <i class="bi bi-check-circle-fill me-2"></i>
             <span>Por favor confirma el pago antes de continuar</span>
           </div>
@@ -308,10 +299,6 @@ const pagar = async (detalleplan) => {
           </div>
           <h5 class="fw-bold mb-2">Monto pagado: S/ ${formatPrice(precio)}</h5>
           <p class="text-muted">El registro ha sido enviado al sistema de pagos.</p>
-          <div class="alert alert-success mt-3">
-            <i class="bi bi-receipt me-2"></i>
-            Recibirás un comprobante por correo electrónico.
-          </div>
         </div>
       `,
       icon: "success",

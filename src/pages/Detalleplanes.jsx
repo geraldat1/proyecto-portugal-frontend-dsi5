@@ -73,7 +73,7 @@ const Detalleplanes = () => {
   
   return (
     <div>
-      <h2>Elección y Pago de Membresía</h2>
+      <h2>Registro de Suscripción de Cliente</h2>
       <Button
         className="mb-3 d-flex align-items-center"
         variant="primary"
@@ -83,7 +83,7 @@ const Detalleplanes = () => {
         }}
       >
         <FaPlus className="me-2" />
-        Agregar Membresía al Cliente
+        Agregar Suscripción para Cliente
       </Button>
 
 

@@ -179,9 +179,9 @@ const validarDuplicado = () => {
       <Modal.Header closeButton className="bg-light">
         <Modal.Title className="fw-bold">
           {detalleplanSeleccionada ? (
-            <><i className="bi bi-pencil-square me-2"></i>Editar Elección</>
+            <><i className="bi bi-pencil-square me-2"></i>Editar Suscripción del Cliente</>
           ) : (
-            <><i className="bi bi-plus-circle me-2"></i>Agregar Membresía al Cliente</>
+            <><i className="bi bi-plus-circle me-2"></i>Registrar Nueva Suscripción</>
           )}
         </Modal.Title>
       </Modal.Header>
@@ -191,7 +191,7 @@ const validarDuplicado = () => {
           {/* Select Cliente con búsqueda por nombre o DNI */}
           <Form.Group className="mb-3">
             <Form.Label className="fw-bold">
-              Cliente <span className="text-danger">*</span>
+              Seleccionar Cliente  <span className="text-danger">*</span>
             </Form.Label>
             <Select
               options={clientes
@@ -222,7 +222,7 @@ const validarDuplicado = () => {
  {/* Select Plan con búsqueda por nombre y precio */}
 <Form.Group className="mb-3">
   <Form.Label className="fw-bold">
-    Plan <span className="text-danger">*</span>
+    Seleccionar Plan <span className="text-danger">*</span>
   </Form.Label>
   <Select
     options={planes
@@ -258,7 +258,7 @@ const validarDuplicado = () => {
           <div className="row">
             {/* Fecha Vencimiento */}
             <Form.Group className="mb-3 col-md-6">
-              <Form.Label className="fw-bold">Fecha Vencimiento <span className="text-danger">*</span></Form.Label>
+              <Form.Label className="fw-bold">Fecha de Fin del Plan<span className="text-danger">*</span></Form.Label>
              <Form.Control
               type="date"
               value={formatDateForInput(fecha_venc)}
@@ -278,7 +278,7 @@ const validarDuplicado = () => {
             />
 
               <Form.Text className="text-muted">
-                Fecha cuando expira el plan
+              Día en que termina la vigencia de la suscripción
               </Form.Text>
               <Form.Control.Feedback type="invalid">
                 {errores.fecha_venc}
@@ -287,7 +287,7 @@ const validarDuplicado = () => {
 
             {/* Fecha Límite */}
             <Form.Group className="mb-3 col-md-6">
-              <Form.Label className="fw-bold">Fecha Límite <span className="text-danger">*</span></Form.Label>
+              <Form.Label className="fw-bold">Fecha Límite de Renovación<span className="text-danger">*</span></Form.Label>
               <Form.Control
                 type="date"
                 value={formatDateForInput(fecha_limite)}
@@ -297,7 +297,7 @@ const validarDuplicado = () => {
               />
 
               <Form.Text className="text-muted">
-                Fecha límite para renovación
+                Fecha máxima para que el cliente renueve antes de suspensión
               </Form.Text>
               <Form.Control.Feedback type="invalid">
                 {errores.fecha_limite}
@@ -311,9 +311,9 @@ const validarDuplicado = () => {
             </Button>
             <Button variant="primary" type="submit" className="px-4">
               {detalleplanSeleccionada ? (
-                <><i className="bi bi-check-circle me-2"></i>Actualizar</>
+                <><i className="bi bi-check-circle me-2"></i>Actualizar Suscripción</>
               ) : (
-                <><i className="bi bi-save me-2"></i>Realizar Acuerdo</>
+                <><i className="bi bi-save me-2"></i>Guardar Suscripción</>
               )}
             </Button>
           </div>

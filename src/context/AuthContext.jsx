@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
+import { obtenerUsuarioPorId } from "../services/usuarioService"; // importa tu servicio
 
 export const AuthContext = createContext();
 
@@ -21,24 +22,35 @@ export const AuthProvider = ({ children }) => {
     if (token) {
       try {
         if (checkTokenExpiration(token)) {
-          // Si el token ha caducado, eliminarlo y redirigir al login
           localStorage.removeItem("token");
-          setUser (null);
+          setUser(null);
           navigate("/login");
         } else {
-          // Si no ha caducado, decodificar el token y almacenar el usuario
           const decoded = jwtDecode(token);
-          setUser (decoded);
+          // Aquí: obtener datos actualizados del usuario
+          obtenerUsuarioPorId(decoded.id).then(usuarioActualizado => {
+            if (usuarioActualizado) {
+              setUser({
+                ...decoded,
+                ...usuarioActualizado,
+                name: usuarioActualizado.nombre,
+                role: usuarioActualizado.rol,
+              });
+            } else {
+              setUser(decoded);
+            }
+          }).catch(() => {
+            setUser(decoded);
+          });
         }
       } catch (error) {
         console.error("Token inválido", error);
         localStorage.removeItem("token");
-        setUser (null);
+        setUser(null);
         navigate("/login");
       }
     } else {
-      // Si no hay token, redirigir al login
-      setUser (null);
+      setUser(null);
       navigate("/login");
     }
   }, [navigate]); // Se incluye navigate como dependencia
