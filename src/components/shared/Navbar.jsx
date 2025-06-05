@@ -38,6 +38,7 @@ const Navbar = () => {
   // Estado para el modal de cambiar contraseña
   const [showModal, setShowModal] = React.useState(false);
   const [usuarioSeleccionado, setUsuarioSeleccionado] = React.useState(null);
+  const [modalMode, setModalMode] = React.useState("config"); // "config" o "password"
 
   // Usar el service para actualizar usuario
   const actualizarUsuario = async (id, usuarioData) => {
@@ -68,8 +69,7 @@ const Navbar = () => {
   const isRole1or2 = user?.role === '1' || user?.rol === '1' || user?.role === '2' || user?.rol === '2';
 
 
-  const handleCambiarContrasena = () => {
-    // Prepara los datos del usuario logueado para el formulario
+  const handleConfigCuenta = () => {
     setUsuarioSeleccionado({
       id: user.id,
       usuario: user.usuario,
@@ -78,6 +78,20 @@ const Navbar = () => {
       telefono: user.telefono,
       rol: user.rol || user.role,
     });
+    setModalMode("config");
+    setShowModal(true);
+  };
+
+  const handleCambiarContrasena = () => {
+    setUsuarioSeleccionado({
+      id: user.id,
+      usuario: user.usuario,
+      nombre: user.name || user.nombre,
+      correo: user.correo,
+      telefono: user.telefono,
+      rol: user.rol || user.role,
+    });
+    setModalMode("password");
     setShowModal(true);
   };
 
@@ -164,12 +178,17 @@ const Navbar = () => {
                       {menuItem(<FaUserTie className="text-gold me-2" />, "Empleados")}
                     </Dropdown.Item>
                   )}
-                  
+                  <Dropdown.Item 
+                    onClick={handleConfigCuenta}
+                    className="d-flex align-items-center py-2 px-3"
+                  >
+                    {menuItem(<FaLock className="text-gold me-2" />, "Config. de Cuenta")}
+                  </Dropdown.Item>
                   <Dropdown.Item 
                     onClick={handleCambiarContrasena}
                     className="d-flex align-items-center py-2 px-3"
                   >
-                    {menuItem(<FaLock className="text-gold me-2" />, "Configuración")}
+                    {menuItem(<FaLock className="text-gold me-2" />, "Cambiar Contraseña")}
                   </Dropdown.Item>
                   
                   <Dropdown.Divider className="my-1" />
@@ -252,6 +271,7 @@ const Navbar = () => {
         actualizar={actualizarUsuario}
         usuarioSeleccionado={usuarioSeleccionado}
         deshabilitarRol={isRole1or2}
+        modo={modalMode}
       />
     </div>
   );
