@@ -83,7 +83,7 @@ const Detalleplanes = () => {
         }}
       >
         <FaPlus className="me-2" />
-        Agregar Suscripción para Cliente
+        Agregar Suscripción
       </Button>
 
 

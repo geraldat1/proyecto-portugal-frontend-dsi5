@@ -87,7 +87,7 @@ const asistenciasFiltradas = asistencias.filter((a) => {
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   // Generar reporte general de asistencias
-  const generarReporteGeneral = () => {
+const generarReporteGeneral = () => {
     const doc = new jsPDF();
     const logo = new Image();
     logo.src = "/imagenes/logo-toreto.png";
@@ -106,69 +106,58 @@ const asistenciasFiltradas = asistencias.filter((a) => {
         });
         const idUsuario = `${user?.id || "N/A"} - ${user?.name || "Nombre no disponible"}`;
 
-        let tituloReporte = "REPORTE DE ASISTENCIAS";
-        let subtituloReporte = "";
+        const colores = {
+          fondo: [0, 0, 0],
+          texto: [255, 255, 255],
+          borde: [200, 200, 200]
+        };
 
+        // Encabezado negro con texto blanco
+        doc.setFillColor(...colores.fondo);
+        doc.rect(0, 0, doc.internal.pageSize.getWidth(), 20, 'F');
+
+        // Logo
+        doc.addImage(logo, "PNG", 8, 1.5, 20, 18);
+
+        // Título del reporte
+        doc.setTextColor(...colores.texto);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(15);
+        doc.text(
+          "REPORTE DE ASISTENCIAS",
+          doc.internal.pageSize.getWidth() / 2,
+          13,
+          { align: "center" }
+        );
+
+        // Información de generación
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(9);
+        doc.text(`Generado: ${fechaStr}`, doc.internal.pageSize.width - 4, 8, { align: "right" });
+        doc.text(`Hora: ${horaStr}`, doc.internal.pageSize.width - 4, 12, { align: "right" });
+        doc.text(`Usuario: ${idUsuario}`, doc.internal.pageSize.width - 4, 16, { align: "right" });
+
+        let yPosition = 28;
+        
+        // Filtros aplicados
         if (fecha) {
+          doc.setFillColor(245, 245, 245);
+          doc.rect(10, yPosition, 190, 10, 'F');
+
+          doc.setTextColor(0, 0, 0);
+          doc.setFontSize(10);
+
           const fechaFiltro = new Date(fecha).toLocaleDateString("es-PE", {
             day: '2-digit',
             month: 'long',
             year: 'numeric'
           });
-          subtituloReporte = `Filtrado por fecha: ${fechaFiltro}`;
+          
+          doc.text(`Filtrado por fecha: ${fechaFiltro}`, 15, yPosition + 7);
+          yPosition += 12;
         }
 
-        const colores = {
-          primario: [0, 0, 0],
-          secundario: [64, 64, 64],
-          texto: [0, 0, 0],
-          borde: [128, 128, 128]
-        };
-
-        let encabezadoDibujado = false;
-
-        const dibujarEncabezado = () => {
-          doc.setDrawColor(...colores.borde);
-          doc.setLineWidth(0.5);
-          doc.rect(10, 10, 190, 35);
-
-          doc.setDrawColor(...colores.borde);
-          doc.setLineWidth(0.3);
-          doc.line(55, 12, 55, 43);
-          doc.line(135, 12, 135, 43);
-
-          doc.addImage(logo, "PNG", 15, 15, 35, 25);
-
-          doc.setTextColor(...colores.primario);
-          doc.setFontSize(11);
-          doc.setFont("helvetica", "bold");
-
-          const tituloWidth = doc.getTextWidth(tituloReporte);
-          const tituloX = 60 + (70 - tituloWidth) / 2;
-          doc.text(tituloReporte, tituloX, 30);
-
-          if (subtituloReporte) {
-            doc.setFontSize(9);
-            doc.setFont("helvetica", "normal");
-            const subtituloWidth = doc.getTextWidth(subtituloReporte);
-            const subtituloX = 60 + (70 - subtituloWidth) / 2;
-            doc.text(subtituloReporte, subtituloX, 32);
-          }
-
-          doc.setFontSize(8);
-          doc.setFont("helvetica", "normal");
-          const infoTextos = [
-            `Generado: ${fechaStr}`,
-            `Hora: ${horaStr}`,
-            `Usuario: ${idUsuario}`,
-            `Total registros: ${asistenciasOrdenadas.length}`
-          ];
-
-          infoTextos.forEach((texto, index) => {
-            doc.text(texto, 140, 17 + (index * 4));
-          });
-        };
-
+        // Estadísticas
         const calcularEstadisticas = () => {
           const total = asistenciasOrdenadas.length;
           const enGimnasio = asistenciasOrdenadas.filter(a => a.estado === 1).length;
@@ -178,37 +167,38 @@ const asistenciasFiltradas = asistencias.filter((a) => {
 
         const stats = calcularEstadisticas();
 
-        doc.setDrawColor(...colores.borde);
-        doc.setLineWidth(0.3);
-        doc.rect(10, 50, 190, 20);
-
-        doc.line(70, 52, 70, 68);
-        doc.line(130, 52, 130, 68);
-
-        doc.setTextColor(...colores.primario);
-        doc.setFontSize(10);
+        // Cuadro de estadísticas
+        doc.setFillColor(0, 0, 0);
+        doc.rect(10, yPosition, 190, 15, 'F');
+        
+        doc.setTextColor(255, 255, 255);
         doc.setFont("helvetica", "bold");
+        doc.setFontSize(10);
+        
+        doc.text("TOTAL REGISTROS", 55, yPosition + 7, { align: "center" });
+        doc.text("EN GIMNASIO", 120, yPosition + 7, { align: "center" });
+        doc.text("SALIDOS", 185, yPosition + 7, { align: "center" });
+        
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(12);
+        doc.text(stats.total.toString(), 55, yPosition + 13, { align: "center" });
+        doc.text(stats.enGimnasio.toString(), 120, yPosition + 13, { align: "center" });
+        doc.text(stats.salidos.toString(), 185, yPosition + 13, { align: "center" });
+        
+        yPosition += 20;
 
-        const estadisticas = [
-          { label: "TOTAL REGISTROS", valor: stats.total, x: 40 },
-          { label: "EN GIMNASIO", valor: stats.enGimnasio, x: 100 },
-          { label: "SALIDOS", valor: stats.salidos, x: 160 }
-        ];
-
-        estadisticas.forEach(stat => {
-          const labelWidth = doc.getTextWidth(stat.label);
-          const valorWidth = doc.getTextWidth(stat.valor.toString());
-          doc.text(stat.label, stat.x - (labelWidth / 2), 57);
-          doc.setFont("helvetica", "normal");
-          doc.setFontSize(12);
-          doc.text(stat.valor.toString(), stat.x - (valorWidth / 2), 65);
-          doc.setFont("helvetica", "bold");
-          doc.setFontSize(10);
-        });
-
+        // Tabla de asistencias
         autoTable(doc, {
-          startY: 80,
-          head: [["ID", "Fecha", "H. Entrada", "H. Salida", "Cliente", "Entrenador", "Estado"]],
+          startY: yPosition,
+          head: [[
+            "ID",
+            "Fecha",
+            "H. Entrada", 
+            "H. Salida",
+            "Cliente",
+            "Entrenador",
+            "Estado"
+          ]],
           body: asistenciasOrdenadas.map((a) => [
             a.id_asistencia || "N/A",
             a.fecha ? new Date(a.fecha).toLocaleDateString("es-PE") : "Sin fecha",
@@ -220,33 +210,37 @@ const asistenciasFiltradas = asistencias.filter((a) => {
           ]),
           theme: 'grid',
           headStyles: {
-            fillColor: [255, 255, 255],
-            textColor: [0, 0, 0],
+            fillColor: colores.fondo,
+            textColor: colores.texto,
             fontStyle: 'bold',
-            fontSize: 9,
+            fontSize: 8,
             halign: 'center',
-            lineColor: [128, 128, 128],
+            valign: 'middle',
+            lineColor: [150, 150, 150],
             lineWidth: 0.3
           },
           bodyStyles: {
             fontSize: 8,
-            cellPadding: 4,
+            cellPadding: 2,
             fillColor: [255, 255, 255],
             textColor: [0, 0, 0],
-            lineColor: [128, 128, 128],
+            halign: 'center',
+            valign: 'middle',
+            fontStyle: 'normal',
+            lineColor: [200, 200, 200],
             lineWidth: 0.1
           },
           alternateRowStyles: {
             fillColor: [255, 255, 255]
           },
           columnStyles: {
-            0: { halign: 'center' },
-            1: { halign: 'center' },
-            2: { halign: 'center' },
-            3: { halign: 'center' },
-            4: { halign: 'left' },
-            5: { halign: 'left' },
-            6: { halign: 'center' }
+            0: { cellWidth: 15, halign: 'center' },
+            1: { cellWidth: 20, halign: 'center' },
+            2: { cellWidth: 20, halign: 'center' },
+            3: { cellWidth: 20, halign: 'center' },
+            4: { cellWidth: 45, halign: 'left' },
+            5: { cellWidth: 45, halign: 'left' },
+            6: { cellWidth: 25, halign: 'center' }
           },
           didParseCell: (data) => {
             if (data.section === 'body' && data.column.index === 6) {
@@ -260,45 +254,37 @@ const asistenciasFiltradas = asistencias.filter((a) => {
               }
             }
           },
-          didDrawPage: (data) => {
-            const pageInfo = doc.internal.getCurrentPageInfo();
-            const pageNumber = pageInfo.pageNumber;
-            const totalPages = doc.internal.getNumberOfPages();
-
-            if (pageNumber === 1 && !encabezadoDibujado) {
-              dibujarEncabezado();
-              encabezadoDibujado = true;
-            }
-
-            doc.setDrawColor(...colores.borde);
-            doc.setLineWidth(0.3);
-            doc.line(10, doc.internal.pageSize.height - 25, 200, doc.internal.pageSize.height - 25);
-
-            doc.setFontSize(8);
-            doc.setTextColor(...colores.texto);
-            doc.setFont("helvetica", "normal");
-
-            doc.text(
-              `Generado el ${fechaStr} a las ${horaStr}`,
-              15,
-              doc.internal.pageSize.height - 15
-            );
-
-            doc.text(
-              `Página ${pageNumber} de ${totalPages}`,
-              doc.internal.pageSize.width - 40,
-              doc.internal.pageSize.height - 15
-            );
-
-            doc.text(
-              "ToretoGym - Sistema de Gestión",
-              doc.internal.pageSize.width / 2,
-              doc.internal.pageSize.height - 15,
-              { align: 'center' }
-            );
-          },
           margin: { top: 15, bottom: 30, left: 10, right: 10 }
         });
+
+        // Pie de página
+        doc.setDrawColor(...colores.borde);
+        doc.setLineWidth(0.3);
+        doc.line(10, doc.internal.pageSize.height - 25, 200, doc.internal.pageSize.height - 25);
+
+        doc.setFontSize(8);
+        doc.setTextColor(0, 0, 0);
+        doc.setFont("helvetica", "normal");
+
+        doc.text(
+          `Generado el ${fechaStr} a las ${horaStr}`,
+          15,
+          doc.internal.pageSize.height - 15
+        );
+
+        const pageNumber = doc.internal.getNumberOfPages();
+        doc.text(
+          `Página ${pageNumber} de ${pageNumber}`,
+          doc.internal.pageSize.width - 40,
+          doc.internal.pageSize.height - 15
+        );
+
+        doc.text(
+          "ToretoGym - Sistema de Gestión",
+          doc.internal.pageSize.width / 2,
+          doc.internal.pageSize.height - 15,
+          { align: 'center' }
+        );
 
         const pdfBlob = doc.output("blob");
         const pdfUrl = URL.createObjectURL(pdfBlob);
@@ -394,7 +380,7 @@ const asistenciasFiltradas = asistencias.filter((a) => {
         
         {/* BOTÓN DE REPORTE GENERAL */}
         <Button
-          variant="success"
+          variant="dark" 
           onClick={generarReporteGeneral}
           className="d-flex align-items-center gap-2 px-3 py-2 shadow-sm rounded"
         >
