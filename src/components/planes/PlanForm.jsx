@@ -168,24 +168,25 @@ const PlanForm = ({ show, handleClose, agregar, actualizar, planSeleccionado }) 
       </Form.Group>
 
       <div className="row">
-        {/* Periodicidad */}
-        <Form.Group className="mb-3 col-md-6">
-          <Form.Label className="fw-bold">Periodicidad <span className="text-danger">*</span></Form.Label>
-          <Form.Select
-            value={condicion}
-            onChange={(e) => setCondicion(e.target.value)}
-            isInvalid={!!errores.condicion}
-          >
-            <option value="">Seleccione una opción</option>
-            <option value="Mensual">Mensual</option>
-            <option value="Bimestral">Bimestral</option>
-            <option value="Trimestral">Trimestral</option>
-            <option value="Anual">Anual</option>
-          </Form.Select>
-          <Form.Control.Feedback type="invalid">
-            {errores.condicion}
-          </Form.Control.Feedback>
-        </Form.Group>
+            {/* Periodicidad */}
+            <Form.Group className="mb-3 col-md-6">
+              <Form.Label className="fw-bold">Periodicidad <span className="text-danger">*</span></Form.Label>
+              <Form.Select
+                value={condicion}
+                onChange={(e) => setCondicion(e.target.value)}
+                isInvalid={!!errores.condicion}
+              >
+                <option value="">Seleccione una opción</option>
+                <option value="1">Diario</option>
+                <option value="2">Mensual</option>
+                <option value="3">Trimestral</option>
+                <option value="4">Anual</option>
+                <option value="5">Promoción</option>
+              </Form.Select>
+              <Form.Control.Feedback type="invalid">
+                {errores.condicion}
+              </Form.Control.Feedback>
+            </Form.Group>
 
         {/* Imagen */}
         <Form.Group className="mb-3 col-md-6">
