@@ -17,7 +17,7 @@ const AsistenciaList = ({ asistencias, seleccionar, entrenadores, detallesPlanes
 
 const obtenerNombreEntrenador = (id_entrenador) => {
   const entrenador = entrenadores.find(e => e.id === id_entrenador);
-  return entrenador ? `${entrenador.nombre} ${entrenador.apellido}` : "Desconocido";
+  return entrenador ? `${entrenador.nombre} ${entrenador.apellido}` : "Sin Entrenador";
 };
 
 

@@ -1,9 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useContext  } from "react";
 import { Card, Button, Badge, ButtonGroup } from "react-bootstrap";
 import Swal from "sweetalert2";
 import { FaEdit, FaBan } from "react-icons/fa";
+import { AuthContext } from "../../context/AuthContext"; // Ajusta la ruta según tu estructura
+
 
 const PlanList = ({ planes, seleccionar, eliminar }) => {
+  const { user } = useContext(AuthContext); // Obtén el usuario del contexto
+  const isRole2 = user?.role === '2' || user?.rol === '2';
   const [paginaActual] = useState(1);
   const [filtroCondicion, setFiltroCondicion] = useState(null); // null means no filter
   const elementosPorPagina = 8;
@@ -272,7 +276,7 @@ const PlanList = ({ planes, seleccionar, eliminar }) => {
                     </div>
                   </div>
                 </Card.Body>
-
+                {!isRole2 && (
                 <Card.Footer className="card-footer-actions border-top-0 d-flex justify-content-end gap-2 p-3">
                   <Button
                     variant="outline-primary"
@@ -307,6 +311,7 @@ const PlanList = ({ planes, seleccionar, eliminar }) => {
                     <FaBan size={12} />
                   </Button>
                 </Card.Footer>
+                )}
               </Card>
             </div>
           ))

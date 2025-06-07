@@ -44,7 +44,12 @@ const PagosplanesList = ({ pagosplanes }) => {
   const currentItems = pagosplanesOrdenados.slice(indexOfFirstItem, indexOfLastItem);
 
   const generarReporteGeneral = () => {
-    const doc = new jsPDF();
+    const doc = new jsPDF({
+      orientation: "landscape",
+      unit: "mm",
+      format: "a4"
+    });
+
     const logo = new window.Image();
     logo.src = "/imagenes/logo-toreto.png";
 
@@ -105,78 +110,69 @@ const PagosplanesList = ({ pagosplanes }) => {
         }
 
         autoTable(doc, {
-          startY: yPosition,
-          head: [[
-            "N°\npago",
-            "Cliente",
-            "DNI",
-            "Plan",
-            "Precio",
-            "M. Pago",
-            "F. Pago.",
-            "Hr. Pago.",
-            "F. Registro",
-            "F. Venc.",
-            "Estado"
-          ]],
-          body: pagosplanesOrdenados.map((p) => [
-            p.id || "N/A",
-            p.nombre_cliente || "Sin nombre",
-            p.dni_cliente || "Sin DNI",
-            p.nombre_plan || "Sin plan",
-            `S/ ${parseFloat(p.precio || 0).toFixed(2)}`,
-            (p.metodo_pago === 1 || p.metodo_pago === "1") ? "Efectivo" : (p.metodo_pago === 2 || p.metodo_pago === "2") ? "Yape/Plin" : "Desconocido",
-            p.fecha ? new Date(p.fecha).toLocaleDateString("es-PE") : "Sin fecha",
-            p.hora || "Sin hora",
-            p.fecha_reg ? new Date(p.fecha_reg).toLocaleDateString("es-PE") : "Sin fecha",
-            p.fecha_venc ? new Date(p.fecha_venc).toLocaleDateString("es-PE") : "Sin fecha",
-            (p.estado === 1 || p.estado === "1") ? "Pagado" : "Pendiente"
-          ]),
-          theme: 'grid',
-          headStyles: {
-            fillColor: colores.fondo,
-            textColor: colores.texto,
-            fontStyle: 'bold',
-            fontSize: 8,
-            halign: 'center',
-            valign: 'middle',
-            lineColor: [150, 150, 150],
-            lineWidth: 0.3
-          },
-          bodyStyles: {
-            fontSize: 7.5,
-            cellPadding: 2,
-            fillColor: [255, 255, 255],
-            textColor: [0, 0, 0],
-            halign: 'center',
-            valign: 'middle',
-            fontStyle: 'normal',
-            lineColor: [200, 200, 200],
-            lineWidth: 0.1
-          },
-          alternateRowStyles: {
-            fillColor: [255, 255, 255]
-          },
-          margin: { top: 15, bottom: 30, left: 2, right: 2 },
-          tableWidth: 'auto',
-          styles: {
-            minCellWidth: 12,
-            overflow: 'linebreak'
-          },
-          columnStyles: {
-            0: { cellWidth: 11, halign: 'center' },
-            1: { cellWidth: 22, halign: 'center' },
-            2: { cellWidth: 16, halign: 'center' },
-            3: { cellWidth: 32, halign: 'center' },
-            4: { cellWidth: 15, halign: 'center' },
-            5: { cellWidth: 18, halign: 'center' },
-            6: { cellWidth: 18, halign: 'center' },
-            7: { cellWidth: 15, halign: 'center' },
-            8: { cellWidth: 18, halign: 'center' },
-            9: { cellWidth: 18, halign: 'center' },
-            10: { cellWidth: 15, halign: 'center' }
-          }
-        });
+  startY: yPosition,
+  head: [[
+    "N°\npago",
+    "Cliente",
+    "DNI",
+    "Plan",
+    "Precio",
+    "Duración",
+    "M. Pago",
+    "F. Pago.",
+    "Hr. Pago.",
+    "F. Registro",
+    "F. Venc.",
+    "Estado"
+  ]],
+  body: pagosplanesOrdenados.map((p) => [
+    p.id || "N/A",
+    p.nombre_cliente || "Sin nombre",
+    p.dni_cliente || "Sin DNI",
+    p.nombre_plan || "Sin plan",
+    `S/ ${parseFloat(p.precio || 0).toFixed(2)}`,
+    p.nombre_condicion || "Sin condición",
+    (p.metodo_pago === 1 || p.metodo_pago === "1") ? "Efectivo" :
+    (p.metodo_pago === 2 || p.metodo_pago === "2") ? "Yape/Plin" : "Desconocido",
+    p.fecha ? new Date(p.fecha).toLocaleDateString("es-PE") : "Sin fecha",
+    p.hora || "Sin hora",
+    p.fecha_reg ? new Date(p.fecha_reg).toLocaleDateString("es-PE") : "Sin fecha",
+    p.fecha_venc ? new Date(p.fecha_venc).toLocaleDateString("es-PE") : "Sin fecha",
+    (p.estado === 1 || p.estado === "1") ? "Pagado" : "Pendiente"
+  ]),
+  theme: 'grid',
+  headStyles: {
+    fillColor: colores.fondo,
+    textColor: colores.texto,
+    fontStyle: 'bold',
+    fontSize: 8,
+    halign: 'center',
+    valign: 'middle',
+    lineColor: [150, 150, 150],
+    lineWidth: 0.3
+  },
+  bodyStyles: {
+    fontSize: 8,
+    cellPadding: 3,
+    fillColor: [255, 255, 255],
+    textColor: [0, 0, 0],
+    halign: 'center',
+    valign: 'middle',
+    fontStyle: 'normal',
+    lineColor: [200, 200, 200],
+    lineWidth: 0.1
+  },
+  alternateRowStyles: {
+    fillColor: [255, 255, 255]
+  },
+  margin: { top: 15, bottom: 30, left: 15, right: 15 }, // más pequeño para más espacio
+  tableWidth: 'auto', // más ancho
+  styles: {
+    minCellWidth: 15, // un poco más ancho cada celda
+    overflow: 'linebreak'
+  }
+});
+
 
         const totalRegistros = pagosplanesOrdenados.length;
         const montoTotal = pagosplanesOrdenados.reduce((acc, p) => acc + parseFloat(p.precio || 0), 0);
@@ -255,10 +251,23 @@ const PagosplanesList = ({ pagosplanes }) => {
         y += 6;
 
         doc.setFontSize(12);
-        const numeroCompleto = `B00${p.numero_boleta || '000'}${p.id}`;
+
+        const numBoleta = Number(p.numero_boleta || p.id || 0);
+
+        // Serie dinámica según cada 1000 boletas, sin sumar 1
+        const serieNumero = Math.floor(numBoleta / 1000) + 1;
+        const serie = `B${serieNumero.toString().padStart(3, '0')}`;
+
+        // Correlativo dentro de la serie, sin sumar 1 (empieza en 000000)
+        const correlativo = numBoleta % 1000;
+        const correlativoStr = correlativo.toString().padStart(6, '0');
+
+        const numeroCompleto = `${serie}-${correlativoStr}`;
+
         const numX = (doc.internal.pageSize.getWidth() - doc.getStringUnitWidth(numeroCompleto) * doc.internal.getFontSize() / doc.internal.scaleFactor) / 2;
         doc.text(numeroCompleto, numX, y);
         y += 4;
+
 
         doc.setDrawColor(150, 150, 150);
         doc.setLineWidth(0.4);
@@ -278,7 +287,14 @@ const PagosplanesList = ({ pagosplanes }) => {
           minute: '2-digit'
         });
         const idUsuario = user?.id || "Desconocido";
-        doc.text(`Emitido el: ${fechaStr} - ${horaStr}`, 5, y);
+        doc.text(`Emitido el: ${fechaStr}`, 5, y);
+
+        // Mostrar hora un poco más hacia la izquierda (desde el borde derecho)
+        const horaTexto = `Hora: ${horaStr}`;
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const horaX = pageWidth - doc.getStringUnitWidth(horaTexto) * doc.internal.getFontSize() / doc.internal.scaleFactor - 5;
+
+        doc.text(horaTexto, horaX, y);
         doc.text(`Usuario ID: ${idUsuario}`, 5, y + 5);
         doc.text(`Fecha del Pago: ${new Date(p.fecha).toLocaleDateString("es-PE")}`, 5, y + 10);
         doc.text(`Hora del Pago: ${p.hora}`, 5, y + 15);
@@ -456,6 +472,7 @@ const PagosplanesList = ({ pagosplanes }) => {
                 <th className="fw-bold" style={{ background: "#FFD700", color: "#111", borderTop: "1px solid #dee2e6", borderBottom: "1px solid #dee2e6", borderLeft: "none", borderRight: "none" }}>DNI</th>
                 <th className="fw-bold" style={{ background: "#FFD700", color: "#111", borderTop: "1px solid #dee2e6", borderBottom: "1px solid #dee2e6", borderLeft: "none", borderRight: "none" }}>PLAN</th>
                 <th className="fw-bold" style={{ background: "#FFD700", color: "#111", borderTop: "1px solid #dee2e6", borderBottom: "1px solid #dee2e6", borderLeft: "none", borderRight: "none" }}>PRECIO</th>
+                <th className="fw-bold" style={{ background: "#FFD700", color: "#111", borderTop: "1px solid #dee2e6", borderBottom: "1px solid #dee2e6", borderLeft: "none", borderRight: "none" }}>DURACIÓN</th>
                 <th className="fw-bold" style={{ background: "#FFD700", color: "#111", borderTop: "1px solid #dee2e6", borderBottom: "1px solid #dee2e6", borderLeft: "none", borderRight: "none" }}>M. PAGO</th>
                 <th className="fw-bold" style={{ background: "#FFD700", color: "#111", borderTop: "1px solid #dee2e6", borderBottom: "1px solid #dee2e6", borderLeft: "none", borderRight: "none" }}>FECHA PAGO</th>
                 <th className="fw-bold" style={{ background: "#FFD700", color: "#111", borderTop: "1px solid #dee2e6", borderBottom: "1px solid #dee2e6", borderLeft: "none", borderRight: "none" }}>HORA PAGO</th>
@@ -474,6 +491,22 @@ const PagosplanesList = ({ pagosplanes }) => {
                     <td className="fw-medium align-middle">{p.dni_cliente?.trim() ? p.dni_cliente : "Sin DNI"}</td>
                     <td className="fw-medium align-middle">{p.nombre_plan}</td>
                     <td className="fw-medium align-middle text-end">S/ {parseFloat(p.precio).toFixed(2)}</td>
+                    <td className="align-middle">
+                      <span className={`badge rounded-pill ${
+                        (() => {
+                          switch (p.id_condicion) {
+                            case 1: return "bg-primary text-white";
+                            case 2: return "bg-success text-white";
+                            case 3: return "bg-info text-white";
+                            case 4: return "bg-warning text-dark";
+                            case 5: return "bg-danger text-white";
+                            default: return "bg-secondary text-white";
+                          }
+                        })()
+                      }`}>
+                        {p.nombre_condicion ?? "No disponible"}
+                      </span>
+                    </td>
                     <td className="align-middle">
                       <span className={`badge rounded-pill ${
                         p.metodo_pago === 1 || p.metodo_pago === "1" 

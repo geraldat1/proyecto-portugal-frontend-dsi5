@@ -23,7 +23,7 @@ const AsistenciaForm = ({ show, handleClose, agregar, actualizar, asistenciaSele
       setHoraEnt(asistenciaSeleccionada.hora_entrada);
       setHoraSal(asistenciaSeleccionada.hora_salida);
       setIdDetalle(asistenciaSeleccionada.id_detalle);
-      setIdEntrenador(asistenciaSeleccionada.id_entrenador);
+      setIdEntrenador(asistenciaSeleccionada.id_entrenador !== null ? asistenciaSeleccionada.id_entrenador : 0);
       setIdUsuario(asistenciaSeleccionada.id_usuario);
       setEstado(asistenciaSeleccionada.estado);
     } else {
@@ -31,7 +31,7 @@ const AsistenciaForm = ({ show, handleClose, agregar, actualizar, asistenciaSele
       setHoraEnt("");
       setHoraSal("");
       setIdDetalle("");
-      setIdEntrenador("");
+      setIdEntrenador(0);
       setIdUsuario("");
       setEstado("");
     }
@@ -45,9 +45,10 @@ const AsistenciaForm = ({ show, handleClose, agregar, actualizar, asistenciaSele
       nuevosErrores.id_detalle = "El ID del detalle es obligatorio";
     }
 
-    if (!id_entrenador || String(id_entrenador).trim() === "") {
-      nuevosErrores.id_entrenador = "El ID del entrenador es obligatorio";
+    if (id_entrenador === undefined || id_entrenador === null) {
+      nuevosErrores.id_entrenador = "Seleccione una opción para el entrenador";
     }
+
 
     setErrores(nuevosErrores);
     return Object.keys(nuevosErrores).length === 0;
@@ -78,7 +79,7 @@ const AsistenciaForm = ({ show, handleClose, agregar, actualizar, asistenciaSele
       return;
     }
 
-    const nuevaAsistencia = { id_detalle, id_entrenador };
+    const nuevaAsistencia = { id_detalle, id_entrenador: id_entrenador === 0 ? null : id_entrenador };
 
     if (asistenciaSeleccionada) {
       actualizar(asistenciaSeleccionada.id_asistencia, {
@@ -172,7 +173,7 @@ const AsistenciaForm = ({ show, handleClose, agregar, actualizar, asistenciaSele
         const plan = planes.find((p) => p.id === detalle.id_plan);
         return {
           value: detalle.id,
-          label: `${cliente?.nombre || "Cliente"} - DNI: ${cliente?.dni || "N/D"} (${plan?.plan || "Plan"})`,
+          label: `${cliente?.nombre || "Cliente"} • DNI: ${cliente?.dni || "N/D"} (${plan?.plan || "Plan"})`,
         };
       })
       .find((option) => option.value === id_detalle) || null
@@ -191,39 +192,50 @@ const AsistenciaForm = ({ show, handleClose, agregar, actualizar, asistenciaSele
         </Form.Group>
 
 
-      {/* Select Entrenador con búsqueda solo por nombre */}
-    <Form.Group className="mb-3 col-md-6">
-  <Form.Label className="fw-bold">
-   Seleccionar Entrenador <span className="text-danger">*</span>
-  </Form.Label>
-  <Select
-    options={entrenadores
-      .filter((entrenador) => entrenador.estado !== 0)
-      .map((entrenador) => ({
-        value: entrenador.id,
-        label: `${entrenador.nombre} ${entrenador.apellido}`,
-      }))
-    }
-    onChange={(selectedOption) =>
-      setIdEntrenador(selectedOption ? selectedOption.value : "")
-    }
-    value={
-      entrenadores
-        .filter((entrenador) => entrenador.estado !== 0)
-        .map((entrenador) => ({
-          value: entrenador.id,
-          label: `${entrenador.nombre} ${entrenador.apellido}`,
-        }))
-        .find((option) => option.value === id_entrenador) || null
-    }
-    placeholder="Buscar entrenador por nombre o apellido..."
-    classNamePrefix={!!errores.id_entrenador ? "is-invalid" : ""}
-    isDisabled={!!asistenciaSeleccionada}
-  />
-  {errores.id_entrenador && (
-    <div className="invalid-feedback d-block">{errores.id_entrenador}</div>
-  )}
-</Form.Group>
+     {/* Select Entrenador con búsqueda solo por nombre */}
+      {/* Select Entrenador con opción "Sin entrenador" */}
+      <Form.Group className="mb-3 col-md-6">
+        <Form.Label className="fw-bold">
+          Seleccionar Entrenador <span className="text-danger">*</span>
+        </Form.Label>
+        <Select
+          options={[
+            {
+              value: 0,
+              label: "Sin entrenador"
+            },
+            ...entrenadores
+              .filter((entrenador) => entrenador.estado !== 0)
+              .map((entrenador) => ({
+                value: entrenador.id,
+                label: `${entrenador.nombre} ${entrenador.apellido}`,
+              }))
+          ]}
+          onChange={(selectedOption) =>
+            setIdEntrenador(selectedOption ? selectedOption.value : null)
+          }
+          value={
+            [
+              {
+                value: 0,
+                label: "Sin entrenador"
+              },
+              ...entrenadores
+                .filter((entrenador) => entrenador.estado !== 0)
+                .map((entrenador) => ({
+                  value: entrenador.id,
+                  label: `${entrenador.nombre} ${entrenador.apellido}`,
+                }))
+            ].find((option) => option.value === (id_entrenador !== null ? id_entrenador : 0)) || null
+          }
+          placeholder="Buscar entrenador por nombre o apellido..."
+          classNamePrefix={!!errores.id_entrenador ? "is-invalid" : ""}
+          isDisabled={!!asistenciaSeleccionada}
+        />
+        {errores.id_entrenador && (
+          <div className="invalid-feedback d-block">{errores.id_entrenador}</div>
+        )}
+      </Form.Group>
 
 
 

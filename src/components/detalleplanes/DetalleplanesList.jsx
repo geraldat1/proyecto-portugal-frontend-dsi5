@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useContext  } from "react";
 import { Table, Button, Pagination, Form, Card } from "react-bootstrap";
 import Swal from "sweetalert2";
 import { BiEdit, BiBlock, BiDollar } from "react-icons/bi";
 import { FaSearch, FaCalendarAlt, FaTimes } from "react-icons/fa";
 import { agregarPagosplan } from "../../services/pagosplanesService";
+
+import { AuthContext } from "../../context/AuthContext"; // Importamos el AuthContext
 
 
 const DetalleplanesList = ({ detalleplanes, seleccionar, eliminar, clientes, planes, recargarDatos }) => {
@@ -11,6 +13,8 @@ const DetalleplanesList = ({ detalleplanes, seleccionar, eliminar, clientes, pla
   const [busqueda, setBusqueda] = useState("");
   const [fecha, setFecha] = useState("");
   const elementosPorPagina = 5;
+  const { user } = useContext(AuthContext); // Obtenemos el usuario del contexto
+
 
   const obtenerClienteNombre = (id) => {
     const cliente = clientes.find((cliente) => cliente.id === id);
@@ -32,6 +36,8 @@ const DetalleplanesList = ({ detalleplanes, seleccionar, eliminar, clientes, pla
   const estaFueraDeRango = (fechaLimite) => {
     return esFechaMayor(fechaLimite); // true si la fecha límite ya pasó
   };
+
+  const isRole2 = user?.role === '2' || user?.rol === '2';
 
   // Filtrado por cliente, plan o fecha
   const detalleplanesFiltrados = detalleplanes.filter((detalle) => {
@@ -71,7 +77,7 @@ const DetalleplanesList = ({ detalleplanes, seleccionar, eliminar, clientes, pla
     }).then((result) => {
       if (result.isConfirmed) {
         eliminar(id);
-        Swal.fire("¡Deshabilitado!", "El registro ha sido deshabilitado.", "success");
+        Swal.fire("¡Suspendido!", "El registro ha sido suspendido.", "success");
       }
     });
   };
@@ -432,6 +438,7 @@ const pagar = async (detalleplan) => {
                 <th className="fw-bold">CLIENTE</th>
                 <th className="fw-bold">PLAN</th>
                 <th className="fw-bold">PRECIO</th>
+                <th className="fw-bold">DURACIÓN</th>
                 <th className="fw-bold">F. REGISTRO</th>
                 <th className="fw-bold">HORA</th>
                 <th className="fw-bold">F. VENC.</th>
@@ -459,6 +466,23 @@ const pagar = async (detalleplan) => {
                     <td className="fw-medium align-middle">
                       {planes.find(plan => plan.id === detalleplan.id_plan)?.precio_plan ?? "No disponible"}
                     </td>
+                    <td className="align-middle">
+                      <span className={`badge rounded-pill ${
+                        (() => {
+                          const plan = planes.find(plan => plan.id === detalleplan.id_plan);
+                          switch (plan?.condicion) {
+                            case 1: return "bg-primary text-white";
+                            case 2: return "bg-success text-white";
+                            case 3: return "bg-info text-white";
+                            case 4: return "bg-warning text-dark";
+                            case 5: return "bg-danger text-white";
+                            default: return "bg-secondary text-white";
+                          }
+                        })()
+                      }`}>
+                        {planes.find(plan => plan.id === detalleplan.id_plan)?.condicion_nombre ?? "No disponible"}
+                      </span>
+                    </td>
                     <td className="fw-medium align-middle">{new Date(detalleplan.fecha).toLocaleDateString()}</td>
                     <td className="fw-medium align-middle">{detalleplan.hora}</td>
                     <td className="fw-medium align-middle">{new Date(detalleplan.fecha_venc).toLocaleDateString()}</td>
@@ -474,9 +498,9 @@ const pagar = async (detalleplan) => {
                               : "bg-secondary"
                       }`}>
                         {detalleplan.estado === 1 
-                          ? "Proceso" 
+                          ? "Sin pagar" 
                           : detalleplan.estado === 0 
-                            ? "Deshabilitado" 
+                            ? "Suspendida" 
                             : detalleplan.estado === 2
                               ? "Pagado"
                               : "Desconocido"}
@@ -504,16 +528,18 @@ const pagar = async (detalleplan) => {
                         >
                           <BiEdit size={16} />
                         </Button>
-                        <Button
-                          variant="danger"
-                          onClick={() => confirmarEliminacion(detalleplan.id)}
-                          title="Bloquear"
-                          disabled={detalleplan.estado === 0}
-                          className="d-flex align-items-center justify-content-center p-2 rounded-circle"
-                          style={{ width: "38px", height: "38px" }}
-                        >
-                          <BiBlock size={16} />
-                        </Button>
+                        {!isRole2 && (
+                          <Button
+                            variant="danger"
+                            onClick={() => confirmarEliminacion(detalleplan.id)}
+                            title="Bloquear"
+                            disabled={detalleplan.estado === 0}
+                            className="d-flex align-items-center justify-content-center p-2 rounded-circle"
+                            style={{ width: "38px", height: "38px" }}
+                          >
+                            <BiBlock size={16} />
+                          </Button>
+                        )}
                       </div>
                     </td>
                   </tr>

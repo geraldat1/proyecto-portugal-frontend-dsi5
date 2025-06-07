@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useContext  } from "react";
 import { Table, Button, Form, Badge, Card, Pagination } from "react-bootstrap";
 import Swal from "sweetalert2";
 import { BiEdit, BiBlock, BiSearch } from "react-icons/bi";
 import { FaUserCheck } from "react-icons/fa";
+import { AuthContext } from "../../context/AuthContext"; // Importamos el AuthContext
+
 
 const ClienteList = ({ clientes, seleccionar, eliminar }) => {
   const [busqueda, setBusqueda] = useState("");
@@ -10,6 +12,9 @@ const ClienteList = ({ clientes, seleccionar, eliminar }) => {
   const [hoveredCard, setHoveredCard] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const clientsPerPage = 5;
+
+  const { user } = useContext(AuthContext); // Obtenemos el usuario del contexto
+
 
   // Filtrar clientes según búsqueda y estado
   const clientesFiltrados = clientes.filter((cliente) => {
@@ -26,6 +31,8 @@ const ClienteList = ({ clientes, seleccionar, eliminar }) => {
     
     return coincideBusqueda && coincideEstado;
   });
+
+  const isRole2 = user?.role === '2' || user?.rol === '2';
 
   // Ordenar por ID descendente
   const clientesOrdenados = [...clientesFiltrados].sort((a, b) => b.id - a.id);
@@ -242,16 +249,18 @@ const ClienteList = ({ clientes, seleccionar, eliminar }) => {
                           <BiEdit size={20} />
                         </Button>
                         
-                        <Button 
-                          variant={cliente.estado === 1 ? "outline-danger" : "outline-secondary"}
-                          onClick={() => cliente.estado === 1 ? confirmarEliminacion(cliente.id) : null}
-                          title={cliente.estado === 1 ? "Deshabilitar" : "Ya deshabilitado"}
-                          className="d-flex align-items-center justify-content-center p-2 rounded-circle"
-                          style={{ width: "38px", height: "38px" }}
-                          disabled={cliente.estado === 0}
-                        >
-                          <BiBlock size={20} />
-                        </Button>
+                        {!isRole2 && (
+                          <Button 
+                            variant={cliente.estado === 1 ? "outline-danger" : "outline-secondary"}
+                            onClick={() => cliente.estado === 1 ? confirmarEliminacion(cliente.id) : null}
+                            title={cliente.estado === 1 ? "Deshabilitar" : "Ya deshabilitado"}
+                            className="d-flex align-items-center justify-content-center p-2 rounded-circle"
+                            style={{ width: "38px", height: "38px" }}
+                            disabled={cliente.estado === 0}
+                          >
+                            <BiBlock size={20} />
+                          </Button>
+                        )}
                       </div>
                     </td>
                   </tr>

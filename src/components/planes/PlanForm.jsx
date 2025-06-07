@@ -44,7 +44,10 @@ const PlanForm = ({ show, handleClose, agregar, actualizar, planSeleccionado }) 
     if (!precio_plan || isNaN(precio_plan) || parseFloat(precio_plan) <= 0) {
       nuevosErrores.precio_plan = "El precio debe ser un número válido y mayor a 0";
     }
-    if (!condicion.trim()) nuevosErrores.condicion = "La condición es obligatoria";
+    if (!String(condicion).trim()) {
+  nuevosErrores.condicion = "La condición es obligatoria";
+}
+
     if (!imagen.trim()) nuevosErrores.imagen = "La URL de la imagen es obligatoria";
 
     setErrores(nuevosErrores);
@@ -68,8 +71,22 @@ const PlanForm = ({ show, handleClose, agregar, actualizar, planSeleccionado }) 
         estado: parseInt(estado),
         id_user: parseInt(id_user),
       });
+      Swal.fire({
+      icon: "info",
+      title: "Plan actualizado",
+      text: "El plan fue actualizado correctamente.",
+      timer: 2000,
+      showConfirmButton: false,
+    });
     } else {
       agregar(nuevoPlan);
+      Swal.fire({
+    icon: "success",
+    title: "Plan registrado",
+    text: "El plan fue registrado exitosamente.",
+    timer: 2000,
+    showConfirmButton: false,
+  });
     }
 
     setPlan("");

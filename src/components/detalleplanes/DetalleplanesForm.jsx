@@ -18,16 +18,6 @@ const formatDateForInput = (date) => {
   return d.toISOString().split('T')[0];
 };
 
-const parseInputDate = (dateString) => {
-  if (!dateString) return null;
-  
-  // Creamos la fecha en la zona horaria local
-  const [year, month, day] = dateString.split('-');
-  const localDate = new Date(year, month - 1, day);
-  
-  return localDate;
-};
-
 const DetalleplanesForm = ({
   show,
   handleClose,
@@ -87,27 +77,77 @@ const DetalleplanesForm = ({
     return Object.keys(nuevosErrores).length === 0;
   };
 
-    const addDays = (date, days) => {
+  const addDays = (date, days) => {
     const result = new Date(date);
     result.setDate(result.getDate() + days);
     return result;
   };
 
+  const addMonths = (date, months) => {
+    const result = new Date(date);
+    result.setMonth(result.getMonth() + months);
+    return result;
+  };
 
+  const addYears = (date, years) => {
+    const result = new Date(date);
+    result.setFullYear(result.getFullYear() + years);
+    return result;
+  };
 
-const validarDuplicado = () => {
-  // Buscamos si ya existe un registro activo o en proceso para el mismo cliente
-  return detallePlanesExistentes.some((dp) => {
-    if (detalleplanSeleccionada && dp.id === detalleplanSeleccionada.id) return false;
-    return (
-      dp.id_cliente === id_cliente &&
-      (dp.estado === 1 || dp.estado === 2)
-    );
-  });
-};
+  const calcularFechaVencimiento = (planId) => {
+    const planSeleccionado = planes.find(plan => plan.id === planId);
+    if (!planSeleccionado) return null;
 
+    const hoy = new Date();
+    
+    switch(planSeleccionado.condicion) {
+      case 1: // 1 día
+        return addDays(hoy, 1);
+      case 2: // 1 mes
+        return addMonths(hoy, 1);
+      case 3: // 3 meses
+        return addMonths(hoy, 3);
+      case 4: // 1 año
+        return addYears(hoy, 1);
+      case 5: // 1 mes
+        return addMonths(hoy, 1);
+      default:
+        return null;
+    }
+  };
 
- const manejarEnvio = (e) => {
+  const handlePlanChange = (selectedOption) => {
+    const planId = selectedOption ? selectedOption.value : "";
+    setIdPlan(planId);
+    
+    if (planId) {
+      const nuevaFechaVenc = calcularFechaVencimiento(planId);
+      setFechaVenc(nuevaFechaVenc);
+      
+      if (nuevaFechaVenc) {
+        setFechaLimite(addDays(nuevaFechaVenc, 2));
+      } else {
+        setFechaLimite(null);
+      }
+    } else {
+      setFechaVenc(null);
+      setFechaLimite(null);
+    }
+  };
+
+  const validarDuplicado = () => {
+    // Buscamos si ya existe un registro activo o en proceso para el mismo cliente
+    return detallePlanesExistentes.some((dp) => {
+      if (detalleplanSeleccionada && dp.id === detalleplanSeleccionada.id) return false;
+      return (
+        dp.id_cliente === id_cliente &&
+        (dp.estado === 1 || dp.estado === 2)
+      );
+    });
+  };
+
+  const manejarEnvio = (e) => {
     e.preventDefault();
     if (!validar()) {
       Swal.fire("Campos inválidos", "Por favor revisa los datos ingresados", "error");
@@ -198,7 +238,7 @@ const validarDuplicado = () => {
                 .filter((cliente) => cliente.estado !== 0)
                 .map((cliente) => ({
                   value: cliente.id,
-                  label: `${cliente.nombre} - DNI: ${cliente.dni}`,
+                  label: `${cliente.nombre} ${cliente.apellido || ''} • DNI: ${cliente.dni}`.trim(),
                 }))
               }
               onChange={(selectedOption) => setIdCliente(selectedOption ? selectedOption.value : "")}
@@ -206,7 +246,7 @@ const validarDuplicado = () => {
                 .filter((cliente) => cliente.estado !== 0)
                 .map((cliente) => ({
                   value: cliente.id,
-                  label: `${cliente.nombre} - DNI: ${cliente.dni}`,
+                  label: `${cliente.nombre} ${cliente.apellido || ''} • DNI: ${cliente.dni}`.trim(),
                 }))
                 .find(option => option.value === id_cliente) || null
               }
@@ -219,71 +259,55 @@ const validarDuplicado = () => {
             )}
           </Form.Group>
 
- {/* Select Plan con búsqueda por nombre y precio */}
-<Form.Group className="mb-3">
-  <Form.Label className="fw-bold">
-    Seleccionar Plan <span className="text-danger">*</span>
-  </Form.Label>
-  <Select
-    options={planes
-      .filter((plan) => plan.estado !== 0)
-      .map((plan) => ({
-        value: plan.id,
-        label: `${plan.plan} - S/ ${plan.precio_plan}`, // Muestra nombre y precio
-      }))
-    }
-    onChange={(selectedOption) =>
-      setIdPlan(selectedOption ? selectedOption.value : "")
-    }
-    value={
-      planes
-        .filter((plan) => plan.estado !== 0)
-        .map((plan) => ({
-          value: plan.id,
-          label: `${plan.plan} - S/ ${plan.precio_plan}`,
-        }))
-        .find((option) => option.value === id_plan) || null
-    }
-    placeholder="Buscar plan por nombre o precio..."
-    classNamePrefix={!!errores.id_plan ? "is-invalid" : ""}
-  />
-  {errores.id_plan && (
-    <div className="invalid-feedback d-block">{errores.id_plan}</div>
-  )}
-</Form.Group>
-
-
-
-
-          <div className="row">
-            {/* Fecha Vencimiento */}
-            <Form.Group className="mb-3 col-md-6">
-              <Form.Label className="fw-bold">Fecha de Fin del Plan<span className="text-danger">*</span></Form.Label>
-             <Form.Control
-              type="date"
-              value={formatDateForInput(fecha_venc)}
-              onChange={(e) => {
-                const nuevaFechaVenc = parseInputDate(e.target.value);
-                setFechaVenc(nuevaFechaVenc);
-
-                // Establecer fecha límite automáticamente como 5 días después
-                if (nuevaFechaVenc) {
-                  setFechaLimite(addDays(nuevaFechaVenc, 2));
-                } else {
-                  setFechaLimite(null);
-                }
-              }}
-              isInvalid={!!errores.fecha_venc}
-              min={formatDateForInput(addDays(new Date(), 1))}
+          {/* Select Plan con búsqueda por nombre, precio y condición */}
+          <Form.Group className="mb-3">
+            <Form.Label className="fw-bold">
+              Seleccionar Plan <span className="text-danger">*</span>
+            </Form.Label>
+            <Select
+              options={planes
+                .filter((plan) => plan.estado !== 0)
+                .map((plan) => ({
+                  value: plan.id,
+                  label: `${plan.plan} • S/ ${plan.precio_plan} • ${plan.condicion_nombre}`,
+                }))
+              }
+              onChange={handlePlanChange}
+              value={
+                planes
+                  .filter((plan) => plan.estado !== 0)
+                  .map((plan) => ({
+                    value: plan.id,
+                    label: `${plan.plan} • S/ ${plan.precio_plan} • ${plan.condicion_nombre}`,
+                  }))
+                  .find((option) => option.value === id_plan) || null
+              }
+              placeholder="Buscar plan por nombre, precio o condición..."
+              classNamePrefix={!!errores.id_plan ? "is-invalid" : ""}
             />
+            {errores.id_plan && (
+              <div className="invalid-feedback d-block">{errores.id_plan}</div>
+            )}
+          </Form.Group>
 
-              <Form.Text className="text-muted">
-              Día en que termina la vigencia de la suscripción
-              </Form.Text>
-              <Form.Control.Feedback type="invalid">
-                {errores.fecha_venc}
-              </Form.Control.Feedback>
-            </Form.Group>
+       <div className="row">
+  {/* Fecha Vencimiento - Ahora no editable */}
+  <Form.Group className="mb-3 col-md-6">
+    <Form.Label className="fw-bold">Fecha de Fin del Plan<span className="text-danger">*</span></Form.Label>
+    <Form.Control
+      type="date"
+      value={formatDateForInput(fecha_venc)}
+      readOnly
+      disabled
+      isInvalid={!!errores.fecha_venc}
+    />
+    <Form.Text className="text-muted">
+      Día en que termina la vigencia de la suscripción (calculado automáticamente)
+    </Form.Text>
+    <Form.Control.Feedback type="invalid">
+      {errores.fecha_venc}
+    </Form.Control.Feedback>
+  </Form.Group>
 
             {/* Fecha Límite */}
             <Form.Group className="mb-3 col-md-6">

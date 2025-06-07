@@ -267,20 +267,23 @@ const Navbar = () => {
                   </Nav.Link>
                 )}
 
-                {!isRole2 && (
-                  <NavDropdown 
-                    title={menuItem(<FaConciergeBell />, "Servicios")} 
-                    id="servicios-dropdown"
-                    className="nav-dropdown"
-                  >
-                    <NavDropdown.Item as={Link} to="/planes">
-                      {menuItem(<FaClipboardList className="text-success me-2" />, "Planes")}
-                    </NavDropdown.Item>
+                <NavDropdown 
+                  title={menuItem(<FaConciergeBell />, "Servicios")} 
+                  id="servicios-dropdown"
+                  className="nav-dropdown"
+                >
+                  {/* Siempre mostrar "Planes" (tanto para no rol 2 como para rol 2) */}
+                  <NavDropdown.Item as={Link} to="/planes">
+                    {menuItem(<FaClipboardList className="text-success me-2" />, "Planes")}
+                  </NavDropdown.Item>
+
+                  {/* Mostrar "Rutinas" SOLO si NO es rol 2 */}
+                  {!isRole2 && (
                     <NavDropdown.Item as={Link} to="/rutinas">
                       {menuItem(<FaRunning className="text-danger me-2" />, "Rutinas")}
                     </NavDropdown.Item>
-                  </NavDropdown>
-                )}
+                  )}
+                </NavDropdown>
               </Nav>
             </BsNavbar.Collapse>
           </BsNavbar>
