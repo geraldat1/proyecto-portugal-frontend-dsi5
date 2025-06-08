@@ -47,7 +47,7 @@ const Personas = () => {
       <h2>Gestión de Personas</h2>
       <Button 
       className="mb-3" 
-      variant="primary"
+      variant="dark"
        onClick={() => {
        setPersonaSeleccionada(null);
        setMostrarModal(true);

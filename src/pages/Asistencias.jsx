@@ -129,7 +129,7 @@ const cargarPlanes = async () => {
       <h2>Registro de Asistencia de Cliente</h2>
       <Button
         className="mb-3 d-flex align-items-center gap-2"
-        variant="primary"
+        variant="dark"
         onClick={() => {
           setAsistenciaSeleccionada(null);
           setMostrarModal(true);

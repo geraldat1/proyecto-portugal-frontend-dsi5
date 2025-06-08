@@ -50,7 +50,7 @@ const Rutinas = () => {
       <h2>Lista de Rutinas</h2>
       <Button
         className="mb-3"
-        variant="primary"
+        variant="dark"
         onClick={() => {
           setRutinaSeleccionada(null);
           setMostrarModal(true);

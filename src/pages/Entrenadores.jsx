@@ -49,7 +49,7 @@ const Entrenadores = () => {
       <h2>Registro de Entrenadores</h2>
       <Button
       className="mb-3 d-flex align-items-center"
-      variant="primary"
+      variant="dark"
       onClick={() => {
         setEntrenadorSeleccionado(null);
         setMostrarModal(true);

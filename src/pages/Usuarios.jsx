@@ -50,7 +50,7 @@ const Usuarios = () => {
       <h2>Administración de Usuarios</h2>
       <Button 
       className="mb-3 d-flex align-items-center gap-2" 
-      variant="primary"
+      variant="dark"
       onClick={() => {
         setUsuarioSeleccionado(null);
         setMostrarModal(true);

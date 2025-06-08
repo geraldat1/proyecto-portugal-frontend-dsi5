@@ -514,12 +514,12 @@ const Login = () => {
             flex-direction: column;
             height: auto;
           }
-          .login-image-section,
+          .login-image-section {
+            display: none; /* Esto ocultará la sección de la imagen en pantallas pequeñas */
+          }
           .login-form-section {
             width: 100%;
-          }
-          .login-image-section {
-            height: 200px;
+            padding: 30px 20px; /* Ajustamos el padding para móviles */
           }
         }
       `}</style>

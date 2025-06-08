@@ -143,12 +143,12 @@ const PlanList = ({ planes, seleccionar, eliminar }) => {
 
       {/* Filter Bar */}
       <div className="d-flex justify-content-center">
-        <div className="filter-bar mb-4">
+        <div className="filter-bar mb-3">
           <div className="d-flex align-items-center">
-            <span className="me-2 text-muted" style={{ fontSize: '0.875rem' }}>Planes Registrados</span>
+            
             <ButtonGroup className="flex-wrap">
               <Button
-                variant={!filtroCondicion ? "primary" : "outline-secondary"}
+                variant={!filtroCondicion ? "primary" : "outline-dark"}
                 className="filter-btn"
                 onClick={() => setFiltroCondicion(null)}
                 active={!filtroCondicion}
@@ -166,7 +166,7 @@ const PlanList = ({ planes, seleccionar, eliminar }) => {
                 return (
                   <Button
                     key={condicion}
-                    variant={filtroCondicion === condicion ? "primary" : "outline-secondary"}
+                    variant={filtroCondicion === condicion ? "primary" : "outline-dark"}
                     className={`filter-btn ${filtroCondicion === condicion ? 'active' : ''}`}
                     onClick={() => setFiltroCondicion(condicion)}
                     active={filtroCondicion === condicion}
@@ -216,7 +216,7 @@ const PlanList = ({ planes, seleccionar, eliminar }) => {
                 
                 <Card.Body className="card-body-content">
                   <div className="d-flex justify-content-between align-items-start mb-2">
-                    <h5 className="card-title mb-0 fw-bold text-truncate">
+                    <h5 className="card-title mb-0 fw-bold" style={{ whiteSpace: 'normal' }}>
                       {plan.plan}
                     </h5>
                     <Badge 
@@ -236,10 +236,8 @@ const PlanList = ({ planes, seleccionar, eliminar }) => {
                   <p className="text-muted mb-3" style={{ 
                     fontSize: '0.8rem', 
                     lineHeight: '1.5',
-                    display: '-webkit-box',
-                    WebkitLineClamp: 3,
-                    WebkitBoxOrient: 'vertical',
-                    overflow: 'hidden'
+                    whiteSpace: 'normal', // Permite saltos de línea naturales
+                    overflow: 'visible'   // Evita que el texto se corte
                   }}>
                     {plan.descripcion}
                   </p>

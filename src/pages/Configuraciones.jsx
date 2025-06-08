@@ -47,7 +47,7 @@ const Configuraciones = () => {
       <h2>Datos de la Empresa</h2>
       <Button 
       className="mb-3" 
-      variant="primary"
+      variant="dark"
        onClick={() => {
        setConfiguracionSeleccionada(null);
        setMostrarModal(true);

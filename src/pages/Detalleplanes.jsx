@@ -76,7 +76,7 @@ const Detalleplanes = () => {
       <h2>Registro de Suscripción de Cliente</h2>
       <Button
         className="mb-3 d-flex align-items-center"
-        variant="primary"
+        variant="dark"
         onClick={() => {
           setDetalleplanSeleccionada(null);
           setMostrarModal(true);

@@ -1,15 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { FiUsers, FiUserCheck, FiClipboard, FiFileText } from 'react-icons/fi';
+import { FiUsers, FiUserCheck, FiClipboard, FiFileText, FiDollarSign, FiAward } from 'react-icons/fi';
 import { obtenerClientes } from '../services/clienteService';
 import { obtenerEntrenadores } from '../services/entrenadorService';
 import { obtenerAsistencias } from '../services/asistenciaService';
 import { obtenerPlanes } from '../services/planService';
+import { obtenerPagoplanes } from '../services/pagosplanesService'; 
+import { obtenerDetalleplanes } from '../services/detalleplanesService';
+
 
 const Home = () => {
   const [clientes, setClientes] = useState([]);
   const [entrenadores, setEntrenadores] = useState([]);
   const [asistencias, setAsistencias] = useState([]);
   const [planes, setPlanes] = useState([]);
+  const [totalPagosHoy, setTotalPagosHoy] = useState(0);
+  const [planesMasComprados, setPlanesMasComprados] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -19,39 +24,82 @@ const Home = () => {
       const todosEntrenadores = await obtenerEntrenadores();
       setEntrenadores(todosEntrenadores.filter(e => e.estado === 1));
 
-    const todasAsistencias = await obtenerAsistencias();
-      // Filtrar solo las asistencias del día de hoy (asumiendo que asistencia tiene campo 'fecha')
+      const todasAsistencias = await obtenerAsistencias();
       const obtenerFechaPeru = () => {
-      const fechaUtc = new Date();
-      // Perú UTC-5, restamos 5 horas a la hora UTC
-      const fechaPeru = new Date(fechaUtc.getTime() - 5 * 60 * 60 * 1000);
-      return fechaPeru.toISOString().split('T')[0];
-    };
+        const fechaUtc = new Date();
+        const fechaPeru = new Date(fechaUtc.getTime() - 5 * 60 * 60 * 1000);
+        return fechaPeru.toISOString().split('T')[0];
+      };
 
-    const formatoFecha = obtenerFechaPeru();
+      const formatoFecha = obtenerFechaPeru();
 
-    setAsistencias(
-      todasAsistencias.filter(a => 
-        (a.estado === 0 || a.estado === 1) &&
-        a.fecha &&
-        a.fecha.startsWith(formatoFecha)
-      )
-    );
+      setAsistencias(
+        todasAsistencias.filter(a => 
+          (a.estado === 0 || a.estado === 1) &&
+          a.fecha &&
+          a.fecha.startsWith(formatoFecha)
+        )
+      );
 
       const todosPlanes = await obtenerPlanes();
       setPlanes(todosPlanes.filter(p => p.estado === 1));
+
+      const todosPagos = await obtenerPagoplanes();
+      const pagosHoy = todosPagos.filter(p => 
+        p.fecha && p.fecha.startsWith(formatoFecha)
+      );
+      
+      const sumaPagos = pagosHoy.reduce((total, pago) => total + (parseFloat(pago.precio) || 0), 0);
+      setTotalPagosHoy(sumaPagos);
+
+      const detallesPlanes = await obtenerDetalleplanes();
+      
+
+
+const conteoPlanes = {};
+detallesPlanes.forEach(detalle => {
+  // Solo procesar si el estado es 2
+  if (detalle.estado === 2) {
+    const idPlan = detalle.id_plan;
+    if (idPlan) {
+      if (!conteoPlanes[idPlan]) {
+        const planCorrespondiente = todosPlanes.find(p => p.id === idPlan);
+        
+        conteoPlanes[idPlan] = {
+          count: 0,
+          nombre: planCorrespondiente?.plan || 'Plan Desconocido',
+          precio: planCorrespondiente?.precio_plan || 0
+        };
+      }
+      conteoPlanes[idPlan].count += 1;
+    }
+  }
+});
+
+// Convertir a array y ordenar
+const planesPopulares = Object.keys(conteoPlanes).map(id => ({
+  id,
+  nombre: conteoPlanes[id].nombre,
+  cantidad: conteoPlanes[id].count,
+  precio: parseFloat(conteoPlanes[id].precio).toFixed(2) // Asegura formato de 2 decimales
+})).sort((a, b) => b.cantidad - a.cantidad);
+
+setPlanesMasComprados(planesPopulares.slice(0, 3));
     };
 
     fetchData();
   }, []);
 
+
+  // Meta diaria para el gráfico (puedes ajustar este valor)
+  const metaDiaria = 3000;
+
   return (
     <div style={{
-      padding: '2rem',
+      padding: '1rem',
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
       width: '100%',
       minHeight: '100vh',
-      backgroundColor: '#f9f9f9',
       boxSizing: 'border-box'
     }}>
       <div style={{
@@ -65,9 +113,9 @@ const Home = () => {
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-          gap: '1.5rem',
+          gap: '1rem',
           width: '100%',
-          marginBottom: '2rem'
+          marginBottom: '1rem'
         }}>
           <Card
             icon={<FiUsers />}
@@ -104,17 +152,179 @@ const Home = () => {
           />
         </div>
 
-        {/* Additional content space */}
+        {/* Sección de estadísticas */}
         <div style={{
-          flex: 1,
-          backgroundColor: '#ffffff',
-          borderRadius: '12px',
-          padding: '1.5rem',
-          boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
-          border: '1px solid #f1f1f1'
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: '1rem',
+          marginBottom: '2rem'
         }}>
-          {/* Puedes añadir contenido adicional aquí */}
+          {/* Gráfico de planes populares */}
+           <div style={{
+            backgroundColor: '#ffffff',
+            borderRadius: '12px', // Más pequeño
+            padding: '1rem', // Menos padding
+            boxShadow: '0 4px 12px rgba(0,0,0,0.1)', // Sombra más sutil
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center'
+          }}>
+            <h3 style={{
+              fontSize: '1rem',
+              marginBottom: '1rem',
+              color: '#111111',
+              fontWeight: '600',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem'
+            }}>
+              <FiAward style={{ color: '#FFD700' }} /> Planes más comprados
+            </h3>
+            
+            <div style={{
+              width: '150px',
+              height: '150px',
+              borderRadius: '50%',
+              background: 'conic-gradient(#FFD700 0% 33%, #111111 33% 66%, #FF6B6B 66% 100%)',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              position: 'relative',
+              marginBottom: '1rem',
+              boxShadow: '0 10px 30px rgba(0,0,0,0.15)'
+            }}>
+              <div style={{
+                width: '120px',
+                height: '120px',
+                borderRadius: '50%',
+                backgroundColor: '#ffffff',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                boxShadow: 'inset 0 0 20px rgba(0,0,0,0.1)'
+              }}>
+                <span style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#111111' }}>
+                  Top 3
+                </span>
+                <span style={{ fontSize: '1rem', color: '#666666' }}>
+                  Más populares
+                </span>
+              </div>
+            </div>
+            
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '0.3rem',
+              width: '100%'
+            }}>
+              {planesMasComprados.map((plan, index) => (
+                <div key={index} style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  padding: '0.3rem 0.5rem',
+                  backgroundColor: index === 0 ? '#FFF8E1' : '#f9f9f9',
+                  borderRadius: '6px'
+                }}>
+                  <div>
+                    <div style={{ fontWeight: '500' }}>{plan.nombre}</div>
+                    <div style={{ fontSize: '0.7rem', color: '#666' }}>S/. {plan.precio}</div>
+                  </div>
+                  <span style={{ fontWeight: 'bold', color: '#85c1e9' }}>{plan.cantidad} compras</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          {/* Gráfico de Ingresos de Hoy - Versión mejorada */}
+          <div style={{
+            backgroundColor: '#ffffff',
+            borderRadius: '12px',
+            padding: '1rem',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center'
+          }}>
+            <h3 style={{
+              fontSize: '1rem',
+              marginBottom: '1rem',
+              color: '#111111',
+              fontWeight: '600',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem'
+            }}>
+              <FiDollarSign style={{ color: '#4CAF50' }} /> Ingresos de Hoy
+            </h3>
+            
+            <div style={{
+              width: '150px',
+              height: '150px',
+              borderRadius: '50%',
+              background: `conic-gradient(#4CAF50 0% ${(totalPagosHoy/metaDiaria)*100}%, #E0E0E0 ${(totalPagosHoy/metaDiaria)*100}% 100%)`,
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              position: 'relative',
+              marginBottom: '1.5rem',
+              boxShadow: '0 10px 30px rgba(0,0,0,0.15)'
+            }}>
+              <div style={{
+                width: '120px',
+                height: '120px',
+                borderRadius: '50%',
+                backgroundColor: '#ffffff',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                boxShadow: 'inset 0 0 20px rgba(0,0,0,0.1)'
+              }}>
+                <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#4CAF50' }}>
+                  S/. {totalPagosHoy.toFixed(2)}
+                </span>
+                <span style={{ fontSize: '0.9rem', color: '#666666' }}>
+                  Total recaudado
+                </span>
+              </div>
+            </div>
+            
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-around',
+              width: '100%',
+              marginTop: '0.5rem'
+            }}>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{
+                  width: '12px',
+                  height: '12px',
+                  backgroundColor: '#4CAF50',
+                  borderRadius: '50%',
+                  margin: '0 auto 0.5rem'
+                }} />
+                <span style={{ fontSize: '0.9rem' }}>
+                  {Math.round((totalPagosHoy/metaDiaria)*100)}% Meta
+                </span>
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{
+                  width: '12px',
+                  height: '12px',
+                  backgroundColor: '#E0E0E0',
+                  borderRadius: '50%',
+                  margin: '0 auto 0.5rem'
+                }} />
+                <span style={{ fontSize: '0.9rem' }}>
+                  {Math.round(100-(totalPagosHoy/metaDiaria)*100)}% Restante
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
+
       </div>
     </div>
   );

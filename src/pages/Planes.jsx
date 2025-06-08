@@ -55,7 +55,7 @@ const Planes = () => {
       {!isRole2 && (
         <Button
           className="mb-3 d-flex align-items-center gap-2 fw-semibold shadow-sm"
-          variant="primary"
+          variant="dark"
           onClick={() => {
             setPlanSeleccionado(null);
             setMostrarModal(true);
@@ -74,6 +74,7 @@ const Planes = () => {
         agregar={agregar}
         actualizar={actualizar}
         planSeleccionado={planSeleccionado}
+        planes={planes}
       />
     </div>
   );

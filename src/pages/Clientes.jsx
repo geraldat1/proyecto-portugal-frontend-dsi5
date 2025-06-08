@@ -49,7 +49,7 @@ const Clientes = () => {
       <h2>Registro de Cliente</h2>
       <Button
         className="mb-3 d-flex align-items-center"
-        variant="primary"
+        variant="dark"
         onClick={() => {
           setClienteSeleccionado(null);
           setMostrarModal(true);
