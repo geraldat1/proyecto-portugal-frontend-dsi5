@@ -215,163 +215,204 @@ const pagosplanesFiltrados = pagosplanes.filter((p) => {
     };
   };
 
-  const generarBoleta = (p) => {
-    const doc = new jsPDF({
-      orientation: "portrait",
-      unit: "mm",
-      format: [80, 200],
-      putOnlyUsedFonts: true,
-      floatPrecision: 16,
-    });
+const generarBoleta = (p) => {
+  const doc = new jsPDF({
+    orientation: "portrait",
+    unit: "mm",
+    format: [80, 200],
+    putOnlyUsedFonts: true,
+    floatPrecision: 16,
+  });
 
-    doc.setFont("helvetica", "normal");
-    doc.setTextColor(0, 0, 0);
+  doc.setFont("helvetica", "normal");
+  doc.setTextColor(0, 0, 0);
 
-    const logo = new window.Image();
-    logo.src = "/imagenes/logo-toreto.png";
+  const logo = new window.Image();
+  logo.src = "/imagenes/logo-toreto.png";
 
-    logo.onload = () => {
-      try {
-        const logoWidth = 20;
-        const logoHeight = 15;
-        const logoX = (doc.internal.pageSize.getWidth() - logoWidth) / 2;
-        let y = 5;
+  logo.onload = () => {
+    try {
+      const logoWidth = 20;
+      const logoHeight = 15;
+      const logoX = (doc.internal.pageSize.getWidth() - logoWidth) / 2;
+      let y = 5;
 
-        doc.addImage(logo, "PNG", logoX, y, logoWidth, logoHeight);
-        y += logoHeight + 2;
-        doc.setDrawColor(150, 150, 150);
-        doc.setLineWidth(0.4);
-        doc.line(5, y, 75, y);
-        y += 5;
+      // Logo
+      doc.addImage(logo, "PNG", logoX, y, logoWidth, logoHeight);
+      y += logoHeight + 2;
 
-        doc.setFontSize(16);
-        doc.setFont("helvetica", "bold");
-        const textTitle = "BOLETA DE PAGO";
-        const titleX = (doc.internal.pageSize.getWidth() - doc.getStringUnitWidth(textTitle) * doc.internal.getFontSize() / doc.internal.scaleFactor) / 2;
-        doc.text(textTitle, titleX, y);
-        y += 6;
+      // Nombre de empresa (centrado)
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "bold");
+      const empresa = "ToretoGym S.A.C";
+      const empresaX = (doc.internal.pageSize.getWidth() - doc.getStringUnitWidth(empresa) * doc.internal.getFontSize() / doc.internal.scaleFactor) / 2;
+      doc.text(empresa, empresaX, y);
+      y += 4;
 
-        doc.setFontSize(12);
+      // RUC (centrado)
+      doc.setFont("helvetica", "normal");
+      const rucText = `RUC: 10708424906`;
+      const rucX = (doc.internal.pageSize.getWidth() - doc.getStringUnitWidth(rucText) * doc.internal.getFontSize() / doc.internal.scaleFactor) / 2;
+      doc.text(rucText, rucX, y);
+      y += 4;
 
-        const numBoleta = Number(p.numero_boleta || p.id || 0);
+      // Teléfono (centrado)
+      const telText = `Tel: 976664659`;
+      const telX = (doc.internal.pageSize.getWidth() - doc.getStringUnitWidth(telText) * doc.internal.getFontSize() / doc.internal.scaleFactor) / 2;
+      doc.text(telText, telX, y);
+      y += 4;
 
-        // Serie dinámica según cada 1000 boletas, sin sumar 1
-        const serieNumero = Math.floor(numBoleta / 1000) + 1;
-        const serie = `B${serieNumero.toString().padStart(3, '0')}`;
+      // Dirección (alineado a la izquierda como en el original)
+      doc.text(`Dirección: Av 9 de Octubre Jr. Manco Capac`, 5, y);
+      y += 4;
 
-        // Correlativo dentro de la serie, sin sumar 1 (empieza en 000000)
-        const correlativo = numBoleta % 1000;
-        const correlativoStr = correlativo.toString().padStart(6, '0');
+      // Línea separadora
+      doc.setDrawColor(150, 150, 150);
+      doc.setLineWidth(0.4);
+      doc.line(5, y, 75, y);
+      y += 5;
 
-        const numeroCompleto = `${serie}-${correlativoStr}`;
+      // Título de la boleta
+      doc.setFontSize(16);
+      doc.setFont("helvetica", "bold");
+      const textTitle = "BOLETA ELECTRONICA";
+      const titleX = (doc.internal.pageSize.getWidth() - doc.getStringUnitWidth(textTitle) * doc.internal.getFontSize() / doc.internal.scaleFactor) / 2;
+      doc.text(textTitle, titleX, y);
+      y += 6;
 
-        const numX = (doc.internal.pageSize.getWidth() - doc.getStringUnitWidth(numeroCompleto) * doc.internal.getFontSize() / doc.internal.scaleFactor) / 2;
-        doc.text(numeroCompleto, numX, y);
-        y += 4;
+      doc.setFontSize(12);
 
+      const numBoleta = Number(p.numero_boleta || p.id || 0);
+      const serieNumero = Math.floor(numBoleta / 1000) + 1;
+      const serie = `B${serieNumero.toString().padStart(3, '0')}`;
+      const correlativo = numBoleta % 1000;
+      const correlativoStr = correlativo.toString().padStart(6, '0');
+      const numeroCompleto = `${serie}-${correlativoStr}`;
 
-        doc.setDrawColor(150, 150, 150);
-        doc.setLineWidth(0.4);
-        doc.line(5, y, 75, y);
-        y += 5;
+      const numX = (doc.internal.pageSize.getWidth() - doc.getStringUnitWidth(numeroCompleto) * doc.internal.getFontSize() / doc.internal.scaleFactor) / 2;
+      doc.text(numeroCompleto, numX, y);
+      y += 4;
 
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(8);
-        const fechaActual = new Date();
-        const fechaStr = fechaActual.toLocaleDateString("es-PE", {
-          day: '2-digit',
-          month: '2-digit',
-          year: 'numeric'
-        });
-        const horaStr = fechaActual.toLocaleTimeString("es-PE", {
-          hour: '2-digit',
-          minute: '2-digit'
-        });
-        const idUsuario = user?.id || "Desconocido";
-        doc.text(`Emitido el: ${fechaStr}`, 5, y);
+      doc.setDrawColor(150, 150, 150);
+      doc.setLineWidth(0.4);
+      doc.line(5, y, 75, y);
+      y += 5;
 
-        // Mostrar hora un poco más hacia la izquierda (desde el borde derecho)
-        const horaTexto = `Hora: ${horaStr}`;
-        const pageWidth = doc.internal.pageSize.getWidth();
-        const horaX = pageWidth - doc.getStringUnitWidth(horaTexto) * doc.internal.getFontSize() / doc.internal.scaleFactor - 5;
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8);
+      const fechaActual = new Date();
+      const fechaStr = fechaActual.toLocaleDateString("es-PE", {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      });
+      const horaStr = fechaActual.toLocaleTimeString("es-PE", {
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+      const idUsuario = user?.id || "Desconocido";
+      doc.text(`Emitido el: ${fechaStr}`, 5, y);
 
-        doc.text(horaTexto, horaX, y);
-        doc.text(`Usuario ID: ${idUsuario}`, 5, y + 5);
-        doc.text(`Fecha del Pago: ${new Date(p.fecha).toLocaleDateString("es-PE")}`, 5, y + 10);
-        doc.text(`Hora del Pago: ${p.hora}`, 5, y + 15);
-        doc.text(`ID Detalle: ${p.id_detalle}`, 5, y + 20);
+      // Mostrar hora un poco más hacia la izquierda (desde el borde derecho)
+      const horaTexto = `Hora: ${horaStr}`;
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const horaX = pageWidth - doc.getStringUnitWidth(horaTexto) * doc.internal.getFontSize() / doc.internal.scaleFactor - 5;
 
-        y += 25;
+      doc.text(horaTexto, horaX, y);
+      doc.text(`Usuario: ${idUsuario}`, 5, y + 5);
+      doc.text(`Fecha del Pago: ${new Date(p.fecha).toLocaleDateString("es-PE")}`, 5, y + 10);
+      doc.text(`Hora del Pago: ${p.hora}`, 5, y + 15);
+      //doc.text(`ID Detalle: ${p.id_detalle}`, 5, y + 20);
 
-        doc.setFont("helvetica", "bold");
-        doc.text("DATOS DEL CLIENTE", 5, y);
-        doc.setFont("helvetica", "normal");
-        y += 5;
-        doc.text(`Nombre: ${p.nombre_cliente}`, 5, y);
-        y += 5;
-        doc.text(`DNI: ${p.dni_cliente?.trim() ? p.dni_cliente : "Sin DNI"}`, 5, y);
-        y += 6;
+      y += 20;
 
-        doc.setDrawColor(150, 150, 150);
-        doc.setLineWidth(0.4);
-        doc.line(5, y, 75, y);
-        y += 5;
+      // Línea separadora añadida antes de DATOS DEL CLIENTE
+      doc.setDrawColor(150, 150, 150);
+      doc.setLineWidth(0.4);
+      doc.line(5, y, 75, y);
+      y += 5;
 
-        doc.setFont("helvetica", "bold");
-        doc.text("DETALLE DEL PAGO DE SUSCRIPCION", 5, y);
-        doc.setFont("helvetica", "normal");
-        y += 5;
+      doc.setFont("helvetica", "bold");
+      doc.text("DATOS DEL CLIENTE", 5, y);
+      doc.setFont("helvetica", "normal");
+      y += 5;
+      doc.text(`Nombre: ${p.nombre_cliente}`, 5, y);
+      y += 5;
+      doc.text(`DNI: ${p.dni_cliente?.trim() ? p.dni_cliente : "Sin DNI"}`, 5, y);
+      y += 6;
 
-        doc.setFont("helvetica", "bold");
-        doc.text("PLAN", 5, y);
-        doc.text("MONTO", 30, y);
-        doc.text("F.REG", 48, y);
-        doc.text("F.VENC", 66, y);
-        doc.setFont("helvetica", "normal");
-        y += 4;
+      doc.setDrawColor(150, 150, 150);
+      doc.setLineWidth(0.4);
+      doc.line(5, y, 75, y);
+      y += 5;
 
-        const planLines = doc.splitTextToSize(p.nombre_plan, 25);
-        planLines.forEach((line, index) => {
-          doc.text(line, 5, y + index * 4);
-        });
+      doc.setFont("helvetica", "bold");
+      doc.text("DETALLE DEL PAGO DE SUSCRIPCION", 5, y);
+      doc.setFont("helvetica", "normal");
+      y += 5;
 
-        const linesUsed = planLines.length;
-        doc.text(`S/ ${parseFloat(p.precio).toFixed(2)}`, 30, y);
-        doc.text(new Date(p.fecha_reg).toLocaleDateString("es-PE"), 48, y);
-        doc.text(new Date(p.fecha_venc).toLocaleDateString("es-PE"), 66, y);
+      // Agregar método de pago aquí
+      const metodoPago = p.metodo_pago === 1 || p.metodo_pago === "1" 
+        ? "Efectivo" 
+        : p.metodo_pago === 2 || p.metodo_pago === "2" 
+          ? "Yape/Plin" 
+          : "Desconocido";
+      
+      doc.setFont("helvetica", "bold");
+      doc.text(`METODO DE PAGO: ${metodoPago}`, 5, y);
+      doc.setFont("helvetica", "normal");
+      y += 5;
 
-        y += 4 * linesUsed;
+      doc.setFont("helvetica", "bold");
+      doc.text("PLAN", 5, y);
+      doc.text("MONTO", 30, y);
+      doc.text("F.REG", 48, y);
+      doc.text("F.VENC", 66, y);
+      doc.setFont("helvetica", "normal");
+      y += 4;
 
-        doc.setDrawColor(150, 150, 150);
-        doc.setLineWidth(0.4);
-        doc.line(5, y, 75, y);
-        y += 4;
+      const planLines = doc.splitTextToSize(p.nombre_plan, 25);
+      planLines.forEach((line, index) => {
+        doc.text(line, 5, y + index * 4);
+      });
 
-        doc.setFont("helvetica", "bold");
-        doc.text(`Estado: ${p.estado === 1 || p.estado === "1" ? "PAGADO" : "PENDIENTE"}`, 5, y);
-        y += 5;
+      const linesUsed = planLines.length;
+      doc.text(`S/ ${parseFloat(p.precio).toFixed(2)}`, 30, y);
+      doc.text(new Date(p.fecha_reg).toLocaleDateString("es-PE"), 48, y);
+      doc.text(new Date(p.fecha_venc).toLocaleDateString("es-PE"), 66, y);
 
-        doc.setDrawColor(100, 100, 100);
-        doc.setLineWidth(0.6);
-        doc.line(5, y, 75, y);
+      y += 4 * linesUsed;
 
-        doc.setFontSize(7);
-        doc.text("Gracias por su preferencia", 5, y + 5);
-        doc.text("Este documento es válido como comprobante de pago", 5, y + 9);
+      doc.setDrawColor(150, 150, 150);
+      doc.setLineWidth(0.4);
+      doc.line(5, y, 75, y);
+      y += 4;
 
-        const pdfBlob = doc.output("blob");
-        const pdfUrl = URL.createObjectURL(pdfBlob);
-        window.open(pdfUrl, "_blank");
-        
-      } catch (error) {
-        console.error("Error al generar boleta:", error);
-      }
-    };
+      doc.setFont("helvetica", "bold");
+      doc.text(`Estado: ${p.estado === 1 || p.estado === "1" ? "PAGADO" : "PENDIENTE"}`, 5, y);
+      y += 5;
 
-    logo.onerror = () => {
-      console.error("No se pudo cargar el logo");
-    };
+      doc.setDrawColor(100, 100, 100);
+      doc.setLineWidth(0.6);
+      doc.line(5, y, 75, y);
+
+      doc.setFontSize(7);
+      doc.text("Gracias por su preferencia", 5, y + 5);
+      doc.text("Este documento es válido como comprobante de pago", 5, y + 9);
+
+      const pdfBlob = doc.output("blob");
+      const pdfUrl = URL.createObjectURL(pdfBlob);
+      window.open(pdfUrl, "_blank");
+      
+    } catch (error) {
+      console.error("Error al generar boleta:", error);
+    }
   };
+
+  logo.onerror = () => {
+    console.error("No se pudo cargar el logo");
+  };
+};
 
   const limpiarFiltros = () => {
     setFecha("");
