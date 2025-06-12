@@ -13,7 +13,7 @@ const DetalleplanesList = ({ detalleplanes, seleccionar, eliminar, clientes, pla
   const [busqueda, setBusqueda] = useState("");
   const [fecha, setFecha] = useState("");
   const elementosPorPagina = 5;
-  const { user } = useContext(AuthContext); // Obtenemos el usuario del contexto
+  const { user } = useContext(AuthContext); 
 
 
   const obtenerClienteNombre = (id) => {

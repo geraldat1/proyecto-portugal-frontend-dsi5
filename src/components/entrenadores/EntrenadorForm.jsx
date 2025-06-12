@@ -73,13 +73,27 @@ const EntrenadorForm = ({ show, handleClose, agregar, actualizar, entrenadorSele
 
     const nuevoEntrenador = { nombre, apellido, telefono, correo, direccion};
 
-    if (entrenadorSeleccionado) {
-      actualizar(entrenadorSeleccionado.id,{
+     if (entrenadorSeleccionado) {
+      actualizar(entrenadorSeleccionado.id, {
         ...nuevoEntrenador,
         estado: parseInt(estado) 
       });
+      Swal.fire({
+        icon: "info",
+        title: "Registro actualizado",
+        text: "El entrenador fue actualizado correctamente.",
+        timer: 2000,
+        showConfirmButton: false,
+      });
     } else {
       agregar(nuevoEntrenador);
+      Swal.fire({
+        icon: "success",
+        title: "Entrenador agregado",
+        text: "El entrenador fue registrado exitosamente.",
+        timer: 2000,
+        showConfirmButton: false,
+      });
     }
 
     setNombre("");
