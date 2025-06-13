@@ -221,7 +221,6 @@ const PlanForm = ({ show, handleClose, agregar, actualizar, planSeleccionado, pl
                 <option value="2">Mensual</option>
                 <option value="3">Trimestral</option>
                 <option value="4">Anual</option>
-                <option value="5">Promoción</option>
               </Form.Select>
               <Form.Control.Feedback type="invalid">
                 {errores.condicion}

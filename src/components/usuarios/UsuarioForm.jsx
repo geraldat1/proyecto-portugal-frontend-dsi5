@@ -81,14 +81,14 @@ const UsuarioForm = ({
     }
 
     // Modo cambiar contraseña
-    if (modo === "password") {
-      if (!claveActual.trim()) nuevosErrores.claveActual = "Ingrese su contraseña actual";
-      if (!nuevaClave.trim()) nuevosErrores.nuevaClave = "Ingrese la nueva contraseña";
-      else if (nuevaClave.length < 6) nuevosErrores.nuevaClave = "La nueva contraseña debe tener al menos 6 caracteres";
-      if (!confirmarClave.trim()) nuevosErrores.confirmarClave = "Confirme la nueva contraseña";
-      else if (nuevaClave !== confirmarClave) nuevosErrores.confirmarClave = "Las contraseñas no coinciden";
-    }
-
+  if (modo === "password") {
+    if (!claveActual.trim()) nuevosErrores.claveActual = "Ingrese su contraseña actual";
+    if (!nuevaClave.trim()) nuevosErrores.nuevaClave = "Ingrese la nueva contraseña";
+    else if (nuevaClave.length < 6) nuevosErrores.nuevaClave = "La contraseña debe tener al menos 6 caracteres";
+    if (!confirmarClave.trim()) nuevosErrores.confirmarClave = "Confirme la nueva contraseña";
+    else if (nuevaClave !== confirmarClave) nuevosErrores.confirmarClave = "Las contraseñas no coinciden";
+  }
+  
     // Modo agregar/actualizar usuario (por defecto)
     if (!modo) {
       if (!usuario.trim()) nuevosErrores.usuario = "El usuario es obligatorio";
@@ -98,8 +98,10 @@ const UsuarioForm = ({
       } else if (!/\S+@\S+\.\S+/.test(correo)) {
         nuevosErrores.correo = "El correo no es válido";
       }
-      if (!usuarioSeleccionado && !clave.trim()) {
-        nuevosErrores.clave = "La clave es obligatoria";
+        if (!usuarioSeleccionado && !clave.trim()) {
+      nuevosErrores.clave = "La contraseña es obligatoria";
+      } else if (!usuarioSeleccionado && clave.length < 6) {
+        nuevosErrores.clave = "La contraseña debe tener al menos 6 caracteres";
       }
       if (!telefono.trim()) {
         nuevosErrores.telefono = "El teléfono es obligatorio";
@@ -111,7 +113,9 @@ const UsuarioForm = ({
       } else if (!["1", "2"].includes(rol)) {
         nuevosErrores.rol = "El rol debe ser Administrador o Empleado";
       }
-      if (usuarioSeleccionado && clave.trim() && clave !== confirmarClaveActualizar) {
+       if (usuarioSeleccionado && clave.trim() && clave.length < 6) {
+      nuevosErrores.clave = "La contraseña debe tener al menos 6 caracteres";
+      } else if (usuarioSeleccionado && clave.trim() && clave !== confirmarClaveActualizar) {
         nuevosErrores.confirmarClaveActualizar = "Las contraseñas no coinciden";
       }
     }

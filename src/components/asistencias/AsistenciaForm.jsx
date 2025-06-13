@@ -124,14 +124,15 @@ const AsistenciaForm = ({ show, handleClose, agregar, actualizar, asistenciaSele
 
 
   return (
-<Modal 
-  show={show} 
-  onHide={handleClose}
-  backdrop="static"
-  keyboard={false}
-  size="lg"
-  centered
+<Modal
+   show={show}
+      onHide={handleClose}
+      backdrop="static"
+      keyboard={false}
+      size="lg"
+      centered
 >
+
   <Modal.Header closeButton className="bg-light">
     <Modal.Title className="fw-bold">
       {asistenciaSeleccionada ? (
